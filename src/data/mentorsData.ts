@@ -1,0 +1,211 @@
+export interface Mentor {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  specialization: string;
+  domain:
+    | "Java Backend"
+    | "MERN"
+    | "React"
+    | "AWS"
+    | "Azure"
+    | "Cyber Security"
+    | "SAP"
+    | "Salesforce"
+    | "Power BI"
+    | "Networking";
+  exp: string;
+  rating: number;
+  reviewsCount: number;
+  studentsCount: string;
+  image: string;
+  skills: string[];
+  languages: string[];
+  linkedin: string;
+  bio: string;
+  coursesTaught: string[];
+}
+
+export const MENTORS_DATA: Mentor[] = [
+  {
+    id: "rajesh-kumar",
+    name: "Rajesh Kumar",
+    role: "Principal Backend Architect",
+    company: "Ex-Amazon",
+    specialization: "Java Backend & Distributed Microservices",
+    domain: "Java Backend",
+    exp: "12+ Years",
+    rating: 4.96,
+    reviewsCount: 420,
+    studentsCount: "2,400+",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["Java 21", "Spring Boot 3.x", "Microservices", "Apache Kafka", "Docker", "AWS"],
+    languages: ["English", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Ex-Amazon architect specializing in high-throughput distributed transaction engines and 1:1 systems coaching.",
+    coursesTaught: ["Java Backend Development", "Spring Microservices", "Distributed Systems System Design"],
+  },
+  {
+    id: "vikram-nair",
+    name: "Vikram Nair",
+    role: "Lead Full Stack Engineer",
+    company: "Ex-Razorpay",
+    specialization: "MERN Stack, Next.js 15 & Real-Time SaaS",
+    domain: "MERN",
+    exp: "10+ Years",
+    rating: 4.95,
+    reviewsCount: 380,
+    studentsCount: "2,100+",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["React 19", "Node.js", "Express", "MongoDB", "Next.js 15", "WebSockets"],
+    languages: ["English", "Hindi", "Malayalam"],
+    linkedin: "https://linkedin.com",
+    bio: "Built scalable payment checkout infrastructure at Razorpay. Passionate about 1:1 modern full-stack web mentoring.",
+    coursesTaught: ["MERN Full Stack Bootcamp", "Next.js Full Stack SaaS", "Real-Time Chat & Collaboration Apps"],
+  },
+  {
+    id: "priya-sundaram",
+    name: "Priya Sundaram",
+    role: "Senior Frontend Systems Architect",
+    company: "Ex-Atlassian",
+    specialization: "Modern React 19, TypeScript & Design Systems",
+    domain: "React",
+    exp: "11+ Years",
+    rating: 4.98,
+    reviewsCount: 310,
+    studentsCount: "1,850+",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["React 19", "TypeScript", "Tailwind CSS", "Design Systems", "Web Vitals", "Vitest"],
+    languages: ["English", "Tamil", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Core contributor to enterprise UI component libraries. Mentors students in building production-grade frontend architectures.",
+    coursesTaught: ["Modern React 19 Mastery", "TypeScript Advanced Patterns", "Enterprise UI Systems"],
+  },
+  {
+    id: "amitav-sengupta",
+    name: "Amitav Sengupta",
+    role: "Lead Cloud Solutions Architect",
+    company: "AWS Certified Solution Architect",
+    specialization: "AWS Cloud Infrastructure, Serverless & Terraform",
+    domain: "AWS",
+    exp: "13+ Years",
+    rating: 4.94,
+    reviewsCount: 290,
+    studentsCount: "1,600+",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["AWS Solutions Architect", "Terraform", "Serverless", "Kubernetes", "IAM Security", "CI/CD"],
+    languages: ["English", "Bengali", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Certified AWS Architect with over a decade of experience designing fault-tolerant multi-region cloud infrastructures.",
+    coursesTaught: ["AWS Solutions Architect Associate", "AWS Cloud Practitioner", "AWS Developer Associate"],
+  },
+  {
+    id: "sneha-deshmukh",
+    name: "Sneha Deshmukh",
+    role: "Enterprise Cloud & DevOps Consultant",
+    company: "Ex-Microsoft Partner",
+    specialization: "Microsoft Azure Architecture & Hybrid Cloud",
+    domain: "Azure",
+    exp: "10+ Years",
+    rating: 4.92,
+    reviewsCount: 250,
+    studentsCount: "1,400+",
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["Azure AZ-104", "Azure AZ-305", "Entra ID", "Azure DevOps", "ARM Templates", "Cost Optimization"],
+    languages: ["English", "Marathi", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Microsoft Certified Azure Solutions Architect Expert who trains working engineers for Azure certifications and enterprise migrations.",
+    coursesTaught: ["Azure Administrator (AZ-104)", "Azure Solutions Architect (AZ-305)", "Azure Fundamentals (AZ-900)"],
+  },
+  {
+    id: "rohan-kulkarni",
+    name: "Rohan Kulkarni",
+    role: "Chief Cyber Security Researcher",
+    company: "Ex-FireEye / CISSP",
+    specialization: "Cyber Security, Ethical Hacking & SOC Threat Hunting",
+    domain: "Cyber Security",
+    exp: "12+ Years",
+    rating: 4.97,
+    reviewsCount: 340,
+    studentsCount: "1,950+",
+    image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["CompTIA Security+", "CEH v12", "CISSP", "Wireshark", "Burp Suite", "SOC SIEM Analysis"],
+    languages: ["English", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Veteran penetration tester and ethical hacker guiding students through real cyber warfare simulations, threat analysis, and certification prep.",
+    coursesTaught: ["Certified Ethical Hacker (CEH)", "CompTIA Security+", "CISSP & CISM Prep"],
+  },
+  {
+    id: "venkat-ramanathan",
+    name: "Venkat Ramanathan",
+    role: "Principal SAP Functional Architect",
+    company: "Ex-Accenture ERP Practice",
+    specialization: "SAP S/4HANA (FICO, MM, SD) & ABAP Integration",
+    domain: "SAP",
+    exp: "14+ Years",
+    rating: 4.93,
+    reviewsCount: 275,
+    studentsCount: "1,350+",
+    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["SAP FICO", "SAP MM", "SAP SD", "SAP S/4HANA", "ABAP on HANA", "ERP Workflow"],
+    languages: ["English", "Telugu", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Led multimillion-dollar SAP ERP global implementations. Helps consultants master SAP modules through hands-on system access.",
+    coursesTaught: ["SAP FICO Consultant Track", "SAP MM & SD Integration", "SAP ABAP for Developers"],
+  },
+  {
+    id: "meera-krishnan",
+    name: "Meera Krishnan",
+    role: "Salesforce Technical Architect",
+    company: "Certified SFDC Application Architect",
+    specialization: "Salesforce Admin, Platform Developer & Lightning Web Components",
+    domain: "Salesforce",
+    exp: "10+ Years",
+    rating: 4.96,
+    reviewsCount: 320,
+    studentsCount: "1,700+",
+    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["Salesforce Admin (ADM-201)", "Apex & Triggers", "LWC Components", "Sales Cloud", "Service Cloud", "SOQL"],
+    languages: ["English", "Hindi", "Kannada"],
+    linkedin: "https://linkedin.com",
+    bio: "Over a decade building enterprise Salesforce CRM custom apps, automation flows, and coaching students toward 100% exam pass rates.",
+    coursesTaught: ["Salesforce Administrator", "Salesforce Platform Developer (PD1)", "Salesforce Lightning Development"],
+  },
+  {
+    id: "divya-menon",
+    name: "Divya Menon",
+    role: "Principal Data & BI Strategist",
+    company: "Ex-Microsoft / PL-300 Certified",
+    specialization: "Power BI, Tableau, Advanced SQL & Business Intelligence",
+    domain: "Power BI",
+    exp: "11+ Years",
+    rating: 4.96,
+    reviewsCount: 410,
+    studentsCount: "2,200+",
+    image: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["Power BI (PL-300)", "DAX Modeling", "Tableau Desktop", "Advanced SQL", "ETL Pipelines", "Executive KPIs"],
+    languages: ["English", "Hindi", "Malayalam"],
+    linkedin: "https://linkedin.com",
+    bio: "Created business intelligence systems for Fortune 100 leaders. Specializes in turning raw data into executive visual decision engines.",
+    coursesTaught: ["Microsoft Power BI Data Analyst", "Tableau Desktop & Business Analytics", "Advanced SQL for Analytics"],
+  },
+  {
+    id: "tariq-mansoori",
+    name: "Tariq Mansoori",
+    role: "Principal Network Infrastructure Engineer",
+    company: "Cisco CCIE & Fortinet Certified",
+    specialization: "Enterprise Routing, Cisco CCNA/CCNP & Fortinet Firewalls",
+    domain: "Networking",
+    exp: "13+ Years",
+    rating: 4.94,
+    reviewsCount: 260,
+    studentsCount: "1,500+",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces&auto=format",
+    skills: ["Cisco CCNA (200-301)", "Cisco CCNP Enterprise", "BGP / OSPF", "Fortinet NSE 4", "Juniper JNCIA", "Packet Tracer"],
+    languages: ["English", "Urdu", "Hindi"],
+    linkedin: "https://linkedin.com",
+    bio: "Network infrastructure architect with over a decade of ISP and data center routing experience. Hands-on packet analysis specialist.",
+    coursesTaught: ["Cisco CCNA 200-301 Mastery", "Cisco CCNP Enterprise Infrastructure", "Fortinet NSE Security"],
+  },
+];

@@ -1,52 +1,159 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import DashboardSidebar, { SidebarItem } from "../components/DashboardSidebar";
+import NotificationDropdown from "../components/NotificationDropdown";
+import { ALL_COURSES, Course } from "../data/coursesData";
+import { MENTORS_DATA, Mentor } from "../data/mentorsData";
+import { leadService, Lead, LeadStatus } from "../services/leadService";
 import { I } from "../components/Icons";
-import { leadService, Lead, LeadStatus, LeadStats } from "../services/leadService";
+
+interface StudentRecord {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  course: string;
+  status: "Active" | "Completed" | "Pending";
+  enrolledDate: string;
+}
+
+const INITIAL_STUDENTS: StudentRecord[] = [
+  { id: "std-1", name: "Aditya Sharma", email: "aditya.sharma@krtech.edu", phone: "+91 98765 43210", course: "Java Backend with Spring Boot", status: "Active", enrolledDate: "Aug 15, 2026" },
+  { id: "std-2", name: "Kavya Patel", email: "kavya.patel@gmail.com", phone: "+91 98234 56789", course: "MERN Stack Mastery Bootcamp", status: "Active", enrolledDate: "Aug 20, 2026" },
+  { id: "std-3", name: "Siddharth Verma", email: "sid.verma@outlook.com", phone: "+91 97123 45678", course: "AWS Solutions Architect Associate", status: "Completed", enrolledDate: "Jun 10, 2026" },
+  { id: "std-4", name: "Meenakshi Iyer", email: "meenakshi.iyer@gmail.com", phone: "+91 99876 54321", course: "Microsoft Azure Administrator (AZ-104)", status: "Active", enrolledDate: "Aug 28, 2026" },
+  { id: "std-5", name: "Rohan Deshmukh", email: "rohan.desh@techmail.com", phone: "+91 96543 21098", course: "Cyber Security & CEH v12", status: "Pending", enrolledDate: "Sep 02, 2026" },
+  { id: "std-6", name: "Ananya Roy", email: "ananya.roy@yahoo.com", phone: "+91 95432 10987", course: "Microsoft Power BI Data Analyst", status: "Active", enrolledDate: "Jul 18, 2026" },
+];
 
 export default function AdminDashboardPage() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<string>("dashboard");
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [stats, setStats] = useState<LeadStats>({
-    totalLeads: 0,
-    todayLeads: 0,
-    demoScheduled: 0,
-    followUpsPending: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const [students, setStudents] = useState<StudentRecord[]>(INITIAL_STUDENTS);
+  const [coursesList, setCoursesList] = useState<Course[]>(ALL_COURSES);
+  const [mentorsList, setMentorsList] = useState<Mentor[]>(MENTORS_DATA);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
-  const fetchLeads = async () => {
-    setLoading(true);
-    try {
-      const data = await leadService.getAllLeads();
-      const currentStats = await leadService.getLeadStats();
-      setLeads(data);
-      setStats(currentStats);
-    } catch (e) {
-      console.error("Error fetching leads", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Modals
+  const [courseModal, setCourseModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [courseForm, setCourseForm] = useState({ title: "", category: "Java Backend", price: "₹12,999", mentor: "Rajesh Kumar", duration: "6 Months" });
+
+  const [mentorModal, setMentorModal] = useState(false);
+  const [mentorForm, setMentorForm] = useState({ name: "", specialization: "", company: "Ex-Google", exp: "10+ Years", domain: "Java Backend" as const });
+
+  const [uploadModal, setUploadModal] = useState(false);
+  const [uploadType, setUploadType] = useState<"Notes" | "Lecture" | "PDF">("Notes");
+  const [uploadTitle, setUploadTitle] = useState("");
+
+  const sidebarItems: SidebarItem[] = [
+    { key: "dashboard", label: "Dashboard", icon: "📊" },
+    { key: "students", label: "Students", icon: "🎓", count: `${students.length}` },
+    { key: "courses", label: "Courses", icon: "📚", count: `${coursesList.length}` },
+    { key: "mentors", label: "Mentors", icon: "⚡", count: `${mentorsList.length}` },
+    { key: "leads", label: "Demo Leads", icon: "📋", count: `${leads.length}` },
+    { key: "resources", label: "Resources", icon: "📥" },
+    { key: "certificates", label: "Certificates", icon: "🏆" },
+    { key: "settings", label: "Settings", icon: "⚙️" },
+  ];
 
   useEffect(() => {
-    fetchLeads();
+    leadService.getAllLeads().then((data) => setLeads(data));
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: LeadStatus) => {
     const updated = await leadService.updateLeadStatus(id, newStatus);
     if (updated) {
       setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
-      const currentStats = await leadService.getLeadStats();
-      setStats(currentStats);
-      if (selectedLead?.id === id) {
-        setSelectedLead({ ...selectedLead, status: newStatus });
-      }
     }
   };
 
-  // Filter & Search Logic
+  // Course Add/Edit/Delete
+  const handleSaveCourse = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!courseForm.title.trim()) return;
+
+    if (editingCourse) {
+      setCoursesList((prev) =>
+        prev.map((c) => (c.id === editingCourse.id ? { ...c, ...courseForm } : c))
+      );
+    } else {
+      const newCourse: Course = {
+        id: `course-${Date.now()}`,
+        title: courseForm.title,
+        category: courseForm.category,
+        categoryGroup: "Software Development",
+        duration: courseForm.duration,
+        students: "1.2K",
+        rating: "4.9",
+        level: "Beginner",
+        mentor: courseForm.mentor,
+        mentorCompany: "Ex-Tech Lead",
+        mentorExp: "10+ Years",
+        language: "English & Hindi",
+        price: courseForm.price,
+        originalPrice: "₹24,999",
+        badge: "New",
+        image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
+        features: ["1:1 Live Coding", "Capstone Real Project", "Resume Review"],
+        roadmap: [
+          { week: "Week 1-2", title: "Fundamentals", topics: ["Core Syntax", "Design Patterns"], milestone: "Foundation Build" },
+          { week: "Week 3-4", title: "Advanced", topics: ["Frameworks", "Deployment"], milestone: "Production Release" },
+        ],
+      };
+      setCoursesList((prev) => [newCourse, ...prev]);
+    }
+    setCourseModal(false);
+    setEditingCourse(null);
+    setCourseForm({ title: "", category: "Java Backend", price: "₹12,999", mentor: "Rajesh Kumar", duration: "6 Months" });
+  };
+
+  const handleDeleteCourse = (id: string) => {
+    if (confirm("Are you sure you want to delete this course?")) {
+      setCoursesList((prev) => prev.filter((c) => c.id !== id));
+    }
+  };
+
+  // Mentor Add
+  const handleSaveMentor = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mentorForm.name.trim()) return;
+    const newM: Mentor = {
+      id: `mentor-${Date.now()}`,
+      name: mentorForm.name,
+      role: "Lead Architect",
+      company: mentorForm.company,
+      specialization: mentorForm.specialization,
+      domain: mentorForm.domain,
+      exp: mentorForm.exp,
+      rating: 4.95,
+      reviewsCount: 150,
+      studentsCount: "800+",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format",
+      skills: ["Enterprise Systems", "1:1 Live Code Review"],
+      languages: ["English", "Hindi"],
+      linkedin: "https://linkedin.com",
+      bio: "Industry veteran training engineers with 10+ years of enterprise experience.",
+      coursesTaught: [mentorForm.specialization],
+    };
+    setMentorsList((prev) => [newM, ...prev]);
+    setMentorModal(false);
+    setMentorForm({ name: "", specialization: "", company: "Ex-Google", exp: "10+ Years", domain: "Java Backend" });
+  };
+
+  // Upload simulation
+  const handleUploadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadTitle.trim()) return;
+    alert(`✓ Successfully uploaded ${uploadType}: "${uploadTitle}" to the student resource portal.`);
+    setUploadModal(false);
+    setUploadTitle("");
+  };
+
+  // Filter leads
   const filteredLeads = leads.filter((l) => {
     const matchStatus = statusFilter === "All" || l.status === statusFilter;
     const q = searchQuery.toLowerCase().trim();
@@ -54,547 +161,653 @@ export default function AdminDashboardPage() {
       !q ||
       l.name.toLowerCase().includes(q) ||
       l.course.toLowerCase().includes(q) ||
-      l.phone.toLowerCase().includes(q) ||
-      l.email.toLowerCase().includes(q);
+      l.phone.toLowerCase().includes(q);
     return matchStatus && matchQuery;
   });
 
-  const getStatusBadge = (status: LeadStatus) => {
-    switch (status) {
-      case "New":
-        return { bg: "#EFF6FF", color: "#1D4ED8", border: "#BFDBFE", dot: "#3B82F6" };
-      case "Contacted":
-        return { bg: "#FEF3C7", color: "#B45309", border: "#FDE68A", dot: "#F59E0B" };
-      case "Scheduled":
-        return { bg: "#EDE9FE", color: "#6D28D9", border: "#DDD6FE", dot: "#7C3AED" };
-      case "Completed":
-        return { bg: "#DCFCE7", color: "#15803D", border: "#BBF7D0", dot: "#22C55E" };
-      default:
-        return { bg: "#F3F4F6", color: "#4B5563", border: "#E5E7EB", dot: "#9CA3AF" };
-    }
-  };
-
   return (
-    <main style={{ paddingTop: 90, minHeight: "100vh", background: "#F8F7FC", paddingBottom: 80 }}>
-      <div className="container-xl">
+    <main className="pt-20 min-h-screen bg-slate-900 text-gray-100 flex flex-col md:flex-row">
+      {/* Reusable Sidebar */}
+      <DashboardSidebar
+        role="admin"
+        activeTab={activeTab}
+        onTabChange={(key) => setActiveTab(key)}
+        items={sidebarItems}
+      />
+
+      {/* Main Content Area */}
+      <section className="flex-1 p-6 md:p-8 overflow-y-auto max-h-[calc(100vh-80px)]">
         {/* Top Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 16,
-            marginBottom: 32,
-            paddingBottom: 20,
-            borderBottom: "1px solid #E5E7EB",
-          }}
-        >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span className="badge badge-purple">Admin Control Panel</span>
-              <span style={{ fontSize: 12, color: "#10B981", fontWeight: 600 }}>● Live Backend Store</span>
-            </div>
-            <h1
-              style={{
-                fontFamily: "Poppins, sans-serif",
-                fontWeight: 800,
-                fontSize: "clamp(1.6rem, 3.5vw, 2.2rem)",
-                color: "#0F0A1E",
-                marginTop: 6,
-              }}
-            >
-              Demo Leads & Inquiries Dashboard
+            <h1 className="font-sans font-extrabold text-2xl md:text-3xl text-white">
+              Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-purple-400">Portal</span>
             </h1>
+            <p className="text-xs text-gray-400 mt-1">
+              Operations Control Center · Welcome back, <strong className="text-gray-200">{user?.name || "Admin Lead"}</strong>
+            </p>
           </div>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div className="flex items-center gap-3">
+            <NotificationDropdown isDark={true} />
             <button
-              onClick={fetchLeads}
-              className="btn-ghost"
-              style={{ fontSize: 13, padding: "9px 16px", borderRadius: 12 }}
+              type="button"
+              onClick={() => {
+                setEditingCourse(null);
+                setCourseForm({ title: "", category: "Java Backend", price: "₹12,999", mentor: "Rajesh Kumar", duration: "6 Months" });
+                setCourseModal(true);
+              }}
+              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              ↻ Refresh Data
+              <span>+</span> Add New Course
             </button>
-            <Link
-              to="/free-demo"
-              className="btn-primary"
-              style={{ fontSize: 13, padding: "9px 18px", borderRadius: 12, textDecoration: "none" }}
-            >
-              <I.Plus /> New Demo Booking
-            </Link>
           </div>
         </div>
 
         {/* ─────────────────────────────────────────────────────────────────────────────
-            1. Stats Cards
+            TAB: DASHBOARD OVERVIEW (Cards + Tables)
         ───────────────────────────────────────────────────────────────────────────── */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-            gap: 18,
-            marginBottom: 36,
-          }}
-        >
-          {[
-            { label: "Total Leads", val: stats.totalLeads, icon: <I.Users />, color: "#7C3AED", bg: "#EDE9FE" },
-            { label: "Today's Leads", val: stats.todayLeads, icon: <I.Sparkles />, color: "#0891B2", bg: "#CFFAFE" },
-            { label: "Demo Scheduled", val: stats.demoScheduled, icon: <I.Calendar />, color: "#10B981", bg: "#D1FAE5" },
-            { label: "Follow Ups Pending", val: stats.followUpsPending, icon: <I.Clock />, color: "#F59E0B", bg: "#FEF3C7" },
-          ].map((s, idx) => (
-            <div
-              key={idx}
-              className="card"
-              style={{
-                padding: "22px 24px",
-                borderRadius: 20,
-                background: "white",
-                border: "1.5px solid #EDE9FE",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                boxShadow: "0 4px 20px rgba(124,58,237,0.04)",
-              }}
-            >
-              <div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#6B7280" }}>{s.label}</span>
-                <div
-                  style={{
-                    fontFamily: "Poppins, sans-serif",
-                    fontWeight: 800,
-                    fontSize: 28,
-                    color: "#0F0A1E",
-                    marginTop: 4,
-                  }}
-                >
-                  {s.val}
+        {activeTab === "dashboard" && (
+          <div className="space-y-8">
+            {/* 4 Admin Stat Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800">
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                  <span>Total Students</span>
+                  <span className="text-emerald-400 font-bold">15,420</span>
                 </div>
+                <div className="text-2xl font-extrabold text-white font-sans mb-1">
+                  15,420 <span className="text-xs font-normal text-emerald-400">+12% this mo</span>
+                </div>
+                <div className="text-[11px] text-gray-400">Enrolled across 1:1 tracks</div>
               </div>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                  background: s.bg,
-                  color: s.color,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {s.icon}
+
+              <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800">
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                  <span>Demo Bookings</span>
+                  <span className="text-purple-400 font-bold">{leads.length} Leads</span>
+                </div>
+                <div className="text-2xl font-extrabold text-white font-sans mb-1">
+                  {leads.length} <span className="text-xs font-normal text-purple-300">Total in CRM</span>
+                </div>
+                <div className="text-[11px] text-gray-400">Active evaluation requests</div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800">
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                  <span>Active Courses</span>
+                  <span className="text-cyan-400 font-bold">{coursesList.length} Tracks</span>
+                </div>
+                <div className="text-2xl font-extrabold text-white font-sans mb-1">
+                  {coursesList.length} <span className="text-xs font-normal text-cyan-300">Live Programs</span>
+                </div>
+                <div className="text-[11px] text-gray-400">7 Certification domains</div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800">
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                  <span>Expert Mentors</span>
+                  <span className="text-amber-400 font-bold">{mentorsList.length} Leads</span>
+                </div>
+                <div className="text-2xl font-extrabold text-white font-sans mb-1">
+                  {mentorsList.length} <span className="text-xs font-normal text-amber-300">Architects</span>
+                </div>
+                <div className="text-[11px] text-gray-400">10+ Years Avg Experience</div>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────────────
-            2. Search & Status Filter Controls
-        ───────────────────────────────────────────────────────────────────────────── */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 20,
-            padding: "20px 24px",
-            border: "1.5px solid #EDE9FE",
-            marginBottom: 24,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 16,
-            boxShadow: "0 4px 20px rgba(124,58,237,0.04)",
-          }}
-        >
-          {/* Search bar */}
-          <div
-            style={{
-              flex: 1,
-              minWidth: 280,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "10px 16px",
-              borderRadius: 12,
-              background: "#F9FAFB",
-              border: "1px solid #E5E7EB",
-            }}
-          >
-            <I.Search />
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by Name, Course, Phone, or Email..."
-              style={{
-                flex: 1,
-                border: "none",
-                outline: "none",
-                fontSize: 14,
-                fontFamily: "Inter, sans-serif",
-                background: "transparent",
-              }}
-            />
-            {searchQuery && (
+            {/* Quick Actions Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button
-                onClick={() => setSearchQuery("")}
-                style={{ background: "transparent", border: "none", cursor: "pointer", color: "#9CA3AF" }}
-              >
-                <I.Close />
-              </button>
-            )}
-          </div>
-
-          {/* Filter Tabs */}
-          <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
-            {["All", "New", "Contacted", "Scheduled", "Completed"].map((st) => (
-              <button
-                key={st}
-                onClick={() => setStatusFilter(st)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 10,
-                  fontSize: 12,
-                  fontFamily: "Poppins, sans-serif",
-                  fontWeight: statusFilter === st ? 700 : 500,
-                  cursor: "pointer",
-                  border: statusFilter === st ? "1.5px solid #7C3AED" : "1px solid #E5E7EB",
-                  background: statusFilter === st ? "#EDE9FE" : "white",
-                  color: statusFilter === st ? "#7C3AED" : "#4B5563",
-                  transition: "all 0.15s ease",
-                  whiteSpace: "nowrap",
+                type="button"
+                onClick={() => {
+                  setUploadType("Notes");
+                  setUploadModal(true);
                 }}
+                className="p-4 bg-slate-950/80 hover:bg-slate-900 border border-purple-500/30 rounded-2xl text-left transition-all cursor-pointer"
               >
-                {st}
+                <div className="text-xl mb-1">📝</div>
+                <h4 className="text-xs font-bold text-white">Upload Notes / PDF</h4>
+                <p className="text-[11px] text-gray-400">Distribute study handbooks to students</p>
               </button>
-            ))}
-          </div>
-        </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────────────
-            3. Leads Table
-        ───────────────────────────────────────────────────────────────────────────── */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 24,
-            border: "1.5px solid #EDE9FE",
-            overflow: "hidden",
-            boxShadow: "0 10px 30px rgba(124,58,237,0.06)",
-          }}
-        >
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: "#F8F7FF", borderBottom: "1.5px solid #EDE9FE", color: "#6B7280" }}>
-                  <th style={{ padding: "16px 20px", fontWeight: 700 }}>Lead Name</th>
-                  <th style={{ padding: "16px 20px", fontWeight: 700 }}>Contact Info</th>
-                  <th style={{ padding: "16px 20px", fontWeight: 700 }}>Interested Course</th>
-                  <th style={{ padding: "16px 20px", fontWeight: 700 }}>Preferred Slot</th>
-                  <th style={{ padding: "16px 20px", fontWeight: 700 }}>Status</th>
-                  <th style={{ padding: "16px 20px", fontWeight: 700 }}>Date</th>
-                  <th style={{ padding: "16px 20px", fontWeight: 700, textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
+              <button
+                type="button"
+                onClick={() => {
+                  setUploadType("Lecture");
+                  setUploadModal(true);
+                }}
+                className="p-4 bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 rounded-2xl text-left transition-all cursor-pointer"
+              >
+                <div className="text-xl mb-1">🎥</div>
+                <h4 className="text-xs font-bold text-white">Upload Recorded Lecture</h4>
+                <p className="text-[11px] text-gray-400">Add 1:1 session replay to video archive</p>
+              </button>
 
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={7} style={{ padding: "40px 20px", textAlign: "center", color: "#6B7280" }}>
-                      Loading lead data from backend service...
-                    </td>
-                  </tr>
-                ) : filteredLeads.length > 0 ? (
-                  filteredLeads.map((lead) => {
-                    const stStyle = getStatusBadge(lead.status);
-                    return (
-                      <tr
-                        key={lead.id}
-                        style={{
-                          borderBottom: "1px solid #F3F4F6",
-                          transition: "background 0.15s ease",
-                        }}
-                      >
-                        {/* Name */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ fontFamily: "Poppins, sans-serif", fontWeight: 700, color: "#0F0A1E" }}>
-                            {lead.name}
-                          </div>
-                          {lead.message && (
-                            <div
-                              style={{
-                                fontSize: 11,
-                                color: "#6B7280",
-                                marginTop: 2,
-                                maxWidth: 180,
-                                textOverflow: "ellipsis",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              💬 {lead.message}
-                            </div>
-                          )}
-                        </td>
+              <button
+                type="button"
+                onClick={() => setMentorModal(true)}
+                className="p-4 bg-slate-950/80 hover:bg-slate-900 border border-amber-500/30 rounded-2xl text-left transition-all cursor-pointer"
+              >
+                <div className="text-xl mb-1">⚡</div>
+                <h4 className="text-xs font-bold text-white">Add Expert Mentor</h4>
+                <p className="text-[11px] text-gray-400">Onboard new senior industry architect</p>
+              </button>
+            </div>
 
-                        {/* Phone & Email */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ fontWeight: 600, color: "#374151" }}>{lead.phone}</div>
-                          <div style={{ fontSize: 11, color: "#9CA3AF" }}>{lead.email}</div>
-                        </td>
+            {/* Students Table Preview */}
+            <div className="p-6 rounded-3xl bg-slate-950/80 border border-slate-800">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-sans font-bold text-base text-white">Active Students List</h3>
+                <button type="button" onClick={() => setActiveTab("students")} className="text-xs text-purple-400 hover:text-purple-300 font-semibold">
+                  View All ({students.length}) →
+                </button>
+              </div>
 
-                        {/* Course */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <span
-                            style={{
-                              fontFamily: "Poppins, sans-serif",
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: "#7C3AED",
-                              background: "#EDE9FE",
-                              padding: "4px 10px",
-                              borderRadius: 8,
-                            }}
-                          >
-                            {lead.course}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="border-b border-slate-800 text-gray-400 uppercase text-[10px]">
+                    <tr>
+                      <th className="pb-3">Name</th>
+                      <th className="pb-3">Email</th>
+                      <th className="pb-3">Phone</th>
+                      <th className="pb-3">Course</th>
+                      <th className="pb-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {students.slice(0, 4).map((std) => (
+                      <tr key={std.id} className="hover:bg-slate-900/50">
+                        <td className="py-3 font-bold text-white">{std.name}</td>
+                        <td className="py-3 text-gray-400">{std.email}</td>
+                        <td className="py-3 text-gray-400">{std.phone}</td>
+                        <td className="py-3 text-purple-300 truncate max-w-xs">{std.course}</td>
+                        <td className="py-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            std.status === "Active" ? "bg-emerald-500/20 text-emerald-400" : "bg-cyan-500/20 text-cyan-400"
+                          }`}>
+                            {std.status}
                           </span>
                         </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-                        {/* Preferred Time */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <div style={{ color: "#374151" }}>{lead.timeSlot}</div>
-                          <div style={{ fontSize: 11, color: "#9CA3AF" }}>{lead.timezone}</div>
+            {/* Demo Leads Table Preview */}
+            <div className="p-6 rounded-3xl bg-slate-950/80 border border-slate-800">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-sans font-bold text-base text-white">Recent Demo Bookings & Leads</h3>
+                <button type="button" onClick={() => setActiveTab("leads")} className="text-xs text-purple-400 hover:text-purple-300 font-semibold">
+                  Manage Leads ({leads.length}) →
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="border-b border-slate-800 text-gray-400 uppercase text-[10px]">
+                    <tr>
+                      <th className="pb-3">Name</th>
+                      <th className="pb-3">Course</th>
+                      <th className="pb-3">Preferred Time</th>
+                      <th className="pb-3">Status</th>
+                      <th className="pb-3">Contact</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {leads.slice(0, 4).map((l) => (
+                      <tr key={l.id} className="hover:bg-slate-900/50">
+                        <td className="py-3 font-bold text-white">{l.name}</td>
+                        <td className="py-3 text-purple-300 truncate max-w-xs">{l.course}</td>
+                        <td className="py-3 text-gray-400">{l.preferredTime || "Evening"}</td>
+                        <td className="py-3">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">
+                            {l.status}
+                          </span>
                         </td>
-
-                        {/* Status dropdown */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <select
-                            value={lead.status}
-                            onChange={(e) => handleStatusChange(lead.id, e.target.value as LeadStatus)}
-                            style={{
-                              padding: "6px 12px",
-                              borderRadius: 99,
-                              fontSize: 12,
-                              fontFamily: "Poppins, sans-serif",
-                              fontWeight: 700,
-                              background: stStyle.bg,
-                              color: stStyle.color,
-                              border: `1px solid ${stStyle.border}`,
-                              outline: "none",
-                              cursor: "pointer",
-                            }}
+                        <td className="py-3">
+                          <a
+                            href={`https://wa.me/${l.phone.replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[11px] no-underline inline-block"
                           >
-                            <option value="New">● New</option>
-                            <option value="Contacted">● Contacted</option>
-                            <option value="Scheduled">● Scheduled</option>
-                            <option value="Completed">● Completed</option>
-                          </select>
-                        </td>
-
-                        {/* Date */}
-                        <td style={{ padding: "16px 20px", color: "#6B7280", fontSize: 12 }}>
-                          {new Date(lead.createdAt).toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </td>
-
-                        {/* Actions */}
-                        <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-                            <a
-                              href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(lead.name)}%2C%20regarding%20your%20KR%20Tech%20demo%20for%20${encodeURIComponent(lead.course)}...`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                padding: "6px 10px",
-                                borderRadius: 8,
-                                background: "#DCFCE7",
-                                color: "#16A34A",
-                                fontSize: 11,
-                                fontWeight: 700,
-                                textDecoration: "none",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 4,
-                              }}
-                            >
-                              <I.MessageCircle /> WhatsApp
-                            </a>
-                            <button
-                              onClick={() => setSelectedLead(lead)}
-                              style={{
-                                padding: "6px 10px",
-                                borderRadius: 8,
-                                background: "#F3F4F6",
-                                color: "#374151",
-                                fontSize: 11,
-                                fontWeight: 600,
-                                border: "none",
-                                cursor: "pointer",
-                              }}
-                            >
-                              View
-                            </button>
-                          </div>
+                            Contact
+                          </a>
                         </td>
                       </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={7} style={{ padding: "40px 20px", textAlign: "center", color: "#6B7280" }}>
-                      No leads found matching your search or status filter.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          4. Quick View Lead Modal
-      ───────────────────────────────────────────────────────────────────────────── */}
-      {selectedLead && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(15,10,30,0.75)",
-            backdropFilter: "blur(10px)",
-            padding: 20,
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setSelectedLead(null);
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 520,
-              background: "white",
-              borderRadius: 24,
-              overflow: "hidden",
-              boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
-              animation: "scaleIn 0.25s ease-out",
-            }}
-          >
-            <div
-              style={{
-                padding: "20px 24px",
-                background: "linear-gradient(135deg,#7C3AED,#06B6D4)",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: 99 }}>
-                  Lead Details #{selectedLead.id}
-                </span>
-                <h3 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 18, marginTop: 4 }}>
-                  {selectedLead.name}
-                </h3>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: STUDENTS TABLE
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "students" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-extrabold text-white font-sans">Students Management</h2>
+              <span className="text-xs text-gray-400">{students.length} Enrolled</span>
+            </div>
+
+            <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800 overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-slate-800 text-gray-400 uppercase text-[10px]">
+                  <tr>
+                    <th className="pb-3">Name</th>
+                    <th className="pb-3">Email</th>
+                    <th className="pb-3">Phone</th>
+                    <th className="pb-3">Course</th>
+                    <th className="pb-3">Enrolled</th>
+                    <th className="pb-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {students.map((std) => (
+                    <tr key={std.id} className="hover:bg-slate-900/50">
+                      <td className="py-3 font-bold text-white">{std.name}</td>
+                      <td className="py-3 text-gray-400">{std.email}</td>
+                      <td className="py-3 text-gray-400">{std.phone}</td>
+                      <td className="py-3 text-purple-300">{std.course}</td>
+                      <td className="py-3 text-gray-400">{std.enrolledDate}</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          std.status === "Active" ? "bg-emerald-500/20 text-emerald-400" : "bg-cyan-500/20 text-cyan-400"
+                        }`}>
+                          {std.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: COURSES MANAGEMENT
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "courses" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-extrabold text-white font-sans">Course Management</h2>
               <button
-                onClick={() => setSelectedLead(null)}
-                style={{
-                  background: "rgba(255,255,255,0.2)",
-                  border: "none",
-                  borderRadius: 10,
-                  width: 32,
-                  height: 32,
-                  color: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
+                type="button"
+                onClick={() => {
+                  setEditingCourse(null);
+                  setCourseForm({ title: "", category: "Java Backend", price: "₹12,999", mentor: "Rajesh Kumar", duration: "6 Months" });
+                  setCourseModal(true);
                 }}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl"
               >
-                <I.Close />
+                + Add Course
               </button>
             </div>
 
-            <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 14 }}>
-              <div>
-                <span style={{ fontSize: 11, color: "#9CA3AF", textTransform: "uppercase", fontWeight: 700 }}>Contact Info</span>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#0F0A1E", marginTop: 2 }}>
-                  📞 {selectedLead.phone} · ✉️ {selectedLead.email}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {coursesList.map((c) => (
+                <div key={c.id} className="p-5 bg-slate-950/80 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300">{c.category}</span>
+                      <span className="text-xs font-bold text-emerald-400">{c.price}</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-white mb-1 line-clamp-2">{c.title}</h3>
+                    <p className="text-xs text-gray-400 mb-3">Mentor: {c.mentor} · {c.duration}</p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-800 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCourse(c);
+                        setCourseForm({ title: c.title, category: c.category, price: c.price, mentor: c.mentor, duration: c.duration });
+                        setCourseModal(true);
+                      }}
+                      className="px-3 py-1 bg-slate-800 hover:bg-purple-600 text-gray-200 hover:text-white text-xs font-bold rounded-lg"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCourse(c.id)}
+                      className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-lg"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-              <div>
-                <span style={{ fontSize: 11, color: "#9CA3AF", textTransform: "uppercase", fontWeight: 700 }}>Course & Schedule</span>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#7C3AED", marginTop: 2 }}>
-                  {selectedLead.course}
-                </div>
-                <div style={{ fontSize: 12, color: "#4B5563", marginTop: 2 }}>
-                  Slot: {selectedLead.timeSlot} ({selectedLead.timezone})
-                </div>
-              </div>
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: MENTORS MANAGEMENT
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "mentors" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-extrabold text-white font-sans">Mentor Management</h2>
+              <button
+                type="button"
+                onClick={() => setMentorModal(true)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl"
+              >
+                + Add Mentor
+              </button>
+            </div>
 
-              {selectedLead.message && (
-                <div style={{ background: "#F9FAFB", padding: "12px 14px", borderRadius: 12, border: "1px solid #E5E7EB" }}>
-                  <span style={{ fontSize: 11, color: "#6B7280", fontWeight: 700 }}>Message / Goals:</span>
-                  <p style={{ fontSize: 13, color: "#374151", margin: "4px 0 0" }}>{selectedLead.message}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {mentorsList.map((m) => (
+                <div key={m.id} className="p-5 bg-slate-950/80 rounded-3xl border border-slate-800 flex items-start gap-3.5">
+                  <img src={m.image} alt={m.name} className="w-12 h-12 rounded-2xl object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-white truncate">{m.name}</h3>
+                    <p className="text-xs text-purple-300 truncate">{m.specialization}</p>
+                    <p className="text-[11px] text-gray-400 mt-1">{m.company} · {m.exp} Exp</p>
+                  </div>
                 </div>
-              )}
+              ))}
+            </div>
+          </div>
+        )}
 
-              <div>
-                <span style={{ fontSize: 11, color: "#9CA3AF", textTransform: "uppercase", fontWeight: 700 }}>Status</span>
-                <div style={{ marginTop: 6 }}>
-                  <select
-                    value={selectedLead.status}
-                    onChange={(e) => handleStatusChange(selectedLead.id, e.target.value as LeadStatus)}
-                    style={{
-                      padding: "8px 14px",
-                      borderRadius: 10,
-                      border: "1.5px solid #DDD6FE",
-                      fontFamily: "Poppins, sans-serif",
-                      fontWeight: 700,
-                      fontSize: 13,
-                      outline: "none",
-                    }}
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: DEMO LEADS
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "leads" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <h2 className="text-xl font-extrabold text-white font-sans">Demo Leads Management ({filteredLeads.length})</h2>
+              <div className="flex gap-2">
+                {["All", "New", "Scheduled", "Completed"].map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setStatusFilter(st)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      statusFilter === st ? "bg-purple-600 text-white" : "bg-slate-800 text-gray-400"
+                    }`}
                   >
-                    <option value="New">New Lead</option>
-                    <option value="Contacted">Contacted</option>
-                    <option value="Scheduled">Demo Scheduled</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                <a
-                  href={`tel:${selectedLead.phone}`}
-                  className="btn-ghost flex-1"
-                  style={{ justifyContent: "center", textDecoration: "none" }}
-                >
-                  <I.Phone /> Call Lead
-                </a>
-                <a
-                  href={`https://wa.me/${selectedLead.phone.replace(/[^0-9]/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary flex-1"
-                  style={{
-                    justifyContent: "center",
-                    textDecoration: "none",
-                    background: "linear-gradient(135deg,#16A34A 0%,#15803D 100%)",
-                  }}
-                >
-                  <I.MessageCircle /> WhatsApp
-                </a>
+                    {st}
+                  </button>
+                ))}
               </div>
             </div>
+
+            <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800 overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-slate-800 text-gray-400 uppercase text-[10px]">
+                  <tr>
+                    <th className="pb-3">Name</th>
+                    <th className="pb-3">Course</th>
+                    <th className="pb-3">Preferred Time</th>
+                    <th className="pb-3">Phone</th>
+                    <th className="pb-3">Status</th>
+                    <th className="pb-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {filteredLeads.map((l) => (
+                    <tr key={l.id} className="hover:bg-slate-900/50">
+                      <td className="py-3 font-bold text-white">{l.name}</td>
+                      <td className="py-3 text-purple-300 max-w-xs truncate">{l.course}</td>
+                      <td className="py-3 text-gray-400">{l.preferredTime || "Evening"}</td>
+                      <td className="py-3 text-gray-400">{l.phone}</td>
+                      <td className="py-3">
+                        <select
+                          value={l.status}
+                          onChange={(e) => handleStatusChange(l.id, e.target.value as LeadStatus)}
+                          className="bg-slate-800 text-white text-[11px] rounded px-2 py-1 border border-slate-700 outline-none"
+                        >
+                          <option value="New">New</option>
+                          <option value="Contacted">Contacted</option>
+                          <option value="Scheduled">Scheduled</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      </td>
+                      <td className="py-3">
+                        <a
+                          href={`https://wa.me/${l.phone.replace(/[^0-9]/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[11px] no-underline inline-block"
+                        >
+                          Contact
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: RESOURCES MANAGEMENT
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "resources" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-extrabold text-white font-sans">Resource Management</h2>
+              <button
+                type="button"
+                onClick={() => setUploadModal(true)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl"
+              >
+                + Upload New Asset
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800">
+                <div className="text-3xl mb-2">📝</div>
+                <h3 className="text-sm font-bold text-white mb-1">Upload Notes</h3>
+                <p className="text-xs text-gray-400 mb-4">Publish markdown or PDF lecture notes for students.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadType("Notes");
+                    setUploadModal(true);
+                  }}
+                  className="w-full py-2 bg-purple-600/80 hover:bg-purple-600 text-white text-xs font-bold rounded-xl"
+                >
+                  Upload Notes
+                </button>
+              </div>
+
+              <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800">
+                <div className="text-3xl mb-2">🎥</div>
+                <h3 className="text-sm font-bold text-white mb-1">Upload Recorded Lecture</h3>
+                <p className="text-xs text-gray-400 mb-4">Post 1080p class video replay to student dashboard.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadType("Lecture");
+                    setUploadModal(true);
+                  }}
+                  className="w-full py-2 bg-cyan-600/80 hover:bg-cyan-600 text-white text-xs font-bold rounded-xl"
+                >
+                  Upload Lecture
+                </button>
+              </div>
+
+              <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800">
+                <div className="text-3xl mb-2">📄</div>
+                <h3 className="text-sm font-bold text-white mb-1">Upload PDF Handbook</h3>
+                <p className="text-xs text-gray-400 mb-4">Distribute cheat sheets and interview roadmaps.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUploadType("PDF");
+                    setUploadModal(true);
+                  }}
+                  className="w-full py-2 bg-amber-600/80 hover:bg-amber-600 text-white text-xs font-bold rounded-xl"
+                >
+                  Upload PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: CERTIFICATES & SETTINGS
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "certificates" && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-extrabold text-white font-sans">Certificate Issuance Control</h2>
+            <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800 max-w-xl">
+              <p className="text-xs text-gray-400 mb-4">
+                Automated certificate generation is enabled. All students who pass capstone code defense are issued a verifiable credential ID.
+              </p>
+              <Link to="/certificates" className="px-4 py-2 bg-purple-600 text-white text-xs font-bold rounded-xl no-underline inline-block">
+                View Certificate Gallery →
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "settings" && (
+          <div className="p-6 bg-slate-950/80 rounded-3xl border border-slate-800 max-w-xl space-y-4">
+            <h2 className="text-xl font-extrabold text-white font-sans">Admin Settings</h2>
+            <div>
+              <label className="text-xs font-bold text-gray-400 block mb-1">Platform Name</label>
+              <input defaultValue="KR Tech — 1:1 Live Coding Academy" className="w-full p-2.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-white" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 block mb-1">Admin Notification Email</label>
+              <input defaultValue="admin@krtech.edu" className="w-full p-2.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-white" />
+            </div>
+            <button
+              type="button"
+              onClick={() => alert("Admin settings updated successfully!")}
+              className="px-5 py-2.5 bg-purple-600 text-white text-xs font-bold rounded-xl"
+            >
+              Save Configuration
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* Course Add/Edit Modal */}
+      {courseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setCourseModal(false)}>
+          <div className="w-full max-w-md bg-slate-900 border border-purple-500/30 rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-white mb-4">{editingCourse ? "Edit Course" : "Add New Course"}</h3>
+            <form onSubmit={handleSaveCourse} className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Course Title</label>
+                <input
+                  required
+                  value={courseForm.title}
+                  onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })}
+                  placeholder="e.g. Master React 19 Architecture"
+                  className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Category</label>
+                <input
+                  value={courseForm.category}
+                  onChange={(e) => setCourseForm({ ...courseForm, category: e.target.value })}
+                  className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1">Price</label>
+                  <input
+                    value={courseForm.price}
+                    onChange={(e) => setCourseForm({ ...courseForm, price: e.target.value })}
+                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1">Duration</label>
+                  <input
+                    value={courseForm.duration}
+                    onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })}
+                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-3">
+                <button type="button" onClick={() => setCourseModal(false)} className="px-4 py-2 text-xs text-gray-400">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl">Save Course</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Mentor Add Modal */}
+      {mentorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setMentorModal(false)}>
+          <div className="w-full max-w-md bg-slate-900 border border-purple-500/30 rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-white mb-4">Add Expert Mentor</h3>
+            <form onSubmit={handleSaveMentor} className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Mentor Name</label>
+                <input
+                  required
+                  value={mentorForm.name}
+                  onChange={(e) => setMentorForm({ ...mentorForm, name: e.target.value })}
+                  placeholder="e.g. Arvind Swaminathan"
+                  className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Specialization</label>
+                <input
+                  required
+                  value={mentorForm.specialization}
+                  onChange={(e) => setMentorForm({ ...mentorForm, specialization: e.target.value })}
+                  placeholder="e.g. AI & Generative AI Systems"
+                  className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-3">
+                <button type="button" onClick={() => setMentorModal(false)} className="px-4 py-2 text-xs text-gray-400">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl">Save Mentor</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Asset Upload Modal */}
+      {uploadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setUploadModal(false)}>
+          <div className="w-full max-w-md bg-slate-900 border border-purple-500/30 rounded-3xl p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-white mb-4">Upload {uploadType}</h3>
+            <form onSubmit={handleUploadSubmit} className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1">Asset Title / Document Name</label>
+                <input
+                  required
+                  value={uploadTitle}
+                  onChange={(e) => setUploadTitle(e.target.value)}
+                  placeholder={`e.g. ${uploadType === "Lecture" ? "Class #15: Kafka Dead Letter Queues" : "Kafka Architecture Guide.pdf"}`}
+                  className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none"
+                />
+              </div>
+              <div className="p-4 border-2 border-dashed border-slate-700 rounded-2xl text-center text-xs text-gray-400">
+                Drag & Drop file here or <span className="text-purple-400 font-bold">Browse Files</span>
+              </div>
+              <div className="flex justify-end gap-2 pt-3">
+                <button type="button" onClick={() => setUploadModal(false)} className="px-4 py-2 text-xs text-gray-400">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl">Publish Asset</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

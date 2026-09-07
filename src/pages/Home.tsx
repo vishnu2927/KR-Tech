@@ -1,7 +1,7 @@
 import Hero from "../components/Hero";
-import StatsBar from "../components/StatsBar";
-import UpcomingBatches from "../components/UpcomingBatches";
-import Services from "../components/Services";
+import StudentSuccessMetrics from "../components/StudentSuccessMetrics";
+import UpcomingLiveSessions from "../components/UpcomingLiveSessions";
+import LearningFeatures from "../components/LearningFeatures";
 import Courses from "../components/Courses";
 import ProfessionalCertifications from "../components/ProfessionalCertifications";
 import LearningJourney from "../components/LearningJourney";
@@ -20,9 +20,9 @@ export default function Home({ onOpenDemoModal }: { onOpenDemoModal: (courseOrMe
   return (
     <main>
       <Hero onOpenDemoModal={() => onOpenDemoModal()} />
-      <StatsBar />
-      <UpcomingBatches onOpenDemo={(course) => onOpenDemoModal(course)} />
-      <Services />
+      <StudentSuccessMetrics />
+      <UpcomingLiveSessions onJoinDemo={(course) => onOpenDemoModal(course)} />
+      <LearningFeatures />
       <Courses limit={4} showFilter={false} />
       <ProfessionalCertifications />
       <LearningJourney onOpenDemo={() => onOpenDemoModal()} />

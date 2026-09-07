@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import NotificationDropdown from "./NotificationDropdown";
 import { I } from "./Icons";
 
 interface NavbarProps {
@@ -14,6 +16,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => {
@@ -34,8 +37,10 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
   const navLinks = [
     { label: "Home", to: "/" },
     { label: "Courses", to: "/courses" },
-    { label: "Services", to: "/#services" },
-    { label: "Mentors", to: "/#mentors" },
+    { label: "Mentors", to: "/mentors" },
+    { label: "Dashboard", to: "/dashboard" },
+    { label: "Certificates", to: "/certificates" },
+    { label: "Resources", to: "/resources" },
     { label: "About", to: "/about" },
     { label: "Contact", to: "/contact" },
     { label: "Admin", to: "/admin" },
@@ -77,7 +82,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
           </Link>
 
           {/* Center Links */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden xl:flex items-center gap-1">
             {navLinks.map((l) => {
               if (l.to.startsWith("/#")) {
                 return (
@@ -113,28 +118,41 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2.5">
             <button
               onClick={() => setSearchOpen((v) => !v)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer"
               style={{
                 background: isSolid ? "#F5F3FF" : "rgba(255,255,255,0.14)",
                 color: isSolid ? "#7C3AED" : "rgba(255,255,255,0.9)",
                 border: "none",
-                cursor: "pointer",
               }}
               aria-label="Search"
             >
               <I.Search />
             </button>
 
-            <button
-              onClick={() => onOpenDemoModal && onOpenDemoModal()}
-              className={isSolid ? "btn-ghost" : "btn-ghost-white"}
-              style={{ padding: "9px 18px", fontSize: 13 }}
-            >
-              Login
-            </button>
+            {/* Notification Bell */}
+            <NotificationDropdown isDark={!isSolid} />
+
+            {user ? (
+              <Link
+                to={user.role === "admin" ? "/admin" : "/dashboard"}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-purple-200/40 bg-white/10 hover:bg-white/20 transition-all text-xs font-bold no-underline"
+                style={{ color: isSolid ? "#7C3AED" : "white" }}
+              >
+                <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-lg object-cover" />
+                <span className="truncate max-w-[100px]">{user.name.split(" ")[0]}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className={isSolid ? "btn-ghost" : "btn-ghost-white"}
+                style={{ padding: "8px 16px", fontSize: 13, textDecoration: "none" }}
+              >
+                Login
+              </Link>
+            )}
 
             <button
               onClick={() => {
@@ -142,9 +160,9 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                 else navigate("/free-demo");
               }}
               className="btn-primary"
-              style={{ padding: "10px 20px", fontSize: 13 }}
+              style={{ padding: "9px 18px", fontSize: 13 }}
             >
-              <I.Sparkles /> Book Free Demo
+              <I.Sparkles /> Book Demo
             </button>
           </div>
 
