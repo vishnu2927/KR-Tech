@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { I } from "./Icons";
 import SectionHeading from "./SectionHeading";
-import { ALL_COURSES } from "../data/coursesData";
+import { courseService, Course } from "../services/courseService";
 
 interface CertCategory {
   id: string;
@@ -96,8 +97,14 @@ const CERT_CATEGORIES: CertCategory[] = [
 ];
 
 export default function ProfessionalCertifications() {
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    courseService.getCourses().then(setCourses).catch(() => {});
+  }, []);
+
   const getCourseCount = (catGroup: string) => {
-    return ALL_COURSES.filter((c) => c.categoryGroup === catGroup).length;
+    return courses.filter((c) => c.categoryGroup === catGroup).length;
   };
 
   return (

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Mentor } from "../data/mentorsData";
+import { Mentor } from "../services/mentorService";
 import { I } from "./Icons";
 
 interface MentorCardProps {

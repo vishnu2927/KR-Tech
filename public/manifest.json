@@ -1,0 +1,19 @@
+{
+  "name": "KR Tech — One-on-One Live Tech Mentorship",
+  "short_name": "KR Tech",
+  "description": "India's premium coding academy with personalized 1:1 live training, project support, and placement mentoring.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F0A1E",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "tech"]
+}

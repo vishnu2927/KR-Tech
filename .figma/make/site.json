@@ -1,7 +1,8 @@
 {
-  "description": "KR Tech offers a modern EdTech platform for college students and professionals, providing coding courses, placement support, and personalized learning experiences.",
+  "title": "KR Tech — One-on-One Live Training & Project Support",
+  "description": "KR Tech offers a modern EdTech platform for college students and professionals, providing 1:1 live coding courses, placement support, and personalized learning experiences.",
   "robots": {
-    "index": false
+    "index": true
   },
   "accessibility": {
     "addBypassLinks": false,

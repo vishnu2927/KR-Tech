@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { I } from "../components/Icons";
+import SEO from "../components/common/SEO";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -58,7 +59,12 @@ export default function ContactPage() {
   ];
 
   return (
-    <main style={{ paddingTop: 90, minHeight: "100vh", background: "#FDFDFE" }}>
+    <SEO
+      title="Contact KR Tech — Learner Support & 1:1 Counseling"
+      description="Get in touch with KR Tech academic advisors. Toll-free support, direct WhatsApp chat, office visits, and 1:1 demo scheduling."
+      canonical="https://krtech.in/contact"
+    >
+      <main style={{ paddingTop: 90, minHeight: "100vh", background: "#FDFDFE" }}>
       {/* Header */}
       <section
         style={{
@@ -475,6 +481,23 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      {/* Google Maps Interactive Embed */}
+      <section className="container-xl" style={{ paddingBottom: 60 }}>
+        <div style={{ borderRadius: 24, overflow: "hidden", border: "1px solid #E5E7EB", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+          <iframe
+            title="KR Tech Global Learning Centre"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248849.886539092!2d77.49085449779313!3d12.953959988188047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+            width="100%"
+            height="320"
+            style={{ border: 0, display: "block" }}
+            allowFullScreen={false}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      </section>
     </main>
+    </SEO>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { I } from "./Icons";
 import SectionHeading from "./SectionHeading";
 
@@ -9,7 +9,7 @@ interface Resource {
   size: string;
   downloads: string;
   desc: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   color: string;
   bg: string;
 }

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { I } from "../components/Icons";
 import StatsBar from "../components/StatsBar";
 import Mentors from "../components/Mentors";
+import SEO from "../components/common/SEO";
 
 export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal: () => void }) {
   const values = [
@@ -36,7 +37,12 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal: () => 
   ];
 
   return (
-    <main style={{ paddingTop: 90, minHeight: "100vh" }}>
+    <SEO
+      title="About KR Tech — India's Premium 1:1 Live Coding Academy"
+      description="Learn about KR Tech's mission to revolutionize tech education through 1:1 live pairing, real-world microservices architectures, and 10+ year industry mentors."
+      canonical="https://krtech.in/about"
+    >
+      <main style={{ paddingTop: 90, minHeight: "100vh" }}>
       {/* Hero */}
       <section
         style={{
@@ -259,5 +265,6 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal: () => 
       {/* Mentors on about page */}
       <Mentors />
     </main>
+    </SEO>
   );
 }

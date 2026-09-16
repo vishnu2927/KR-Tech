@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { ALL_COURSES, CourseCard, Course } from "../components/Courses";
+import { CourseCard } from "../components/Courses";
+import { courseService, Course } from "../services/courseService";
 import { I } from "../components/Icons";
-import SectionHeading from "../components/SectionHeading";
+import SEO from "../components/common/SEO";
+import { SchemaBuilder } from "../utils/seo";
 
 export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (courseName?: string) => void }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +16,33 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [activeDetailsCourse, setActiveDetailsCourse] = useState<Course | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
+  const fetchCourses = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await courseService.getCourses();
+      setCourses(data);
+    } catch (err: any) {
+      setError(err?.message || "Failed to fetch live courses from MongoDB Atlas.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, selectedCategory, selectedLevel]);
 
   useEffect(() => {
     const s = searchParams.get("search");
@@ -44,7 +73,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
 
   const levels = ["All", "Beginner", "Intermediate", "Advanced"];
 
-  const filtered = ALL_COURSES.filter((course) => {
+  const filtered = courses.filter((course) => {
     // Category match
     let matchCat = false;
     if (selectedCategory === "All") {
@@ -89,6 +118,9 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
 
     return matchCat && matchLevel && matchQuery;
   });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+  const paginatedCourses = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const benefits = [
     {
@@ -149,7 +181,17 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
   ];
 
   return (
-    <main style={{ paddingTop: 80, minHeight: "100vh", background: "#FDFDFE" }}>
+    <SEO
+      title="55+ One-on-One Live Tech Courses & Vendor Certifications"
+      description="Explore 55+ technical courses in Java Backend, MERN Stack, AI, AWS, Azure, Cyber Security, SAP, and Salesforce. 1:1 Live mentorship with industry projects."
+      canonical="https://krtech.in/courses"
+      keywords="tech courses, 1:1 live training, java backend, spring boot, mern stack, aws certification, data engineering, cyber security"
+      structuredData={SchemaBuilder.getBreadcrumbSchema([
+        { name: "Home", url: "https://krtech.in/" },
+        { name: "Courses", url: "https://krtech.in/courses" },
+      ])}
+    >
+      <main style={{ paddingTop: 80, minHeight: "100vh", background: "#FDFDFE" }}>
       {/* ─────────────────────────────────────────────────────────────────────────────
           1. Hero Banner
       ───────────────────────────────────────────────────────────────────────────── */}
@@ -390,18 +432,118 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
       ───────────────────────────────────────────────────────────────────────────── */}
       <section style={{ paddingBottom: "70px" }}>
         <div className="container-xl">
-          {filtered.length > 0 ? (
+          {/* Loading Skeleton UI */}
+          {loading && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filtered.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  onViewDetails={(c) => setActiveDetailsCourse(c)}
-                  onBookDemo={(cName) => onOpenDemoModal(cName)}
-                />
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <div
+                  key={n}
+                  className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm animate-pulse flex flex-col gap-3"
+                  style={{ minHeight: 380 }}
+                >
+                  <div className="w-full h-44 bg-gray-200 rounded-2xl" />
+                  <div className="h-4 bg-gray-200 rounded-full w-24 mt-2" />
+                  <div className="h-6 bg-gray-200 rounded-lg w-5/6" />
+                  <div className="h-4 bg-gray-200 rounded-md w-full" />
+                  <div className="h-4 bg-gray-200 rounded-md w-3/4" />
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="h-6 bg-gray-200 rounded-md w-20" />
+                    <div className="h-9 bg-gray-200 rounded-xl w-28" />
+                  </div>
+                </div>
               ))}
             </div>
-          ) : (
+          )}
+
+          {/* Error State with Retry */}
+          {!loading && error && (
+            <div className="text-center py-12 px-6 bg-red-50 rounded-3xl border border-red-200 max-w-2xl mx-auto my-8">
+              <div className="text-3xl mb-3">⚠️</div>
+              <h3 className="font-bold text-lg text-red-900 mb-2">Unable to Load Live Courses</h3>
+              <p className="text-sm text-red-700 mb-5">{error}</p>
+              <button
+                type="button"
+                onClick={fetchCourses}
+                className="px-6 py-2.5 rounded-xl bg-red-600 text-white font-semibold text-sm hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
+              >
+                Retry Connection
+              </button>
+            </div>
+          )}
+
+          {/* Live Courses Grid */}
+          {!loading && !error && filtered.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {paginatedCourses.map((course) => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    onViewDetails={(c) => setActiveDetailsCourse(c)}
+                    onBookDemo={(cName) => onOpenDemoModal(cName)}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex items-center justify-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() => {
+                      setCurrentPage((prev) => Math.max(prev - 1, 1));
+                      window.scrollTo({ top: 400, behavior: "smooth" });
+                    }}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                      currentPage === 1
+                        ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                        : "border-purple-200 text-purple-700 bg-white hover:bg-purple-50 shadow-xs cursor-pointer"
+                    }`}
+                  >
+                    ← Previous
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        window.scrollTo({ top: 400, behavior: "smooth" });
+                      }}
+                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                        currentPage === pageNum
+                          ? "bg-purple-600 text-white shadow-md shadow-purple-200 border border-purple-600"
+                          : "bg-white text-gray-700 border border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    disabled={currentPage === totalPages}
+                    onClick={() => {
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                      window.scrollTo({ top: 400, behavior: "smooth" });
+                    }}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                      currentPage === totalPages
+                        ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                        : "border-purple-200 text-purple-700 bg-white hover:bg-purple-50 shadow-xs cursor-pointer"
+                    }`}
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && filtered.length === 0 && (
             <div
               style={{
                 textAlign: "center",
@@ -914,5 +1056,6 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
         </div>
       )}
     </main>
+    </SEO>
   );
 }

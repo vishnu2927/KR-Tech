@@ -23,6 +23,10 @@ export default function SignupPage() {
       setError("Please fill out all required fields.");
       return;
     }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match. Please verify.");
       return;
@@ -36,12 +40,12 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      await signup({ name, email, phone, course });
+      await signup({ name: name.trim(), email: email.trim(), phone: phone.trim(), course, password });
       setLoading(false);
       navigate("/dashboard");
-    } catch {
+    } catch (err: any) {
       setLoading(false);
-      setError("Registration failed. Please try again.");
+      setError(err.message || "Registration failed. Please try again.");
     }
   };
 

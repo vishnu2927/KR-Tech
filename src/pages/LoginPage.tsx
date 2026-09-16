@@ -26,34 +26,52 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const loggedUser = await login(email.trim(), password);
       setLoading(false);
-      if (email.toLowerCase().includes("admin")) {
+      // Admin redirect after login
+      if (loggedUser.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/dashboard");
       }
-    } catch {
+    } catch (err: any) {
       setLoading(false);
-      setError("Failed to sign in. Please check your credentials.");
+      setError(err.message || "Failed to sign in. Please verify your email and password.");
     }
   };
 
   const handleQuickLogin = async (role: "student" | "admin") => {
+    setError("");
     setLoading(true);
-    const demoEmail = role === "admin" ? "admin@krtech.edu" : "student@krtech.edu";
+    const demoEmail = role === "admin" ? "admin@krtech.com" : "student@krtech.edu";
+    const demoPass = role === "admin" ? "admin123" : "password123";
     setEmail(demoEmail);
-    setPassword("password123");
-    await login(demoEmail, "password123", role);
-    setLoading(false);
-    navigate(role === "admin" ? "/admin" : "/dashboard");
+    setPassword(demoPass);
+    try {
+      const loggedUser = await login(demoEmail, demoPass);
+      setLoading(false);
+      if (loggedUser.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      setLoading(false);
+      setError(err.message || "Login failed. Please verify credentials.");
+    }
   };
 
   const handleGoogleLogin = async () => {
+    setError("");
     setLoading(true);
-    await login("aditya.sharma@gmail.com", "google-oauth", "student");
-    setLoading(false);
-    navigate("/dashboard");
+    try {
+      const loggedUser = await login("student@krtech.edu", "password123");
+      setLoading(false);
+      navigate("/dashboard");
+    } catch {
+      setLoading(false);
+      setError("Social login: Please sign in with your email or register a new student account.");
+    }
   };
 
   return (

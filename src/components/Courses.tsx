@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { I } from "./Icons";
 import SectionHeading from "./SectionHeading";
-import { ALL_COURSES, Course } from "../data/coursesData";
+import { courseService, Course } from "../services/courseService";
 
-export { ALL_COURSES };
 export type { Course };
 
 export function CourseCard({
@@ -32,7 +31,7 @@ export function CourseCard({
       style={{ height: "100%" }}
     >
       {/* Thumbnail */}
-      <div className="relative h-44 w-full overflow-hidden bg-gray-100">
+      <Link to={`/courses/${course.id || course._id}`} className="block relative h-44 w-full overflow-hidden bg-gray-100">
         <img
           src={course.image}
           alt={course.title}
@@ -64,7 +63,7 @@ export function CourseCard({
             Recorded Included
           </span>
         </div>
-      </div>
+      </Link>
 
       {/* Card Body */}
       <div className="p-5 flex-1 flex flex-col justify-between">
@@ -80,9 +79,11 @@ export function CourseCard({
           </div>
 
           {/* Course Title */}
-          <h3 className="font-sans font-bold text-[15px] text-gray-900 leading-snug mb-2 line-clamp-2 min-h-[42px] group-hover:text-purple-700 transition-colors">
-            {course.title}
-          </h3>
+          <Link to={`/courses/${course.id || course._id}`} className="no-underline block">
+            <h3 className="font-sans font-bold text-[15px] text-gray-900 leading-snug mb-2 line-clamp-2 min-h-[42px] group-hover:text-purple-700 transition-colors">
+              {course.title}
+            </h3>
+          </Link>
 
           {/* Mentor Experience */}
           <div className="flex items-center justify-between text-xs text-gray-600 mb-3 pb-2.5 border-b border-gray-100">
@@ -135,8 +136,14 @@ export function CourseCard({
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => onViewDetails && onViewDetails(course)}
-              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-all text-center"
+              onClick={() => {
+                if (onViewDetails) {
+                  onViewDetails(course);
+                } else {
+                  navigate(`/courses/${course.id || course._id}`);
+                }
+              }}
+              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-all text-center cursor-pointer"
             >
               View Curriculum
             </button>
@@ -163,8 +170,37 @@ export default function Courses({
   showFilter?: boolean;
   categoryFilter?: string;
 }) {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryFilter || "All");
   const [activeDetailsCourse, setActiveDetailsCourse] = useState<Course | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await courseService.getCourses();
+        if (isMounted) {
+          setCourses(data);
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          setError(err.message || "Failed to load live courses");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const categories = [
     "All",
@@ -181,14 +217,21 @@ export default function Courses({
     "AI & ML",
   ];
 
-  const filtered = ALL_COURSES.filter((c) => {
+  const filtered = courses.filter((c) => {
     if (selectedCategory === "All") return true;
-    if (c.categoryGroup === selectedCategory) return true;
-    if (c.category === selectedCategory) return true;
+    if (c.categoryGroup?.toLowerCase() === selectedCategory.toLowerCase()) return true;
+    if (c.category?.toLowerCase() === selectedCategory.toLowerCase()) return true;
     return false;
   });
 
-  const displayCourses = limit ? filtered.slice(0, limit) : filtered;
+  const popularSorted = [...filtered].sort((a, b) => {
+    const aPop = (a.badge?.toLowerCase().includes("bestseller") || a.badge?.toLowerCase().includes("popular") || a.badge?.toLowerCase().includes("hot")) ? 1 : 0;
+    const bPop = (b.badge?.toLowerCase().includes("bestseller") || b.badge?.toLowerCase().includes("popular") || b.badge?.toLowerCase().includes("hot")) ? 1 : 0;
+    if (bPop !== aPop) return bPop - aPop;
+    return parseFloat(b.rating || "0") - parseFloat(a.rating || "0");
+  });
+
+  const displayCourses = limit ? popularSorted.slice(0, limit) : filtered;
 
   return (
     <section id="courses" className="py-20 bg-white">
@@ -199,7 +242,7 @@ export default function Courses({
             badgeClass="badge-cyan"
             title="Explore One-on-One"
             accent="Live Courses"
-            desc="Hands-on, project-based 1:1 curricula taught by industry mentors with 10+ years of experience."
+            desc="Hands-on, project-based 1:1 curricula taught by industry mentors with 10+ years of experience from MongoDB Atlas."
             center={false}
           />
           {limit && (
@@ -207,7 +250,7 @@ export default function Courses({
               to="/courses"
               className="btn-ghost flex items-center gap-1.5 self-start md:self-auto text-purple-700 font-semibold no-underline text-sm"
             >
-              View All {ALL_COURSES.length} Courses <I.ChevronRight />
+              View All {courses.length > 0 ? courses.length : "55"} Courses <I.ChevronRight />
             </Link>
           )}
         </div>
@@ -231,16 +274,51 @@ export default function Courses({
           </div>
         )}
 
-        {/* Responsive Grid: Desktop 4, Tablet 2, Mobile 1 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {displayCourses.map((c) => (
-            <CourseCard
-              key={c.id}
-              course={c}
-              onViewDetails={(course) => setActiveDetailsCourse(course)}
-            />
-          ))}
-        </div>
+        {/* Loading Skeleton */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: limit || 8 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm animate-pulse space-y-4"
+              >
+                <div className="h-44 bg-gray-200 rounded-2xl w-full" />
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-1/2" />
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                  <div className="h-5 bg-purple-100 rounded w-16" />
+                  <div className="h-8 bg-gray-200 rounded-xl w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 p-6 bg-rose-50 rounded-3xl border border-rose-200 max-w-lg mx-auto">
+            <p className="text-rose-700 font-semibold text-sm mb-3">⚠️ {error}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold shadow hover:bg-rose-700 cursor-pointer"
+            >
+              Retry Sync with Atlas
+            </button>
+          </div>
+        ) : displayCourses.length === 0 ? (
+          <div className="text-center py-12 text-gray-500 text-sm">
+            No courses found matching "{selectedCategory}".
+          </div>
+        ) : (
+          /* Responsive Grid: Desktop 4, Tablet 2, Mobile 1 */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {displayCourses.map((c) => (
+              <CourseCard
+                key={c.id || c._id}
+                course={c}
+                onViewDetails={(course) => setActiveDetailsCourse(course)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Curriculum / Details Modal */}

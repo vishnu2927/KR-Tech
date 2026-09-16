@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /cms
+Disallow: /cms/*
+
+Sitemap: https://krtech.in/sitemap.xml
+Host: https://krtech.in

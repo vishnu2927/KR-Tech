@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MENTORS_DATA } from "../data/mentorsData";
+import { mentorService, Mentor } from "../services/mentorService";
 import MentorCard from "../components/MentorCard";
 import { I } from "../components/Icons";
-import SectionHeading from "../components/SectionHeading";
+import SEO from "../components/common/SEO";
+import { SchemaBuilder } from "../utils/seo";
 
 export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (mentorOrCourse?: string) => void }) {
   const [selectedDomain, setSelectedDomain] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchMentors = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await mentorService.getMentors();
+      setMentors(data);
+    } catch (err: any) {
+      setError(err?.message || "Failed to load mentors from live API");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMentors();
+  }, []);
 
   const domainCategories = [
     "All",
@@ -23,7 +44,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
     "Networking",
   ];
 
-  const filteredMentors = MENTORS_DATA.filter((m) => {
+  const filteredMentors = mentors.filter((m) => {
     const matchDomain = selectedDomain === "All" || m.domain === selectedDomain;
     const q = searchQuery.trim().toLowerCase();
     const matchQuery =
@@ -38,7 +59,17 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
   });
 
   return (
-    <main className="pt-20 min-h-screen bg-gradient-to-b from-gray-50 via-white to-purple-50/20">
+    <SEO
+      title="Meet Expert Industry Mentors — Ex-Amazon, Razorpay & Google"
+      description="Connect 1-on-1 with senior tech mentors with 10+ years experience. Get personalized code reviews, system design coaching, and live project mentorship."
+      canonical="https://krtech.in/mentors"
+      keywords="tech mentors, 1:1 mentorship, coding mentor, code review, mock interviews, system design mentor, amazon engineer mentor"
+      structuredData={SchemaBuilder.getBreadcrumbSchema([
+        { name: "Home", url: "https://krtech.in/" },
+        { name: "Mentors", url: "https://krtech.in/mentors" },
+      ])}
+    >
+      <main className="pt-20 min-h-screen bg-gradient-to-b from-gray-50 via-white to-purple-50/20">
       {/* ─────────────────────────────────────────────────────────────────────────────
           1. Hero Section
       ───────────────────────────────────────────────────────────────────────────── */}
@@ -140,8 +171,52 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
             </Link>
           </div>
 
-          {/* 10 Mentors Grid (Desktop 3/4, Tablet 2, Mobile 1) */}
-          {filteredMentors.length > 0 ? (
+          {/* Loading Skeleton */}
+          {loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div
+                  key={n}
+                  className="bg-white rounded-3xl border border-purple-100 p-6 shadow-sm animate-pulse flex flex-col gap-4"
+                  style={{ minHeight: 340 }}
+                >
+                  <div className="h-20 bg-purple-100 rounded-2xl w-full" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gray-200" />
+                    <div className="flex-1">
+                      <div className="h-5 bg-gray-200 rounded-md w-3/4 mb-2" />
+                      <div className="h-4 bg-gray-200 rounded-md w-1/2" />
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 rounded-md w-full" />
+                  <div className="h-4 bg-gray-200 rounded-md w-4/5" />
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="h-6 bg-gray-200 rounded-full w-24" />
+                    <div className="h-9 bg-purple-200 rounded-xl w-32" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State with Retry */}
+          {!loading && error && (
+            <div className="text-center py-12 px-6 bg-red-50 rounded-3xl border border-red-200 max-w-2xl mx-auto my-8">
+              <div className="text-3xl mb-3">⚠️</div>
+              <h3 className="font-bold text-lg text-red-900 mb-2">Unable to Load Mentors</h3>
+              <p className="text-sm text-red-700 mb-5">{error}</p>
+              <button
+                type="button"
+                onClick={fetchMentors}
+                className="px-6 py-2.5 rounded-xl bg-red-600 text-white font-semibold text-sm hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
+              >
+                Retry Connection
+              </button>
+            </div>
+          )}
+
+          {/* Live Mentors Grid */}
+          {!loading && !error && filteredMentors.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMentors.map((mentor) => (
                 <MentorCard
@@ -153,7 +228,10 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
                 />
               ))}
             </div>
-          ) : (
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && filteredMentors.length === 0 && (
             <div className="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-purple-200">
               <div className="text-4xl mb-3">🔍</div>
               <h3 className="font-sans font-bold text-lg text-gray-900 mb-1">
@@ -168,7 +246,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
                   setSelectedDomain("All");
                   setSearchQuery("");
                 }}
-                className="px-4 py-2 bg-purple-600 text-white text-xs font-bold rounded-xl"
+                className="px-4 py-2 bg-purple-600 text-white text-xs font-bold rounded-xl cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -260,5 +338,6 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
         </div>
       </section>
     </main>
+    </SEO>
   );
 }
