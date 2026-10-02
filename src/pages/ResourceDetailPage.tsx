@@ -37,7 +37,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
         if (!isMounted) return;
 
         if (!item) {
-          setError("This resource could not be found in the KR Tech Atlas library.");
+          setError("This resource could not be found in the KR Global Learning Atlas library.");
           setLoading(false);
           return;
         }
@@ -102,7 +102,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
     if (!rawContent) {
       return (
         <div className="py-8 text-gray-500 italic text-sm">
-          No detailed markdown content available for this artifact. Please use the download button to access the full package.
+          No detailed markdown content available for this artifact. Please use the download button to access the full resource bundle.
         </div>
       );
     }
@@ -228,7 +228,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
 
   return (
     <SEO
-      title={`${resource.title} | Free Download | KR Tech`}
+      title={`${resource.title} | Free Download | KR Global Learning`}
       description={resource.description}
       canonical={`https://krtech.in/resources/${resource.id}`}
     >
@@ -257,7 +257,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
                   {resource.format} · {resource.fileSize}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                  ✓ Verified by {resource.author || "KR Tech Council"}
+                  ✓ Verified by {resource.author || "KR Global Learning Council"}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                   🔥 {resource.downloadsCount} Downloads
@@ -406,7 +406,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
                   </button>
                 </div>
 
-                {/* 1:1 Mentorship Card */}
+                {/* One-on-One Expert Mentorship Card */}
                 <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 text-white shadow-xl">
                   <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-purple-500/30 text-purple-300 border border-purple-400/30 mb-3">
                     Personalized Training

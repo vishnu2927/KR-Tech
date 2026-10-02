@@ -4,11 +4,11 @@ import { I } from "./Icons";
 export default function AIMentor() {
   const [msg, setMsg] = useState("");
   const [chat, setChat] = useState([
-    { from: "bot", text: "Hi! I'm Kira, your KR Tech AI Mentor. What would you like to learn or build today?" },
+    { from: "bot", text: "Hi! I'm Kira, your KR Global Learning AI Mentor. What would you like to learn or build today?" },
     { from: "user", text: "What's the best way to prepare for Java backend and Spring Boot?" },
     {
       from: "bot",
-      text: "Great question! Focus on: 1) Core Java (OOP, Collections, Streams), 2) Spring Boot internals & REST APIs, 3) Microservices & Docker, 4) Real projects. In KR Tech's 1:1 Live Training, our mentor guides you step-by-step with code reviews. Would you like a sample roadmap?",
+      text: "Great question! Focus on: 1) Core Java (OOP, Collections, Streams), 2) Spring Boot internals & REST APIs, 3) Microservices & Docker, 4) Real projects. In KR Global Learning's One-on-One Live Training, our mentor guides you step-by-step with code reviews. Would you like a sample roadmap?",
     },
   ]);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -21,7 +21,7 @@ export default function AIMentor() {
       { from: "user", text: userText },
       {
         from: "bot",
-        text: "That's a fantastic goal! With KR Tech's 1:1 mentorship, we create a personalized curriculum specifically around this. You can book a free demo class to discuss this with an expert mentor directly!",
+        text: "That's a fantastic goal! With KR Global Learning's One-on-One mentorship, we create a personalized curriculum specifically around this. You can book a free demo class to discuss this with an expert mentor directly!",
       },
     ]);
     setMsg("");
@@ -33,7 +33,7 @@ export default function AIMentor() {
     "Personalized study plan generation",
     "Code review and debugging assistance",
     "Conceptual explanations with step-by-step examples",
-    "Seamless transition to 1:1 human mentor sessions",
+    "Seamless transition to One-on-One human mentor sessions",
   ];
 
   return (
@@ -58,7 +58,7 @@ export default function AIMentor() {
             </h2>
             <p className="section-desc">
               Available 24/7, Kira helps you understand tough programming concepts, debug errors, plan study schedules,
-              and prepare for 1:1 live sessions.
+              and prepare for One-on-One live sessions.
             </p>
             <ul style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
               {feats.map((f, i) => (

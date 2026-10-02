@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { CourseCard } from "../components/Courses";
 import { courseService, Course } from "../services/courseService";
 import { I } from "../components/Icons";
+import SectionHeading from "../components/SectionHeading";
 import SEO from "../components/common/SEO";
 import { SchemaBuilder } from "../utils/seo";
 
@@ -56,19 +57,15 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
 
   const categories = [
     { label: "All", key: "All" },
-    { label: "Cloud", key: "Cloud" },
-    { label: "Cyber Security", key: "Cyber Security" },
+    { label: "Cloud & Cloud Architecture", key: "Cloud & Cloud Architecture" },
+    { label: "AI, Machine Learning & GenAI", key: "AI, Machine Learning & GenAI" },
+    { label: "Cybersecurity", key: "Cybersecurity" },
     { label: "Networking", key: "Networking" },
-    { label: "Microsoft", key: "Microsoft" },
+    { label: "Software Development", key: "Software Development" },
+    { label: "Microsoft & IT", key: "Microsoft & IT" },
     { label: "Data Analytics", key: "Data Analytics" },
     { label: "Project Management", key: "Project Management" },
-    { label: "Salesforce", key: "Salesforce" },
-    { label: "SAP", key: "SAP" },
-    { label: "Java Backend", key: "Java Backend" },
-    { label: "MERN Stack", key: "MERN Stack" },
-    { label: "Python", key: "Python" },
-    { label: "AI & ML", key: "AI & ML" },
-    { label: "DSA", key: "DSA" },
+    { label: "Enterprise Technologies", key: "Enterprise Technologies" },
   ];
 
   const levels = ["All", "Beginner", "Intermediate", "Advanced"];
@@ -76,28 +73,86 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
   const filtered = courses.filter((course) => {
     // Category match
     let matchCat = false;
+    const catLower = (course.category || "").toLowerCase();
+    const groupLower = (course.categoryGroup || "").toLowerCase();
+    const selLower = selectedCategory.toLowerCase();
+
     if (selectedCategory === "All") {
       matchCat = true;
-    } else if (selectedCategory === "Cloud" || selectedCategory === "Cloud Computing") {
-      matchCat = course.categoryGroup === "Cloud Computing" || course.category.toLowerCase().includes("cloud") || course.category.toLowerCase().includes("aws") || course.category.toLowerCase().includes("azure") || course.category.toLowerCase().includes("gcp");
-    } else if (selectedCategory === "Cyber Security") {
-      matchCat = course.categoryGroup === "Cyber Security" || course.category.toLowerCase().includes("security") || course.category.toLowerCase().includes("cyber");
-    } else if (selectedCategory === "Networking") {
-      matchCat = course.categoryGroup === "Networking" || course.category.toLowerCase().includes("network") || course.category.toLowerCase().includes("cisco");
-    } else if (selectedCategory === "Microsoft" || selectedCategory === "Microsoft & IT") {
-      matchCat = course.categoryGroup === "Microsoft & IT" || course.category.toLowerCase().includes("microsoft") || course.title.toLowerCase().includes("windows") || course.title.toLowerCase().includes("active directory");
-    } else if (selectedCategory === "Data Analytics" || selectedCategory === "Data & Analytics") {
-      matchCat = course.categoryGroup === "Data & Analytics" || course.category === "Data Science" || course.category.toLowerCase().includes("analytics") || course.category.toLowerCase().includes("power bi") || course.category.toLowerCase().includes("tableau");
-    } else if (selectedCategory === "Project Management" || selectedCategory === "Project Management & Agile") {
-      matchCat = course.categoryGroup === "Project Management" || course.category.toLowerCase().includes("project") || course.category.toLowerCase().includes("agile") || course.category.toLowerCase().includes("pmp");
-    } else if (selectedCategory === "Salesforce") {
-      matchCat = course.category.toLowerCase().includes("salesforce") || course.title.toLowerCase().includes("salesforce");
-    } else if (selectedCategory === "SAP") {
-      matchCat = course.category.toLowerCase().includes("sap") || course.title.toLowerCase().includes("sap");
-    } else if (selectedCategory === "Enterprise Technologies") {
-      matchCat = course.categoryGroup === "Enterprise Technologies";
+    } else if (selLower.includes("cloud")) {
+      matchCat =
+        groupLower.includes("cloud") ||
+        catLower.includes("cloud") ||
+        catLower.includes("aws") ||
+        catLower.includes("azure") ||
+        catLower.includes("gcp");
+    } else if (selLower.includes("ai") || selLower.includes("machine learning") || selLower.includes("genai")) {
+      matchCat =
+        groupLower.includes("ai") ||
+        groupLower.includes("machine learning") ||
+        catLower.includes("ai") ||
+        catLower.includes("machine learning") ||
+        catLower.includes("genai") ||
+        catLower.includes("generative ai") ||
+        catLower.includes("databricks");
+    } else if (selLower.includes("cyber") || selLower.includes("security")) {
+      matchCat =
+        groupLower.includes("cyber") ||
+        groupLower.includes("security") ||
+        catLower.includes("security") ||
+        catLower.includes("cyber") ||
+        catLower.includes("comptia") ||
+        catLower.includes("ceh") ||
+        catLower.includes("cissp") ||
+        catLower.includes("palo alto");
+    } else if (selLower.includes("network")) {
+      matchCat =
+        groupLower.includes("network") ||
+        catLower.includes("network") ||
+        catLower.includes("cisco") ||
+        catLower.includes("fortinet");
+    } else if (selLower.includes("microsoft") || selLower.includes("microsoft & it")) {
+      matchCat =
+        groupLower.includes("microsoft") ||
+        catLower.includes("microsoft") ||
+        course.title.toLowerCase().includes("windows") ||
+        course.title.toLowerCase().includes("active directory");
+    } else if (selLower.includes("data")) {
+      matchCat =
+        groupLower.includes("data") ||
+        catLower.includes("data") ||
+        catLower.includes("analytics") ||
+        catLower.includes("power bi") ||
+        catLower.includes("tableau");
+    } else if (selLower.includes("project")) {
+      matchCat =
+        groupLower.includes("project") ||
+        catLower.includes("project") ||
+        catLower.includes("agile") ||
+        catLower.includes("pmp") ||
+        catLower.includes("scrum");
+    } else if (selLower.includes("enterprise") || selLower.includes("salesforce") || selLower.includes("sap")) {
+      matchCat =
+        groupLower.includes("enterprise") ||
+        catLower.includes("enterprise") ||
+        catLower.includes("sap") ||
+        catLower.includes("salesforce") ||
+        catLower.includes("servicenow");
+    } else if (selLower.includes("software")) {
+      matchCat =
+        groupLower.includes("software") ||
+        catLower.includes("java") ||
+        catLower.includes("mern") ||
+        catLower.includes("react") ||
+        catLower.includes("node") ||
+        catLower.includes("python") ||
+        catLower.includes("dsa");
     } else {
-      matchCat = course.category.toLowerCase() === selectedCategory.toLowerCase() || course.categoryGroup.toLowerCase() === selectedCategory.toLowerCase();
+      matchCat =
+        catLower === selLower ||
+        groupLower === selLower ||
+        catLower.includes(selLower) ||
+        groupLower.includes(selLower);
     }
 
     // Level match
@@ -114,7 +169,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
       course.mentorCompany.toLowerCase().includes(q) ||
       (course.badge && course.badge.toLowerCase().includes(q)) ||
       course.features.some((f) => f.toLowerCase().includes(q)) ||
-      course.roadmap.some((r) => r.title.toLowerCase().includes(q) || r.topics.some((top) => top.toLowerCase().includes(q)));
+      Boolean(course.roadmap?.some((r) => r.title.toLowerCase().includes(q) || r.topics.some((top) => top.toLowerCase().includes(q))));
 
     return matchCat && matchLevel && matchQuery;
   });
@@ -125,7 +180,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
   const benefits = [
     {
       title: "One-on-One Mentorship",
-      desc: "Learn with your dedicated 1:1 trainer who tailors each coding session to your speed, background, and goals.",
+      desc: "Learn with your dedicated One-on-One trainer who tailors each coding session to your speed, background, and goals.",
       icon: <I.Users />,
       color: "#7C3AED",
       bg: "#EDE9FE",
@@ -160,7 +215,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
     },
     {
       q: "What if I miss a live class due to an emergency or exam?",
-      a: "No problem at all. You can easily reschedule your 1:1 session with your mentor in advance. Furthermore, all completed classes are automatically recorded and accessible 24/7 on your dashboard.",
+      a: "No problem at all. You can easily reschedule your One-on-One session with your mentor in advance. Furthermore, all completed classes are automatically recorded and accessible 24/7 on your dashboard.",
     },
     {
       q: "Are the mentors available outside of live class hours for doubts?",
@@ -168,14 +223,14 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
     },
     {
       q: "Do I receive a certificate upon course completion?",
-      a: "Yes. You receive a verified KR Tech Certificate of Completion containing a unique verification URL that you can showcase on LinkedIn and your resume.",
+      a: "Yes. You receive a verified KR GLOBAL LEARNING PRIVATE LIMITED Certificate of Completion containing a unique verification URL that you can showcase on LinkedIn and your resume.",
     },
     {
       q: "Is there any financial assistance or EMI option available?",
       a: "Yes, we offer zero-cost monthly EMI options starting at ₹1,200/month as well as merit-based fee concessions for students.",
     },
     {
-      q: "How does the Free 1:1 Demo class work?",
+      q: "How does the Free One-on-One Learning Consultation class work?",
       a: "You attend a private 45-minute live screen-sharing session with a senior mentor. We assess your goals, show you our interactive coding setup, and build a personalized study roadmap for you with zero upfront cost.",
     },
   ];
@@ -183,9 +238,9 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
   return (
     <SEO
       title="55+ One-on-One Live Tech Courses & Vendor Certifications"
-      description="Explore 55+ technical courses in Java Backend, MERN Stack, AI, AWS, Azure, Cyber Security, SAP, and Salesforce. 1:1 Live mentorship with industry projects."
+      description="Explore 55+ technical courses in Java Backend, MERN Stack, AI, AWS, Azure, Cyber Security, SAP, and Salesforce. One-on-One Live mentorship with industry projects."
       canonical="https://krtech.in/courses"
-      keywords="tech courses, 1:1 live training, java backend, spring boot, mern stack, aws certification, data engineering, cyber security"
+      keywords="tech courses, One-on-One live training, java backend, spring boot, mern stack, aws certification, data engineering, cyber security"
       structuredData={SchemaBuilder.getBreadcrumbSchema([
         { name: "Home", url: "https://krtech.in/" },
         { name: "Courses", url: "https://krtech.in/courses" },
@@ -209,7 +264,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
 
         <div className="container-xl" style={{ position: "relative", zIndex: 1 }}>
           <span className="badge badge-dark" style={{ marginBottom: 18, display: "inline-block" }}>
-            ⭐ 1:1 Live Coding Programs
+            ⭐ One-on-One Live Coding Programs
           </span>
 
           <h1
@@ -271,7 +326,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
             {[
               { n: "20+ Live Courses", icon: <I.Code /> },
               { n: "10+ Expert Mentors", icon: <I.Award /> },
-              { n: "1:1 Live Sessions", icon: <I.Users /> },
+              { n: "One-on-One Live Sessions", icon: <I.Users /> },
               { n: "Recorded Lectures Included", icon: <I.Play /> },
             ].map((s, idx) => (
               <div
@@ -582,7 +637,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
         <div className="container-xl">
           <div style={{ marginBottom: 48 }}>
             <SectionHeading
-              badge="Why KR Tech"
+              badge="Why KR Global Learning"
               badgeClass="badge-purple"
               title="Built for True Mastery:"
               accent="Learning Benefits"
@@ -698,7 +753,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
                 stage: "Stage 4 · Production",
                 time: "Weeks 7-8",
                 title: "Capstone & Resume Polish",
-                desc: "Complete end-to-end production application deployment, 1:1 code audit, and ATS resume overhaul.",
+                desc: "Complete end-to-end production application deployment, One-on-One code audit, and ATS resume overhaul.",
                 badge: "Verified Certificate",
                 color: "#10B981",
                 bg: "#D1FAE5",
@@ -804,7 +859,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
                 lineHeight: 1.7,
               }}
             >
-              Connect with an experienced academic mentor for a free 45-minute 1:1 evaluation session and custom
+              Connect with an experienced academic mentor for a free 45-minute One-on-One evaluation session and custom
               roadmap recommendation.
             </p>
 
@@ -844,7 +899,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
                 badgeClass="badge-purple"
                 title="Courses & Enrollment"
                 accent="Questions"
-                desc="Everything you need to know about our live classes, roadmaps, and 1:1 mentoring."
+                desc="Everything you need to know about our live classes, roadmaps, and One-on-One mentoring."
               />
             </div>
 
@@ -971,7 +1026,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
             >
               <div>
                 <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: 99 }}>
-                  1:1 Live Syllabus & Roadmap
+                  One-on-One Live Syllabus & Roadmap
                 </span>
                 <h3 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 18, marginTop: 6, marginBottom: 2 }}>
                   {activeDetailsCourse.title}
@@ -1005,7 +1060,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {activeDetailsCourse.roadmap.map((r, idx) => (
+                {activeDetailsCourse.roadmap?.map((r, idx) => (
                   <div
                     key={idx}
                     style={{
@@ -1049,7 +1104,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
                 className="btn-primary"
                 style={{ padding: "10px 20px" }}
               >
-                <I.Sparkles /> Book Free 1:1 Live Demo
+                <I.Sparkles /> Book Free Free One-on-One Learning Consultation
               </button>
             </div>
           </div>

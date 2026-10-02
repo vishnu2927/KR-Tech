@@ -41,7 +41,7 @@ export interface MentorPayload {
 function normalizeMentor(raw: any): Mentor {
   const skills = Array.isArray(raw.skills) && raw.skills.length > 0
     ? raw.skills
-    : ["Software Architecture", "System Design", "1:1 Live Coding"];
+    : ["Software Architecture", "System Design", "One-on-One Live Coding"];
   const languages = Array.isArray(raw.languages) && raw.languages.length > 0
     ? raw.languages
     : ["English", "Hindi"];
@@ -52,7 +52,7 @@ function normalizeMentor(raw: any): Mentor {
     name: raw.name,
     role: raw.role,
     company: raw.company || "Top Tech MNC",
-    specialization: raw.specialization || (skills.length > 0 ? skills.slice(0, 3).join(", ") : "System Architecture & 1:1 Live Mentorship"),
+    specialization: raw.specialization || (skills.length > 0 ? skills.slice(0, 3).join(", ") : "System Architecture & One-on-One Live Mentorship"),
     domain: raw.domain || (skills[0] || "Java Backend"),
     exp: raw.exp || raw.experience || "10+ Years",
     rating: typeof raw.rating === "number" ? raw.rating : 4.95,
@@ -65,7 +65,7 @@ function normalizeMentor(raw: any): Mentor {
     bio: raw.bio || "Senior industry practitioner training software engineers with 10+ years of enterprise experience.",
     coursesTaught: Array.isArray(raw.coursesTaught) && raw.coursesTaught.length > 0
       ? raw.coursesTaught
-      : [raw.role, "1:1 System Design Capstone"],
+      : [raw.role, "One-on-One System Design Capstone"],
   };
 }
 

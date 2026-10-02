@@ -27,6 +27,10 @@ const resourceSchema = new mongoose.Schema(
       type: String,
       default: '4.5 MB',
     },
+    downloadCount: {
+      type: Number,
+      default: 1250,
+    },
     downloadsCount: {
       type: String,
       default: '12.5k',
@@ -39,6 +43,9 @@ const resourceSchema = new mongoose.Schema(
     downloadUrl: {
       type: String,
       default: '#',
+    },
+    pdfUrl: {
+      type: String,
     },
     content: {
       type: String,

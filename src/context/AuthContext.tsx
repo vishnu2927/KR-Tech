@@ -26,9 +26,10 @@ export interface AppNotification {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password?: string) => Promise<User>;
+  login: (email: string, password?: string, rememberMe?: boolean) => Promise<User>;
   signup: (userData: { name: string; email: string; phone: string; course: string; password?: string }) => Promise<User>;
   logout: () => void;
+  logoutAll: () => Promise<void>;
   refreshProfile: () => Promise<User | null>;
   updateProfile: (data: { name?: string; phone?: string; avatar?: string; password?: string }) => Promise<User>;
   notifications: AppNotification[];
@@ -42,7 +43,7 @@ const DEFAULT_NOTIFICATIONS: AppNotification[] = [
   {
     id: "notif-1",
     title: "New Demo Booked",
-    message: "Rahul Sharma booked a 1:1 Live Demo for Java Backend Development.",
+    message: "Rahul Sharma booked a Free One-on-One Learning Consultation for Java Backend Development.",
     time: "10 mins ago",
     read: false,
     type: "demo",
@@ -131,8 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("krtech_notifications", JSON.stringify(notifications));
   }, [notifications]);
 
-  const login = async (email: string, password?: string): Promise<User> => {
-    const res = await authService.login(email, password);
+  const login = async (email: string, password?: string, rememberMe: boolean = true): Promise<User> => {
+    const res = await authService.login(email, password, rememberMe);
     const loggedInUser: User = {
       id: res.user.id,
       name: res.user.name,
@@ -174,7 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(newUser);
 
     addNotification({
-      title: "Welcome to KR Tech!",
+      title: "Welcome to KR Global Learning!",
       message: `Hi ${userData.name}, your student account has been created in our live portal.`,
       type: "system",
     });
@@ -184,6 +185,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     authService.logout();
+    setUser(null);
+  };
+
+  const logoutAll = async () => {
+    await authService.logoutAll();
     setUser(null);
   };
 
@@ -252,6 +258,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
+        logoutAll,
         refreshProfile,
         updateProfile,
         notifications,

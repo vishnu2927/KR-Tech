@@ -44,8 +44,8 @@ export default function CategoryPieChart({
             dataKey="value"
             nameKey="name"
             animationDuration={1200}
-            label={({ name, percent }) =>
-              `${name}: ${(percent * 100).toFixed(0)}%`
+            label={({ name, percent }: any) =>
+              `${name}: ${((percent || 0) * 100).toFixed(0)}%`
             }
             labelLine={false}
           >
@@ -59,7 +59,7 @@ export default function CategoryPieChart({
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number) => [`${value}% Share`, "Enrollment Volume"]}
+            formatter={(value: any) => [`${value}% Share`, "Enrollment Volume"]}
             contentStyle={{
               backgroundColor: isDark ? "#0f172a" : "#ffffff",
               borderColor: isDark ? "#334155" : "#cbd5e1",

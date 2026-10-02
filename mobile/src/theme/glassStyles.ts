@@ -1,0 +1,68 @@
+import { StyleSheet } from "react-native";
+import { Colors } from "./colors";
+
+export const GlassStyles = StyleSheet.create({
+  card: {
+    backgroundColor: Colors.cardGlass,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.cardBorder,
+    padding: 16,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  cardSubtle: {
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.cardBorderSubtle,
+    padding: 14,
+  },
+  cardCyan: {
+    backgroundColor: Colors.cardGlass,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.cardBorderCyan,
+    padding: 16,
+    shadowColor: Colors.secondary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  input: {
+    backgroundColor: Colors.inputBackground,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.inputBorder,
+    color: Colors.textPrimary,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+  },
+  glowBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(124, 58, 237, 0.2)",
+    borderWidth: 1,
+    borderColor: "rgba(168, 85, 247, 0.4)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  emeraldBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: Colors.successLight,
+    borderWidth: 1,
+    borderColor: "rgba(16, 185, 129, 0.4)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  }
+});

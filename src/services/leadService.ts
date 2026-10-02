@@ -49,7 +49,7 @@ const INITIAL_MOCK_LEADS: Lead[] = [
     course: "Complete Java Backend (Spring Boot 3.x)",
     timeSlot: "Evening (7:00 PM - 9:00 PM IST)",
     timezone: "IST (India · UTC+5:30)",
-    message: "Interested in 1:1 mentorship for microservices architecture.",
+    message: "Interested in One-on-One mentorship for microservices architecture.",
     status: "New",
     createdAt: new Date().toISOString(),
   },
@@ -85,7 +85,7 @@ const INITIAL_MOCK_LEADS: Lead[] = [
     course: "DSA & Problem Solving (Java/C++)",
     timeSlot: "Weekend Special Slot",
     timezone: "IST (India · UTC+5:30)",
-    message: "Need 1:1 doubt solving for Dynamic Programming and Graphs.",
+    message: "Need One-on-One doubt solving for Dynamic Programming and Graphs.",
     status: "Completed",
     createdAt: new Date(Date.now() - 3600 * 1000 * 48).toISOString(),
   },
@@ -204,7 +204,7 @@ export const leadService = {
           success: true,
           lead,
           bookingId: res.data.bookingId || lead.bookingId || `KRDEMO-${Math.floor(100000 + Math.random() * 900000)}`,
-          message: res.data.message || "1:1 Live Demo booked successfully!",
+          message: res.data.message || "Free One-on-One Learning Consultation booked successfully!",
         };
       }
     } catch (err: any) {
@@ -230,7 +230,7 @@ export const leadService = {
         success: false,
         isDuplicate: true,
         bookingId: existing.bookingId || `KRDEMO-${existing.id.slice(-6).toUpperCase()}`,
-        message: `A 1:1 Live Demo is already booked for ${payload.email}. Your active Booking ID is #${existing.bookingId || 'KRDEMO-EXISTING'}.`,
+        message: `A Free One-on-One Learning Consultation is already booked for ${payload.email}. Your active Booking ID is #${existing.bookingId || 'KRDEMO-EXISTING'}.`,
         lead: existing,
       };
     }
@@ -250,7 +250,7 @@ export const leadService = {
       success: true,
       lead: newLead,
       bookingId,
-      message: "1:1 Live Demo booked successfully with your mentor!",
+      message: "Free One-on-One Learning Consultation booked successfully with your mentor!",
     };
   },
 

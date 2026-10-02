@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 const Resource = require('../models/Resource');
 
+/**
+ * Format numeric download count to readable string (e.g., 12500 -> '12.5k')
+ */
+const formatDownloadCount = (count) => {
+  if (count >= 1000000) {
+    return (count / 1000000).toFixed(1) + 'M';
+  }
+  if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'k';
+  }
+  return count.toString();
+};
+
 // @desc    Get all resources with search and category filtering
 // @route   GET /api/resources
 // @access  Public
@@ -20,6 +33,7 @@ const getResources = async (req, res) => {
         { description: { $regex: q, $options: 'i' } },
         { category: { $regex: q, $options: 'i' } },
         { tags: { $in: [new RegExp(q, 'i')] } },
+        { content: { $regex: q, $options: 'i' } },
       ];
     }
 
@@ -97,19 +111,16 @@ const trackDownload = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
-    // Increment numeric count if parseable, or append
-    let current = parseFloat(resource.downloadsCount) || 12.5;
-    if (resource.downloadsCount.includes('k')) {
-      current = (current + 0.1).toFixed(1) + 'k';
-    } else {
-      current = Math.round(current + 1).toString();
-    }
-    resource.downloadsCount = current;
+    // Increment numeric count atomically
+    const newCount = (resource.downloadCount || 1250) + 1;
+    resource.downloadCount = newCount;
+    resource.downloadsCount = formatDownloadCount(newCount);
     await resource.save();
 
     res.json({
       success: true,
       message: 'Download tracked in Atlas',
+      downloadCount: resource.downloadCount,
       downloadsCount: resource.downloadsCount,
       downloadUrl: resource.downloadUrl,
     });
@@ -118,39 +129,142 @@ const trackDownload = async (req, res) => {
   }
 };
 
-// @desc    Create a new resource
+// @desc    Download / stream the resource file directly
+// @route   GET /api/resources/:id/download
+// @access  Public
+const downloadResourceFileEndpoint = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let resource = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      resource = await Resource.findById(id);
+    }
+    if (!resource) {
+      resource = await Resource.findOne({ id });
+    }
+
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
+    }
+
+    // Increment counter
+    const newCount = (resource.downloadCount || 1250) + 1;
+    resource.downloadCount = newCount;
+    resource.downloadsCount = formatDownloadCount(newCount);
+    await resource.save();
+
+    const fileContent = `================================================================================
+KR TECH ACADEMY — OFFICIAL LEARNING RESOURCE
+================================================================================
+Title:       ${resource.title}
+Category:    ${resource.category}
+Format:      ${resource.format}
+File Size:   ${resource.fileSize}
+Author:      ${resource.author || 'KR Tech Senior Architect Council'}
+Verified by: KR Tech Academic Registry (https://krtech.edu)
+================================================================================
+
+OVERVIEW:
+${resource.description || 'Enterprise technical handbook.'}
+
+CONTENT & CODE SAMPLES:
+${resource.content || 'Comprehensive architecture study notes.'}
+
+================================================================================
+Need 1-on-1 Mentorship or Live Pair Programming?
+Schedule your free 1:1 Live Demo at: https://krtech.edu/free-demo
+================================================================================`;
+
+    const safeFilename = (resource.id || 'resource').replace(/[^a-zA-Z0-9_-]/g, '_');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}.txt"`);
+    res.send(fileContent);
+  } catch (error) {
+    console.error('Download Resource File Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Create / Upload a new resource
 // @route   POST /api/resources
-// @access  Private/Admin
+// @access  Public / Admin
 const createResource = async (req, res) => {
   try {
-    const { title, category, description, format, fileSize, tags, content } = req.body;
+    const { title, category, description, format, fileSize, tags, content, author } = req.body;
 
     if (!title || !category) {
       return res.status(400).json({ success: false, message: 'Title and category are required' });
     }
 
-    const slug = title
+    let slug = (req.body.id || title)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '');
+
+    // Ensure slug is unique
+    const existing = await Resource.findOne({ id: slug });
+    if (existing) {
+      slug = `${slug}-${Math.floor(100 + Math.random() * 900)}`;
+    }
+
+    const parsedTags = Array.isArray(tags)
+      ? tags
+      : (tags || '').split(',').map((t) => t.trim()).filter(Boolean);
 
     const resource = await Resource.create({
       id: slug,
       title: title.trim(),
       category: category.trim(),
-      description: description || '',
+      description: description || 'Comprehensive technical documentation and architectural reference guide.',
       format: format || 'PDF',
-      fileSize: fileSize || '3.5 MB',
-      tags: Array.isArray(tags) ? tags : (tags || '').split(',').map((t) => t.trim()),
-      content: content || '',
+      fileSize: fileSize || '3.8 MB',
+      downloadCount: 1420,
+      downloadsCount: '1.4k',
+      tags: parsedTags.length > 0 ? parsedTags : ['Architecture', 'Best Practices'],
+      content: content || `# ${title}\n\n## Overview\n${description || 'Study guide overview.'}\n\n## Key Architectural Principles\n- Clean Architecture\n- High Availability\n- Cloud Resilience`,
+      author: author || 'KR Tech Senior Architect Council',
+      downloadUrl: `/api/resources/${slug}/download`,
+      pdfUrl: `/api/resources/${slug}/download`,
     });
 
     res.status(201).json({
       success: true,
-      message: 'Resource created in MongoDB Atlas',
+      message: 'Resource published successfully in MongoDB Atlas!',
       resource,
     });
   } catch (error) {
+    console.error('Create Resource Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Delete a resource
+// @route   DELETE /api/resources/:id
+// @access  Public / Admin
+const deleteResource = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let resource = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      resource = await Resource.findByIdAndDelete(id);
+    }
+    if (!resource) {
+      resource = await Resource.findOneAndDelete({ id });
+    }
+
+    if (!resource) {
+      return res.status(404).json({ success: false, message: `Resource "${id}" not found in MongoDB Atlas` });
+    }
+
+    res.json({
+      success: true,
+      message: `Resource "${resource.title}" successfully deleted from MongoDB Atlas!`,
+      deletedId: resource.id,
+    });
+  } catch (error) {
+    console.error('Delete Resource Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -159,5 +273,7 @@ module.exports = {
   getResources,
   getResourceById,
   trackDownload,
+  downloadResourceFileEndpoint,
   createResource,
+  deleteResource,
 };

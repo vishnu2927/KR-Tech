@@ -152,8 +152,8 @@ const [optimisticMessages, setOptimisticMessages] = useOptimistic(
     format: "DOCX & PDF",
     fileSize: "1.8 MB",
     downloadsCount: "45.1k",
-    tags: ["Career", "Resume", "ATS", "Job Search"],
-    author: "KR Tech Placement Council",
+    tags: ["Portfolio", "Resume", "ATS", "Technical Profile"],
+    author: "KR Global Learning Academic Council",
     content: `
 # ATS-Optimized Technical Resume Guide & Template
 *Validated with Workday, Greenhouse, Taleo, and Lever ATS parsers*

@@ -57,7 +57,7 @@ export function CertificateCard({
               ★
             </span>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-200">
-              KR Tech Official
+              KR Global Learning
             </span>
           </div>
           <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 backdrop-blur-md flex items-center gap-1">

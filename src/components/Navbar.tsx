@@ -16,7 +16,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const onScroll = () => {
@@ -35,15 +35,16 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
   };
 
   const navLinks = [
-    { label: "Home", to: "/" },
     { label: "Courses", to: "/courses" },
+    { label: "Live Classes", to: "/live" },
+    { label: "AI Mentor", to: "/ai/mentor" },
     { label: "Mentors", to: "/mentors" },
-    { label: "Dashboard", to: "/dashboard" },
     { label: "Certificates", to: "/certificates" },
-    { label: "Resources", to: "/resources" },
+    { label: "Achievements", to: "/achievements" },
+    { label: "Free Resources", to: "/resources" },
+    { label: "Blog", to: "/blogs" },
     { label: "About", to: "/about" },
     { label: "Contact", to: "/contact" },
-    { label: "Admin", to: "/admin" },
   ];
 
   const isSolid = scrolled || !isHomePage;
@@ -53,7 +54,12 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
       <div className="container-xl">
         <div className="nav-inner">
           {/* Logo Left */}
-          <Link to="/" className="flex items-center gap-3 flex-shrink-0" style={{ textDecoration: "none" }}>
+          <Link
+            to="/"
+            title="KR GLOBAL LEARNING PRIVATE LIMITED"
+            className="flex items-center gap-3 flex-shrink-0"
+            style={{ textDecoration: "none" }}
+          >
             <I.Logo />
             <div>
               <div
@@ -65,7 +71,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                   lineHeight: 1.1,
                 }}
               >
-                KR Tech
+                KR Global Learning
               </div>
               <div
                 style={{
@@ -76,7 +82,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                   lineHeight: 1,
                 }}
               >
-                Learn. Build. Grow.
+                Learn. Build. Grow. Globally.
               </div>
             </div>
           </Link>
@@ -132,26 +138,63 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
               <I.Search />
             </button>
 
-            {/* Notification Bell */}
-            <NotificationDropdown isDark={!isSolid} />
+            {/* Notification Bell - only visible when authenticated */}
+            {user && <NotificationDropdown isDark={!isSolid} />}
 
             {user ? (
-              <Link
-                to={user.role === "admin" ? "/admin" : "/dashboard"}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-purple-200/40 bg-white/10 hover:bg-white/20 transition-all text-xs font-bold no-underline"
-                style={{ color: isSolid ? "#7C3AED" : "white" }}
-              >
-                <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-lg object-cover" />
-                <span className="truncate max-w-[100px]">{user.name.split(" ")[0]}</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  to={user.role === "admin" ? "/admin" : "/dashboard"}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-purple-200/40 bg-white/10 hover:bg-white/20 transition-all text-xs font-bold no-underline"
+                  style={{ color: isSolid ? "#7C3AED" : "white" }}
+                >
+                  <img
+                    src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&h=160&fit=crop&crop=faces&auto=format"}
+                    alt={user.name}
+                    className="w-6 h-6 rounded-lg object-cover"
+                  />
+                  <span className="truncate max-w-[100px]">{user.name.split(" ")[0]}</span>
+                </Link>
+                <Link
+                  to="/security"
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-700/50 bg-slate-900/30 hover:bg-cyan-500/20 hover:text-cyan-300 text-xs font-medium transition-all text-slate-400 no-underline"
+                  title="Security & Active Devices"
+                >
+                  🛡️ Security
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-700/50 bg-slate-900/30 hover:bg-rose-500/20 hover:text-rose-300 text-xs font-medium transition-all text-slate-400 cursor-pointer"
+                  title="Sign Out"
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
-              <Link
-                to="/login"
-                className={isSolid ? "btn-ghost" : "btn-ghost-white"}
-                style={{ padding: "8px 16px", fontSize: 13, textDecoration: "none" }}
-              >
-                Login
-              </Link>
+              <div className="flex items-center gap-1.5">
+                <Link
+                  to="/login"
+                  className={isSolid ? "btn-ghost" : "btn-ghost-white"}
+                  style={{ padding: "8px 14px", fontSize: 13, textDecoration: "none" }}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn-ghost"
+                  style={{
+                    padding: "8px 14px",
+                    fontSize: 13,
+                    textDecoration: "none",
+                    color: isSolid ? "#7C3AED" : "rgba(255,255,255,0.9)",
+                  }}
+                >
+                  Register
+                </Link>
+              </div>
             )}
 
             <button
@@ -159,10 +202,10 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                 if (onOpenDemoModal) onOpenDemoModal();
                 else navigate("/free-demo");
               }}
-              className="btn-primary"
+              className="btn-primary header-glow-btn"
               style={{ padding: "9px 18px", fontSize: 13 }}
             >
-              <I.Sparkles /> Book Demo
+              <I.Sparkles /> Book Free Consultation
             </button>
           </div>
 
@@ -234,28 +277,57 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
               </Link>
             ))}
           </div>
-          <div className="flex gap-3 pt-6">
-            <button
-              onClick={() => {
-                setMobileOpen(false);
-                if (onOpenDemoModal) onOpenDemoModal();
-              }}
-              className="btn-ghost flex-1"
-              style={{ justifyContent: "center" }}
-            >
-              Login
-            </button>
-            <button
-              onClick={() => {
-                setMobileOpen(false);
-                if (onOpenDemoModal) onOpenDemoModal();
-                else navigate("/free-demo");
-              }}
-              className="btn-primary flex-1"
-              style={{ justifyContent: "center" }}
-            >
-              Book Demo
-            </button>
+          <div className="flex gap-2.5 pt-6">
+            {user ? (
+              <>
+                <Link
+                  to={user.role === "admin" ? "/admin" : "/dashboard"}
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-primary flex-1 no-underline text-xs"
+                  style={{ justifyContent: "center" }}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/security"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-ghost flex-1 no-underline text-xs text-center"
+                  style={{ justifyContent: "center" }}
+                >
+                  🛡️ Security
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logout();
+                    navigate("/login");
+                  }}
+                  className="btn-ghost flex-1 text-xs"
+                  style={{ justifyContent: "center" }}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-ghost flex-1 no-underline text-xs"
+                  style={{ justifyContent: "center" }}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-primary flex-1 no-underline text-xs"
+                  style={{ justifyContent: "center" }}
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

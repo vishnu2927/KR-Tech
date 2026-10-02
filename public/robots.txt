@@ -2,10 +2,13 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /super-admin
+Disallow: /super-admin/*
 Disallow: /dashboard
 Disallow: /dashboard/*
-Disallow: /cms
-Disallow: /cms/*
+Disallow: /checkout
+Disallow: /payment-failed
+Disallow: /api/
 
-Sitemap: https://krtech.in/sitemap.xml
-Host: https://krtech.in
+Sitemap: https://krgloballearning.com/sitemap.xml
+Host: https://krgloballearning.com

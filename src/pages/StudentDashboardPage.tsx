@@ -1,159 +1,171 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DashboardSidebar, { SidebarItem } from "../components/DashboardSidebar";
 import NotificationDropdown from "../components/NotificationDropdown";
-import { courseService, Course } from "../services/courseService";
-import { authService, DemoBooking, EnrolledCourse } from "../services/authService";
+import {
+  studentDashboardService,
+  EnrollmentItem,
+  CourseProgress,
+  RecordedLecture,
+  AssignmentItem,
+  CertificateItem,
+  UpcomingClassItem,
+  DashboardSummary,
+} from "../services/studentDashboardService";
+import { authService, DemoBooking } from "../services/authService";
+import { paymentService, PaymentRecord } from "../services/paymentService";
+import StudentProgressTrackerView from "../components/student/StudentProgressTrackerView";
+import RecordedLecturePortal from "../components/lectures/RecordedLecturePortal";
 import { I } from "../components/Icons";
 
-interface EnrolledTrack {
-  id: string;
-  title: string;
-  category: string;
-  thumbnail: string;
-  progress: number;
-  currentLesson: string;
-  totalModules: number;
-  completedModules: number;
-  mentor: string;
-  mentorCompany: string;
-  duration: string;
-  nextSession: string;
-}
-
-interface CertificateItem {
-  id: string;
-  title: string;
-  issueDate: string;
-  grade: string;
-  verifyCode: string;
-  image: string;
-}
-
-interface BatchItem {
-  id: string;
-  track: string;
-  timing: string;
-  startDate: string;
-  seatsLeft: number;
-  mode: "Weekend 1:1" | "Weekday Evening" | "Fast-Track";
-}
-
-const DEFAULT_ENROLLED_COURSES: EnrolledTrack[] = [
+const DEFAULT_ENROLLMENTS: EnrollmentItem[] = [
   {
-    id: "java-backend",
-    title: "Complete Java Backend Development with Spring Boot & Microservices",
+    _id: "enr-01",
+    courseId: "java-backend",
+    courseTitle: "Complete Java Backend Development with Spring Boot 3 & Microservices",
     category: "Java Backend",
     thumbnail: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
-    progress: 78,
-    currentLesson: "Kafka Event-Driven Architecture & Consumer Groups",
-    totalModules: 32,
-    completedModules: 25,
     mentor: "Rajesh Kumar",
-    mentorCompany: "Ex-Amazon",
-    duration: "6 Months",
-    nextSession: "Today, 7:00 PM IST",
+    mentorCompany: "Principal Technical Architect · Staff Architect",
+    batch: "Batch-2026 (Live One-on-One Weekend)",
+    status: "active",
+    enrolledAt: "2026-08-01T00:00:00.000Z",
   },
   {
-    id: "mern-stack",
-    title: "MERN Stack Full Stack Web Development Mastery Bootcamp",
+    _id: "enr-02",
+    courseId: "mern-stack",
+    courseTitle: "MERN Stack Full Stack Web Development Mastery Bootcamp",
     category: "MERN Stack",
     thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=340&fit=crop&auto=format",
-    progress: 45,
-    currentLesson: "React 19 Server Actions & Next.js 15 App Router",
-    totalModules: 28,
-    completedModules: 13,
     mentor: "Amit Verma",
-    mentorCompany: "Ex-Meta",
-    duration: "5 Months",
-    nextSession: "Tomorrow, 8:30 PM IST",
+    mentorCompany: "Principal Systems Architect",
+    batch: "Batch-2026 (Live One-on-One Evening)",
+    status: "active",
+    enrolledAt: "2026-08-15T00:00:00.000Z",
   },
   {
-    id: "aws-architect",
-    title: "AWS Certified Solutions Architect – Associate (SAA-C03)",
+    _id: "enr-03",
+    courseId: "aws-architect",
+    courseTitle: "AWS Certified Solutions Architect – Associate (SAA-C03)",
     category: "AWS Cloud",
     thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=340&fit=crop&auto=format",
-    progress: 92,
-    currentLesson: "Multi-Region VPC Peering & Transit Gateway Transit",
-    totalModules: 24,
-    completedModules: 22,
     mentor: "Vikram Nair",
-    mentorCompany: "Ex-Google Cloud",
-    duration: "4 Months",
-    nextSession: "Saturday, 10:00 AM IST",
+    mentorCompany: "Staff Software Engineer Cloud · Cloud Specialist",
+    batch: "Batch-2026 (Fast-Track)",
+    status: "completed",
+    enrolledAt: "2026-07-10T00:00:00.000Z",
+  },
+];
+
+const DEFAULT_PROGRESS: CourseProgress[] = [
+  {
+    courseId: "java-backend",
+    completedLectures: ["lec-java-01", "lec-java-02", "lec-java-03"],
+    completedAssignments: ["asg-java-01"],
+    progressPercent: 75,
+    currentLectureId: "lec-java-04",
+    totalTimeSpentMinutes: 360,
+  },
+  {
+    courseId: "mern-stack",
+    completedLectures: ["lec-mern-01", "lec-mern-02"],
+    completedAssignments: [],
+    progressPercent: 45,
+    currentLectureId: "lec-mern-02",
+    totalTimeSpentMinutes: 180,
+  },
+  {
+    courseId: "aws-architect",
+    completedLectures: ["lec-aws-01", "lec-aws-02", "lec-aws-03", "lec-aws-04"],
+    completedAssignments: ["asg-aws-01"],
+    progressPercent: 100,
+    currentLectureId: "lec-aws-04",
+    totalTimeSpentMinutes: 480,
   },
 ];
 
 const DEFAULT_CERTIFICATES: CertificateItem[] = [
   {
     id: "CERT-KR-2026-8841",
-    title: "AWS Certified Solutions Architect Associate (SAA-C03)",
+    certificateId: "KR-AWS-88419",
+    courseName: "AWS Certified Solutions Architect Associate (SAA-C03)",
     issueDate: "Sep 01, 2026",
     grade: "Distinction (96%)",
-    verifyCode: "KR-AWS-88419",
-    image: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&h=400&fit=crop&auto=format",
+    credentialUrl: "https://krtech.edu/verify/KR-AWS-88419",
+    downloadUrl: "https://krtech.edu/certificates/KR-AWS-88419.pdf",
+    skills: ["AWS", "VPC", "ECS", "Terraform", "Serverless"],
   },
   {
     id: "CERT-KR-2026-9204",
-    title: "Core Java 21 & Distributed Microservices Engineering",
+    certificateId: "KR-JAV-92041",
+    courseName: "Enterprise Spring Boot 3 & Distributed Microservices",
     issueDate: "Aug 15, 2026",
     grade: "Distinction (94%)",
-    verifyCode: "KR-JAV-92041",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&h=400&fit=crop&auto=format",
+    credentialUrl: "https://krtech.edu/verify/KR-JAV-92041",
+    downloadUrl: "https://krtech.edu/certificates/KR-JAV-92041.pdf",
+    skills: ["Spring Boot 3", "Kafka", "Docker", "PostgreSQL", "Redis"],
   },
 ];
 
-const UPCOMING_BATCHES: BatchItem[] = [
+const DEFAULT_UPCOMING_CLASSES: UpcomingClassItem[] = [
   {
-    id: "batch-1",
-    track: "Full Stack Java 21 & High-Scale Microservices",
-    timing: "Sat & Sun (10:00 AM - 1:00 PM IST)",
-    startDate: "Sep 15, 2026",
-    seatsLeft: 3,
-    mode: "Weekend 1:1",
+    id: "cls-01",
+    title: "One-on-One Live Mentoring: Event-Driven Kafka Consumer Partitioning & Offsets",
+    date: "Today",
+    time: "7:00 PM - 8:30 PM IST",
+    course: "Java Backend Microservices Mastery",
+    instructor: "Rajesh Kumar (Principal Technical Architect)",
+    meetLink: "https://meet.google.com/krtech-live-mentorship",
   },
   {
-    id: "batch-2",
-    track: "MERN Stack SaaS Architect (React 19 + Next.js 15)",
-    timing: "Mon - Thu (8:00 PM - 9:30 PM IST)",
-    startDate: "Sep 18, 2026",
-    seatsLeft: 5,
-    mode: "Weekday Evening",
+    id: "cls-02",
+    title: "One-on-One Architecture Review: Next.js 15 Server Actions & Multi-Tenant Database",
+    date: "Tomorrow",
+    time: "8:00 PM - 9:30 PM IST",
+    course: "MERN Stack Full Stack Mastery",
+    instructor: "Amit Verma (Principal Systems Architect)",
+    meetLink: "https://meet.google.com/krtech-live-mentorship",
   },
   {
-    id: "batch-3",
-    track: "AWS Cloud & DevOps Professional CI/CD Pipeline",
-    timing: "Sat & Sun (6:00 PM - 9:00 PM IST)",
-    startDate: "Sep 22, 2026",
-    seatsLeft: 2,
-    mode: "Weekend 1:1",
-  },
-  {
-    id: "batch-4",
-    track: "Cyber Security & Certified Ethical Hacker (CEH v12)",
-    timing: "Tue & Thu (7:00 PM - 9:30 PM IST)",
-    startDate: "Oct 01, 2026",
-    seatsLeft: 6,
-    mode: "Fast-Track",
+    id: "cls-03",
+    title: "Weekend Capstone Clinic: Multi-Region High-Availability VPC Peering",
+    date: "Saturday",
+    time: "10:00 AM - 12:00 PM IST",
+    course: "AWS Cloud Solutions Architect",
+    instructor: "Vikram Nair (Staff Software Engineer Cloud)",
+    meetLink: "https://meet.google.com/krtech-live-mentorship",
   },
 ];
 
 export default function StudentDashboardPage() {
   const { user, updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("dashboard");
-  const [enrolledCourses, setEnrolledCourses] = useState<EnrolledTrack[]>(DEFAULT_ENROLLED_COURSES);
+
+  // Live Data States
+  const [enrollments, setEnrollments] = useState<EnrollmentItem[]>(DEFAULT_ENROLLMENTS);
+  const [progressList, setProgressList] = useState<CourseProgress[]>(DEFAULT_PROGRESS);
+  const [lectures, setLectures] = useState<RecordedLecture[]>([]);
+  const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [certificates, setCertificates] = useState<CertificateItem[]>(DEFAULT_CERTIFICATES);
-  const [batches, setBatches] = useState<BatchItem[]>(UPCOMING_BATCHES);
+  const [upcomingClasses, setUpcomingClasses] = useState<UpcomingClassItem[]>(DEFAULT_UPCOMING_CLASSES);
   const [myBookings, setMyBookings] = useState<DemoBooking[]>([]);
-  const [userCourses, setUserCourses] = useState<EnrolledCourse[]>([]);
-  const [resumeModal, setResumeModal] = useState<EnrolledTrack | null>(null);
+  const [myPayments, setMyPayments] = useState<PaymentRecord[]>([]);
+
+  // UI / Modal States
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>("all");
+  const [activeLectureModal, setActiveLectureModal] = useState<RecordedLecture | null>(null);
+  const [submittingAssignment, setSubmittingAssignment] = useState<AssignmentItem | null>(null);
+  const [githubUrlInput, setGithubUrlInput] = useState<string>("");
+  const [liveDemoUrlInput, setLiveDemoUrlInput] = useState<string>("");
+  const [notesInput, setNotesInput] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState<boolean>(false);
 
-  // Profile Form State synced with Atlas User
-  const [profileName, setProfileName] = useState(user?.name || "Student");
-  const [profileEmail, setProfileEmail] = useState(user?.email || "");
+  // Profile Form State
+  const [profileName, setProfileName] = useState(user?.name || "Aditya Sharma");
+  const [profileEmail, setProfileEmail] = useState(user?.email || "aditya.sharma@krtech.edu");
   const [profilePhone, setProfilePhone] = useState(user?.phone || "+91 98765 43210");
   const [profileTimezone, setProfileTimezone] = useState("IST (UTC+5:30)");
 
@@ -166,60 +178,151 @@ export default function StudentDashboardPage() {
     if (user) {
       setProfileName(user.name);
       setProfileEmail(user.email);
-      setProfilePhone(user.phone || "");
+      if (user.phone) setProfilePhone(user.phone);
     }
   }, [user]);
 
-  // Load Demo Bookings and Enrolled Courses from MongoDB Atlas
+  // Load all student dashboard data from MongoDB Atlas
   useEffect(() => {
-    authService.getMyBookings().then((b) => {
-      if (b) setMyBookings(b);
-    });
-    authService.getMyCourses().then((c) => {
-      if (c) setUserCourses(c);
-    });
-  }, []);
-
-  const sidebarItems: SidebarItem[] = [
-    { key: "dashboard", label: "Dashboard", icon: "📊" },
-    { key: "courses", label: "My Courses", icon: "📚", count: `${userCourses.length > 0 ? userCourses.length : enrolledCourses.length}` },
-    { key: "bookings", label: "My Demo Bookings", icon: "🎯", count: `${myBookings.length}` },
-    { key: "resources", label: "Resources", icon: "📥", count: "16" },
-    { key: "certificates", label: "Certificates", icon: "🏆", count: `${certificates.length}` },
-    { key: "batches", label: "Upcoming Batches", icon: "📅", count: "4" },
-    { key: "settings", label: "Student Profile", icon: "👤" },
-  ];
-
-  // Fetch MongoDB courses on load to sync any updates
-  useEffect(() => {
-    courseService.getAllCourses().then((dbCourses) => {
-      if (dbCourses && dbCourses.length > 0) {
-        // Enriched tracks with live database metadata
-        const enriched = DEFAULT_ENROLLED_COURSES.map((track) => {
-          const matched = dbCourses.find((c) => c.id === track.id || c.title.toLowerCase().includes(track.category.toLowerCase()));
-          return matched
-            ? { ...track, title: matched.title, duration: matched.duration || track.duration }
-            : track;
-        });
-        setEnrolledCourses(enriched);
+    const loadData = async () => {
+      try {
+        const summary: DashboardSummary = await studentDashboardService.getDashboardSummary(user?.email);
+        if (summary) {
+          if (summary.enrollments?.length) setEnrollments(summary.enrollments);
+          if (summary.progress?.length) setProgressList(summary.progress);
+          if (summary.recentLectures?.length) setLectures(summary.recentLectures);
+          if (summary.assignments?.length) setAssignments(summary.assignments);
+          if (summary.certificates?.length) setCertificates(summary.certificates);
+          if (summary.upcomingClasses?.length) setUpcomingClasses(summary.upcomingClasses);
+        }
+      } catch (err) {
+        console.warn("Using default student data fallback:", err);
       }
-    });
-  }, []);
 
-  // Download PDF Handler
+      // Fetch all recorded lectures
+      try {
+        const allLectures = await studentDashboardService.getLectures();
+        if (allLectures && allLectures.length > 0) {
+          setLectures(allLectures);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch full lecture list:", err);
+      }
+
+      // Fetch assignments
+      try {
+        const allAssignments = await studentDashboardService.getAssignments();
+        if (allAssignments && allAssignments.length > 0) {
+          setAssignments(allAssignments);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch assignments:", err);
+      }
+
+      // Fetch bookings & payments
+      try {
+        const bookings = await authService.getMyBookings();
+        if (bookings) setMyBookings(bookings);
+      } catch {}
+
+      try {
+        const payments = await paymentService.getMyPayments();
+        if (payments) setMyPayments(payments);
+      } catch {}
+    };
+
+    loadData();
+  }, [user]);
+
+  // Calculate Overall Progress
+  const overallProgress = useMemo(() => {
+    if (progressList.length === 0) return 75;
+    const total = progressList.reduce((acc, p) => acc + (p.progressPercent || 0), 0);
+    return Math.round(total / progressList.length);
+  }, [progressList]);
+
+  // Filtered Lectures
+  const filteredLectures = useMemo(() => {
+    if (selectedCourseFilter === "all") return lectures;
+    return lectures.filter((l) => l.courseId === selectedCourseFilter);
+  }, [lectures, selectedCourseFilter]);
+
+  // Handle Mark Lecture Completed
+  const handleToggleLectureComplete = async (lecture: RecordedLecture) => {
+    const courseProgress = progressList.find((p) => p.courseId === lecture.courseId);
+    const isCompleted = courseProgress?.completedLectures?.includes(lecture._id);
+    const newStatus = !isCompleted;
+
+    try {
+      const updatedProgress = await studentDashboardService.markLectureCompleted(
+        lecture.courseId,
+        lecture._id,
+        newStatus
+      );
+
+      setProgressList((prev) =>
+        prev.map((p) => (p.courseId === lecture.courseId ? updatedProgress : p))
+      );
+
+      showToast(
+        newStatus
+          ? `✓ Lecture marked completed! Course progress updated to ${updatedProgress.progressPercent}%.`
+          : `✓ Lecture marked as uncompleted.`
+      );
+    } catch (err: any) {
+      showToast(err.message || "Failed to update lecture status");
+    }
+  };
+
+  // Handle Assignment Submission
+  const handleSubmitAssignment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!submittingAssignment) return;
+
+    if (!githubUrlInput.trim()) {
+      showToast("Please provide a valid GitHub repository URL.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await studentDashboardService.submitAssignment(submittingAssignment._id, {
+        githubUrl: githubUrlInput.trim(),
+        liveDemoUrl: liveDemoUrlInput.trim(),
+        notes: notesInput.trim(),
+      });
+
+      if (res.success) {
+        showToast("🎉 Capstone Assignment submitted successfully to your mentor!");
+        setSubmittingAssignment(null);
+        setGithubUrlInput("");
+        setLiveDemoUrlInput("");
+        setNotesInput("");
+
+        // Refresh assignments
+        const refreshed = await studentDashboardService.getAssignments();
+        if (refreshed?.length) setAssignments(refreshed);
+      }
+    } catch (err: any) {
+      showToast(err.message || "Failed to submit assignment.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Download Certificate Text
   const handleDownloadCertificate = (cert: CertificateItem) => {
     const certContent = `
 ================================================================================
-                    KR TECH CERTIFICATE OF ACCOMPLISHMENT
+            KR GLOBAL LEARNING CERTIFICATE OF ACCOMPLISHMENT
 ================================================================================
 This is to certify that:
-Recipient:        ${user?.name || "Student"}
-Course Completed: ${cert.title}
+Recipient:        ${user?.name || "Aditya Sharma"}
+Course Completed: ${cert.courseName}
 Grade Achieved:   ${cert.grade}
 Issue Date:       ${cert.issueDate}
-Credential ID:    ${cert.verifyCode}
-Verification URL: https://krtech.com/verify/${cert.verifyCode}
-Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
+Credential ID:    ${cert.certificateId}
+Verification:    KR Global Learning Registry Verified Training Credential
 ================================================================================
     `;
 
@@ -227,14 +330,15 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${cert.verifyCode}_Certificate.txt`;
+    a.download = `${cert.certificateId}_Certificate.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(`✓ Downloaded certificate for: ${cert.title}`);
+    showToast(`✓ Downloaded credential text for: ${cert.courseName}`);
   };
 
+  // Profile Save Handler
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingProfile(true);
@@ -248,10 +352,20 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
     }
   };
 
-  // Calculate Overall Progress
-  const overallProgress = Math.round(
-    enrolledCourses.reduce((acc, c) => acc + c.progress, 0) / enrolledCourses.length
-  );
+  const sidebarItems: SidebarItem[] = [
+    { key: "dashboard", label: "Dashboard", icon: "📊" },
+    { key: "progress", label: "Progress & XP", icon: "🔥", count: "Level 8" },
+    { key: "courses", label: "My Courses", icon: "📚", count: `${enrollments.length}` },
+    { key: "ai_assistant", label: "AI Study Assistant", icon: "🤖", count: "24×7", path: "/ai-assistant" },
+    { key: "portfolio_builder", label: "Portfolio Builder", icon: "✨", path: "/portfolio/builder" },
+    { key: "lectures", label: "Recorded Lectures", icon: "🎥", count: `${lectures.length}` },
+    { key: "notes", label: "Notes Download", icon: "📥", count: `${lectures.length}` },
+    { key: "assignments", label: "Assignments", icon: "📝", count: `${assignments.length}` },
+    { key: "certificates", label: "Certificates", icon: "🏆", count: `${certificates.length}` },
+    { key: "classes", label: "Upcoming Classes", icon: "🗓", count: `${upcomingClasses.length}` },
+    { key: "payments", label: "Payments & Invoices", icon: "💳", count: `${myPayments.length}` },
+    { key: "profile", label: "Student Profile", icon: "👤" },
+  ];
 
   return (
     <main className="pt-20 min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row antialiased selection:bg-purple-600 selection:text-white">
@@ -277,8 +391,9 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
-                1:1 Student Portal
+              <span className="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Welcome to KR Global Learning
               </span>
               <span className="text-xs text-slate-400">
                 {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
@@ -292,7 +407,7 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
               🚀
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              Track your syllabus milestones, join 1:1 live mentor sessions, and download certified credentials.
+              Access your enrolled tracks, recorded One-on-One classes, downloadable lecture notes, and assignments.
             </p>
           </div>
 
@@ -302,452 +417,391 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
               to="/courses"
               className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all no-underline flex items-center gap-1.5"
             >
-              <span>+</span> Explore New Tracks
+              <span>+</span> Explore All Courses
             </Link>
           </div>
         </div>
 
         {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB 1: DASHBOARD (4 Key Widgets + Enrolled Cards)
+            TAB 1: DASHBOARD OVERVIEW
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "dashboard" && (
           <div className="space-y-8">
-            {/* 4 Dashboard Widgets */}
+            {/* KPI Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Widget 1: Learning Progress */}
+              {/* Metric 1: Learning Progress */}
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all group shadow-lg">
                 <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span className="font-semibold text-slate-300">Learning Progress</span>
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px] border border-emerald-500/20">On Track</span>
+                  <span className="font-semibold text-slate-300">Overall Progress</span>
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px] border border-emerald-500/20">
+                    Active Sync
+                  </span>
                 </div>
                 <div className="text-2xl lg:text-3xl font-extrabold text-white font-sans tracking-tight mb-1">
                   {overallProgress}% <span className="text-xs font-normal text-slate-400">Average</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
-                  <span>60 of 84 Modules</span>
-                  <span className="text-purple-400 font-semibold">Tier-1 Progress</span>
+                  <span>Across {enrollments.length} Enrolled Tracks</span>
+                  <span className="text-purple-400 font-semibold">Tier-1 Pace</span>
                 </div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
                   <div
                     style={{ width: `${overallProgress}%` }}
-                    className="bg-gradient-to-r from-purple-500 to-indigo-500 h-full rounded-full"
+                    className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-700"
                   />
                 </div>
               </div>
 
-              {/* Widget 2: Courses Enrolled */}
+              {/* Metric 2: Enrolled Tracks */}
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all group shadow-lg">
                 <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span className="font-semibold text-slate-300">Courses Enrolled</span>
-                  <span className="text-purple-300 font-bold bg-purple-500/10 px-2 py-0.5 rounded-full text-[10px] border border-purple-500/20">Active</span>
+                  <span className="font-semibold text-slate-300">Enrolled Tracks</span>
+                  <span className="text-purple-300 font-bold bg-purple-500/10 px-2 py-0.5 rounded-full text-[10px] border border-purple-500/20">
+                    One-on-One Mentored
+                  </span>
                 </div>
                 <div className="text-2xl lg:text-3xl font-extrabold text-white font-sans tracking-tight mb-1">
-                  {enrolledCourses.length} <span className="text-xs font-normal text-purple-300">Certification Tracks</span>
+                  {enrollments.length} <span className="text-xs font-normal text-purple-300">Tracks</span>
                 </div>
-                <div className="text-[11px] text-slate-400">1:1 Live Interactive Mentorship</div>
+                <div className="text-[11px] text-slate-400">Live One-on-One Pair Programming with FAANG Staff</div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800 mt-3">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full w-[75%]" />
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full w-[80%]" />
                 </div>
               </div>
 
-              {/* Widget 3: Completed Certificates */}
+              {/* Metric 3: Recorded Lectures */}
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all group shadow-lg">
                 <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span className="font-semibold text-slate-300">Completed Certificates</span>
-                  <span className="text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full text-[10px] border border-amber-500/20">Verified</span>
+                  <span className="font-semibold text-slate-300">Recorded Lectures</span>
+                  <span className="text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded-full text-[10px] border border-cyan-500/20">
+                    HD Video
+                  </span>
                 </div>
                 <div className="text-2xl lg:text-3xl font-extrabold text-white font-sans tracking-tight mb-1">
-                  {certificates.length} <span className="text-xs font-normal text-amber-300">Credentials</span>
+                  {lectures.length} <span className="text-xs font-normal text-cyan-300">Archive Lessons</span>
                 </div>
-                <div className="text-[11px] text-slate-400">Shareable on LinkedIn & Resumes</div>
+                <div className="text-[11px] text-slate-400">Includes Architecture Notes & Cheatsheets</div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800 mt-3">
-                  <div className="bg-gradient-to-r from-amber-500 to-yellow-500 h-full rounded-full w-[100%]" />
+                  <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full w-[65%]" />
                 </div>
               </div>
 
-              {/* Widget 4: Upcoming Live Session */}
+              {/* Metric 4: Next Live Class */}
               <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-950/80 to-indigo-950/80 border border-purple-500/30 hover:border-purple-500 transition-all group shadow-lg">
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-bold text-white flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-                    Next Live Class
+                    Next Live One-on-One Class
                   </span>
                   <span className="text-purple-300 font-bold text-[10px]">Today 7 PM</span>
                 </div>
-                <div className="text-sm font-bold text-white line-clamp-1 mb-1">
-                  Kafka Event Producer Pipeline
+                <div className="text-xs font-bold text-white line-clamp-1 mb-1">
+                  {upcomingClasses[0]?.title || "Event-Driven Kafka Architecture"}
                 </div>
                 <div className="text-[11px] text-slate-300 mb-3">
-                  Mentor: <strong className="text-purple-300">Rajesh Kumar (Ex-Amazon)</strong>
+                  Mentor: <strong className="text-purple-300">{upcomingClasses[0]?.instructor || "Rajesh Kumar (Principal Technical Architect)"}</strong>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => showToast("Launching 1:1 Live Classroom Room...")}
-                  className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md cursor-pointer"
+                <a
+                  href={upcomingClasses[0]?.meetLink || "https://meet.google.com/krtech-live-mentorship"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md text-center block no-underline"
                 >
                   Join Live Room 🔴
-                </button>
+                </a>
               </div>
             </div>
 
-            {/* Enrolled Course Cards Section */}
+            {/* Gamified Progress & Streak Quick Widget */}
+            <div className="p-5 rounded-3xl bg-gradient-to-r from-purple-950/70 via-slate-900 to-indigo-950/70 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-2xl shadow-lg shadow-orange-500/20 flex-shrink-0">
+                  🔥
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-xs font-bold text-white">Gamified Level 8 · Senior Systems Builder</span>
+                    <span className="text-[10px] font-extrabold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
+                      5-Day Streak Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Earn XP, track live attendance (94.1%), unlock engineering badges, and climb cohort rankings.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab("progress")}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5 flex-shrink-0"
+              >
+                <span>View Full Progress Tracker</span>
+                <span>→</span>
+              </button>
+            </div>
+
+            {/* Enrolled Tracks Grid */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-sans font-extrabold text-xl text-white">My Enrolled Certification Tracks</h3>
-                  <p className="text-xs text-slate-400">Continue where you left off in your 1:1 mentorship syllabus</p>
+                  <p className="text-xs text-slate-400">Live progress tracking synced with MongoDB Atlas</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab("courses")}
                   className="text-xs font-bold text-purple-400 hover:text-purple-300 cursor-pointer"
                 >
-                  View All Tracks ({enrolledCourses.length}) →
+                  View All Tracks ({enrollments.length}) →
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {enrolledCourses.map((course) => (
-                  <div
-                    key={course.id}
-                    className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all overflow-hidden shadow-xl flex flex-col justify-between group"
-                  >
-                    <div>
-                      {/* Thumbnail with overlay */}
-                      <div className="relative h-44 overflow-hidden">
-                        <img
-                          src={course.thumbnail}
-                          alt={course.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                        <span className="absolute top-3 left-3 px-3 py-1 bg-slate-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
-                          {course.category}
-                        </span>
-                        <span className="absolute top-3 right-3 px-2.5 py-1 bg-slate-950/80 backdrop-blur-md text-slate-300 text-[10px] font-semibold rounded-full border border-slate-700">
-                          ⏱ {course.duration}
-                        </span>
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <span className="text-[10px] font-bold text-purple-300 block mb-0.5">CURRENT LESSON</span>
-                          <h4 className="text-xs font-bold text-white truncate">{course.currentLesson}</h4>
+                {enrollments.map((course) => {
+                  const prog = progressList.find((p) => p.courseId === course.courseId);
+                  const percent = prog ? prog.progressPercent : 50;
+
+                  return (
+                    <div
+                      key={course._id}
+                      className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all overflow-hidden shadow-xl flex flex-col justify-between group"
+                    >
+                      <div>
+                        {/* Thumbnail with overlay */}
+                        <div className="relative h-44 overflow-hidden">
+                          <img
+                            src={course.thumbnail}
+                            alt={course.courseTitle}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                          <span className="absolute top-3 left-3 px-3 py-1 bg-slate-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
+                            {course.category}
+                          </span>
+                          <span className="absolute top-3 right-3 px-2.5 py-1 bg-slate-950/80 backdrop-blur-md text-slate-300 text-[10px] font-semibold rounded-full border border-slate-700">
+                            {course.status === "completed" ? "✓ Completed" : "⚡ Active Track"}
+                          </span>
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <span className="text-[10px] font-bold text-purple-300 block mb-0.5">BATCH</span>
+                            <h4 className="text-xs font-bold text-white truncate">{course.batch}</h4>
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-5 space-y-3">
+                          <h3 className="font-sans font-bold text-sm text-white line-clamp-2 leading-snug">
+                            {course.courseTitle}
+                          </h3>
+
+                          <div className="flex items-center justify-between text-xs text-slate-400">
+                            <span>Mentor: <strong className="text-slate-200">{course.mentor}</strong></span>
+                            <span className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-purple-300 font-semibold">
+                              {course.mentorCompany || "Senior Architect"}
+                            </span>
+                          </div>
+
+                          {/* Progress Bar */}
+                          <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="text-slate-400">Course Progress</span>
+                              <span className="font-bold text-emerald-400">{percent}%</span>
+                            </div>
+                            <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                              <div
+                                style={{ width: `${percent}%` }}
+                                className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Content */}
-                      <div className="p-5 space-y-3">
-                        <h3 className="font-sans font-bold text-sm text-white line-clamp-2 leading-snug">
-                          {course.title}
-                        </h3>
-
-                        <div className="flex items-center justify-between text-xs text-slate-400">
-                          <span>Mentor: <strong className="text-slate-200">{course.mentor}</strong></span>
-                          <span className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-purple-300 font-semibold">{course.mentorCompany}</span>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="space-y-1.5 pt-1">
-                          <div className="flex items-center justify-between text-[11px]">
-                            <span className="text-slate-400">{course.completedModules}/{course.totalModules} Modules</span>
-                            <span className="font-bold text-emerald-400">{course.progress}% Complete</span>
-                          </div>
-                          <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                            <div
-                              style={{ width: `${course.progress}%` }}
-                              className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all"
-                            />
-                          </div>
-                        </div>
+                      {/* Bottom Actions */}
+                      <div className="p-5 pt-0 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCourseFilter(course.courseId);
+                            setActiveTab("lectures");
+                          }}
+                          className="flex-1 py-2.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white font-bold rounded-2xl text-xs transition-all border border-purple-500/30 hover:border-purple-600 shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <span>🎥</span> Watch Lectures
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCourseFilter(course.courseId);
+                            setActiveTab("notes");
+                          }}
+                          className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition cursor-pointer"
+                          title="Download Notes"
+                        >
+                          📥 Notes
+                        </button>
                       </div>
                     </div>
-
-                    {/* Bottom Action */}
-                    <div className="p-5 pt-0">
-                      <button
-                        type="button"
-                        onClick={() => setResumeModal(course)}
-                        className="w-full py-2.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white font-bold rounded-2xl text-xs transition-all border border-purple-500/30 hover:border-purple-600 shadow-md cursor-pointer flex items-center justify-center gap-2"
-                      >
-                        <span>▶</span> Resume Learning
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
         )}
 
         {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB 2: MY COURSES
+            TAB 2: MY COURSES & PROGRESS
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "courses" && (
           <div className="space-y-6">
-            <div>
-              <h2 className="font-sans font-extrabold text-2xl text-white">My Enrolled Courses</h2>
-              <p className="text-xs text-slate-400 mt-1">Access all 1:1 modules, project capstones, and session archives</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl text-white">My Enrolled Courses & Progress</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  One-on-One mentorship cohort tracks registered in MongoDB Atlas with module checklists
+                </p>
+              </div>
+              <div className="text-xs text-purple-300 bg-purple-950/60 border border-purple-800/60 px-3 py-1.5 rounded-xl font-mono">
+                Collection: `enrollments` & `progress`
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {enrolledCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className="rounded-3xl bg-slate-900/80 border border-slate-800 p-5 space-y-4 shadow-xl"
-                >
-                  <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-full h-36 object-cover rounded-2xl border border-slate-800"
-                  />
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">{course.category} · {course.duration}</span>
-                    <h3 className="font-bold text-sm text-white line-clamp-2">{course.title}</h3>
-                    <p className="text-xs text-slate-400">Mentor: <strong className="text-slate-200">{course.mentor}</strong> ({course.mentorCompany})</p>
-                  </div>
+              {enrollments.map((course) => {
+                const prog = progressList.find((p) => p.courseId === course.courseId);
+                const percent = prog ? prog.progressPercent : 50;
+                const completedCount = prog?.completedLectures?.length || 0;
 
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-[11px] text-slate-400">
-                      <span>Progress</span>
-                      <span className="font-bold text-emerald-400">{course.progress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                      <div
-                        style={{ width: `${course.progress}%` }}
-                        className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setResumeModal(course)}
-                    className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-md"
-                  >
-                    Resume Learning →
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB: MY DEMO BOOKINGS (Live from MongoDB Atlas Leads collection)
-        ───────────────────────────────────────────────────────────────────────────── */}
-        {activeTab === "bookings" && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-sans font-extrabold text-2xl text-white">My Free Demo Bookings</h2>
-                  <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/30 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    MongoDB Atlas Cloud
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400 mt-1">
-                  1:1 Live pair-programming sessions reserved under your email ({user?.email})
-                </p>
-              </div>
-              <Link
-                to="/free-demo"
-                className="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all no-underline inline-flex items-center gap-2 w-fit"
-              >
-                <span>+</span> Book Another 1:1 Demo
-              </Link>
-            </div>
-
-            {myBookings.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {myBookings.map((b) => (
+                return (
                   <div
-                    key={b.id}
-                    className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all shadow-xl space-y-4"
+                    key={course._id}
+                    className="rounded-3xl bg-slate-900/80 border border-slate-800 p-5 space-y-4 shadow-xl flex flex-col justify-between"
                   >
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div className="space-y-3">
+                      <img
+                        src={course.thumbnail}
+                        alt={course.courseTitle}
+                        className="w-full h-40 object-cover rounded-2xl border border-slate-800"
+                      />
                       <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Official Booking ID
+                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                          {course.category} · {course.batch}
                         </span>
-                        <span className="font-mono text-base font-extrabold text-purple-300">
-                          #{b.bookingId}
-                        </span>
+                        <h3 className="font-bold text-sm text-white line-clamp-2 mt-1">{course.courseTitle}</h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Mentor: <strong className="text-slate-200">{course.mentor}</strong> ({course.mentorCompany})
+                        </p>
                       </div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-[11px] font-bold border ${
-                          b.status === "Scheduled"
-                            ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/30"
-                            : b.status === "Contacted"
-                            ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                            : b.status === "Completed"
-                            ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
-                            : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                        }`}
-                      >
-                        ● {b.status}
-                      </span>
-                    </div>
 
-                    <div className="space-y-2">
-                      <h3 className="font-sans font-bold text-base text-white">{b.course}</h3>
-                      <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 pt-1">
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Time Slot</span>
-                          <span className="font-semibold">{b.timeSlot || "Evening Slot"}</span>
+                      {/* Live Progress Bar */}
+                      <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
+                        <div className="flex justify-between text-xs text-slate-400">
+                          <span>{completedCount} Lectures Finished</span>
+                          <span className="font-bold text-emerald-400">{percent}% Complete</span>
                         </div>
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Time Zone</span>
-                          <span className="font-semibold">{b.timeZone || "IST (UTC+5:30)"}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Candidate</span>
-                          <span className="font-semibold">{b.name}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Booked On</span>
-                          <span className="font-semibold">
-                            {new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                          </span>
+                        <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                          <div
+                            style={{ width: `${percent}%` }}
+                            className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                          />
                         </div>
                       </div>
                     </div>
 
                     <div className="pt-2 flex items-center gap-2">
-                      <a
-                        href={`https://wa.me/919876543210?text=${encodeURIComponent(
-                          `Hi KR Tech, following up on my 1:1 Live Demo for "${b.course}" (Booking ID: #${b.bookingId}).`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold text-center transition-all no-underline flex items-center justify-center gap-2 shadow-sm shadow-emerald-900/30"
-                      >
-                        <I.MessageCircle />
-                        <span>Chat with Mentor on WhatsApp</span>
-                      </a>
                       <button
                         type="button"
                         onClick={() => {
-                          navigator.clipboard.writeText(b.bookingId);
-                          showToast(`✓ Copied Booking ID #${b.bookingId}`);
+                          setSelectedCourseFilter(course.courseId);
+                          setActiveTab("lectures");
                         }}
-                        className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                        title="Copy Booking ID"
+                        className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md cursor-pointer text-center"
                       >
-                        <I.FileText />
+                        Go to Lectures →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCourseFilter(course.courseId);
+                          setActiveTab("assignments");
+                        }}
+                        className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Assignments
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-12 text-center rounded-3xl bg-slate-900/40 border border-slate-800/80 space-y-4 max-w-xl mx-auto">
-                <div className="w-16 h-16 rounded-full bg-purple-500/10 text-purple-400 mx-auto flex items-center justify-center text-2xl">
-                  🎯
-                </div>
-                <h3 className="font-sans font-bold text-lg text-white">No Demo Bookings Yet</h3>
-                <p className="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
-                  Experience our 1:1 live pair-programming mentorship for free. Evaluate our curriculum, debug real production code, and meet your senior mentor.
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 3: RECORDED LECTURES PORTAL (KR GLOBAL LEARNING)
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "lectures" && (
+          <RecordedLecturePortal
+            userEmail={user?.email}
+            userName={user?.name}
+            onToast={showToast}
+          />
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 4: NOTES & RESOURCES DOWNLOAD
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "notes" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl text-white">Lecture Notes & Architecture Handbooks</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Download official lecture slides, Redis caching cheat sheets, and production capstone blueprints
                 </p>
-                <Link
-                  to="/free-demo"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all no-underline"
-                >
-                  <I.Sparkles /> Book Your Free 1:1 Demo
-                </Link>
               </div>
-            )}
-          </div>
-        )}
-
-        {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB 3: RESOURCES
-        ───────────────────────────────────────────────────────────────────────────── */}
-        {activeTab === "resources" && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="font-sans font-extrabold text-2xl text-white">Student Learning Resources</h2>
-              <p className="text-xs text-slate-400 mt-1">Download official architecture handbooks, cheat sheets, and source code repositories</p>
+              <span className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl font-semibold">
+                ✓ Free Unlimited Access for Enrolled Students
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { title: "Kafka Event-Driven Architecture Handbook 2026", type: "PDF Guide", size: "4.8 MB", date: "Sep 05, 2026" },
-                { title: "Spring Boot 3.x Production Deployment Checklist", type: "Cheatsheet", size: "2.1 MB", date: "Sep 02, 2026" },
-                { title: "Distributed Microservices Architecture Diagrams", type: "ZIP Archive", size: "14.2 MB", date: "Aug 28, 2026" },
-                { title: "AWS Solutions Architect Exam Cram Sheet (SAA-C03)", type: "PDF Guide", size: "3.5 MB", date: "Aug 20, 2026" },
-                { title: "React 19 Server Components Code Recipes", type: "Markdown / Code", size: "1.2 MB", date: "Aug 15, 2026" },
-                { title: "System Design Interview Capstone Questions", type: "PDF Guide", size: "5.4 MB", date: "Aug 10, 2026" },
-              ].map((res, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3 shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
-                      {res.type}
-                    </span>
-                    <span className="text-[11px] text-slate-500">{res.size}</span>
-                  </div>
-                  <h4 className="font-bold text-sm text-white line-clamp-2">{res.title}</h4>
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-xs">
-                    <span className="text-slate-400 text-[11px]">{res.date}</span>
-                    <button
-                      type="button"
-                      onClick={() => showToast(`✓ Downloading: ${res.title}`)}
-                      className="px-3 py-1 bg-slate-800 hover:bg-purple-600 text-slate-200 hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
-                    >
-                      📥 Download
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB 4: CERTIFICATES (With Download PDF Button)
-        ───────────────────────────────────────────────────────────────────────────── */}
-        {activeTab === "certificates" && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="font-sans font-extrabold text-2xl text-white">Earned Professional Certificates</h2>
-              <p className="text-xs text-slate-400 mt-1">Verified industry credentials with cryptographic verification codes</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {certificates.map((cert) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {lectures.map((lec) => (
                 <div
-                  key={cert.id}
-                  className="rounded-3xl bg-slate-900/80 border border-purple-500/30 overflow-hidden shadow-2xl p-6 space-y-4"
+                  key={lec._id}
+                  className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition shadow-xl space-y-4 flex flex-col justify-between"
                 >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-                    <div>
-                      <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                        {cert.grade}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
+                        PDF Notes
                       </span>
-                      <h3 className="font-bold text-base text-white mt-1">{cert.title}</h3>
+                      <span className="text-[11px] text-slate-500 font-mono">Module #{lec.moduleNumber}</span>
                     </div>
-                    <span className="text-[11px] font-mono text-purple-300 bg-purple-950 px-2.5 py-1 rounded-lg border border-purple-800">
-                      {cert.verifyCode}
-                    </span>
-                  </div>
-
-                  <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-800">
-                    <img src={cert.image} alt={cert.title} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-slate-950/60 flex flex-col items-center justify-center text-center p-4">
-                      <span className="text-3xl mb-1">🏆</span>
-                      <h4 className="text-sm font-bold text-white">KR Tech Certified Professional</h4>
-                      <p className="text-[11px] text-slate-300 mt-0.5">Awarded to {user?.name || "Aditya Sharma"}</p>
-                      <span className="text-[10px] text-purple-300 mt-1">Issued on {cert.issueDate}</span>
+                    <h3 className="font-bold text-sm text-white line-clamp-2">{lec.title}</h3>
+                    <p className="text-xs text-slate-400 line-clamp-2">{lec.description}</p>
+                    <div className="text-[11px] text-purple-300 font-mono pt-1">
+                      File: {lec.notesFileName || "Architecture_Notes.pdf"}
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                    <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
-                      <span>✓</span> Verified on Blockchain Registry
-                    </span>
-
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-400">{lec.instructor}</span>
                     <button
                       type="button"
-                      onClick={() => handleDownloadCertificate(cert)}
-                      className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer flex items-center gap-2"
+                      onClick={() => {
+                        const content = `KR GLOBAL LEARNING OFFICIAL LECTURE NOTES\n\nCourse: ${lec.courseId}\nLecture: ${lec.title}\nInstructor: ${lec.instructor}\nDate: ${lec.recordedDate}\n\nTopics Covered:\n- ${lec.description}\n- Architecture best practices & enterprise code standards\n- Recommended Next Steps: Complete Capstone Assignment\n\nKR Global Learning Management System © 2026`;
+                        const blob = new Blob([content], { type: "text/plain" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = lec.notesFileName || "Lecture_Notes.txt";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast(`✓ Downloaded ${lec.notesFileName}`);
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-md cursor-pointer flex items-center gap-1.5"
                     >
                       <span>📥</span> Download PDF
                     </button>
@@ -759,43 +813,179 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
         )}
 
         {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB 5: UPCOMING BATCHES
+            TAB 5: ASSIGNMENTS HUB (From MongoDB Atlas assignments Collection)
         ───────────────────────────────────────────────────────────────────────────── */}
-        {activeTab === "batches" && (
+        {activeTab === "assignments" && (
           <div className="space-y-6">
-            <div>
-              <h2 className="font-sans font-extrabold text-2xl text-white">Upcoming 1:1 Live Batches</h2>
-              <p className="text-xs text-slate-400 mt-1">Explore upcoming weekend cohorts and live fast-track tracks</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl text-white">Capstone Assignments & Code Reviews</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Submit your GitHub repositories for One-on-One senior architect code review and grading
+                </p>
+              </div>
+              <span className="text-xs text-purple-300 bg-purple-950 border border-purple-800 px-3 py-1.5 rounded-xl font-mono">
+                Collection: `assignments`
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {batches.map((b) => (
-                <div
-                  key={b.id}
-                  className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-4 shadow-xl"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
-                      {b.mode}
-                    </span>
-                    <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                      🔥 {b.seatsLeft} Seats Left
-                    </span>
-                  </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {assignments.map((asg) => {
+                const sub = asg.studentSubmission || asg.submissions?.[0];
+                const isSubmitted = !!sub;
 
-                  <div>
-                    <h3 className="font-bold text-base text-white">{b.track}</h3>
-                    <p className="text-xs text-slate-400 mt-1">🗓 Starts: <strong className="text-slate-200">{b.startDate}</strong></p>
-                    <p className="text-xs text-slate-400">⏰ Timing: <strong className="text-slate-200">{b.timing}</strong></p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => showToast(`Requested seat reservation for: ${b.track}`)}
-                    className="w-full py-2.5 bg-slate-800 hover:bg-purple-600 text-slate-200 hover:text-white font-bold rounded-xl text-xs transition-all cursor-pointer"
+                return (
+                  <div
+                    key={asg._id}
+                    className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition shadow-xl space-y-4 flex flex-col justify-between"
                   >
-                    Reserve Seat in Cohort →
-                  </button>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="px-3 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
+                          {asg.moduleTitle}
+                        </span>
+                        <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                          Max Score: {asg.maxScore} pts
+                        </span>
+                      </div>
+
+                      <h3 className="font-bold text-base text-white">{asg.title}</h3>
+                      <p className="text-xs text-slate-400 leading-relaxed">{asg.description}</p>
+
+                      {/* Requirements Checklist */}
+                      <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
+                        <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">
+                          Key Architecture Requirements
+                        </span>
+                        <ul className="space-y-1.5 text-xs text-slate-300">
+                          {asg.requirements?.map((req, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-emerald-400 mt-0.5">✓</span>
+                              <span>{req}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Submission Status */}
+                      {isSubmitted ? (
+                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                              <span>✓</span> Submitted for Review
+                            </span>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              Grade: {sub.grade || "Under Evaluation"} ({sub.score ? `${sub.score}/100` : "Pending"})
+                            </span>
+                          </div>
+                          {sub.feedback && (
+                            <p className="text-xs text-slate-300 italic">
+                              "{sub.feedback}"
+                            </p>
+                          )}
+                          <div className="text-[11px] text-cyan-300 truncate">
+                            Repo: {sub.githubUrl}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Deadline: <strong className="text-slate-200">{asg.deadline}</strong></span>
+                          <span className="text-amber-400 font-semibold">Pending Submission</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-2 flex items-center gap-3">
+                      {asg.starterRepoUrl && (
+                        <a
+                          href={asg.starterRepoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition text-center no-underline flex items-center gap-1.5"
+                        >
+                          <I.Github /> Starter Code
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setSubmittingAssignment(asg)}
+                        className="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-md cursor-pointer text-center"
+                      >
+                        {isSubmitted ? "Resubmit / Update Project" : "Submit Capstone Project 🚀"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 6: CERTIFICATES (Verifiable Credentials)
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "certificates" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl text-white">Earned Professional Certificates</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Verifiable completion credentials certified by KR Global Learning
+                </p>
+              </div>
+              <Link
+                to="/certificates"
+                className="text-xs font-bold text-purple-400 hover:text-purple-300 no-underline"
+              >
+                Public Verification Portal →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {certificates.map((cert) => (
+                <div
+                  key={cert.id || cert.certificateId}
+                  className="rounded-3xl bg-slate-900/80 border border-purple-500/30 overflow-hidden shadow-2xl p-6 space-y-4"
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                        {cert.grade}
+                      </span>
+                      <h3 className="font-bold text-base text-white mt-1">{cert.courseName}</h3>
+                    </div>
+                    <span className="text-[11px] font-mono text-purple-300 bg-purple-950 px-2.5 py-1 rounded-lg border border-purple-800">
+                      {cert.certificateId}
+                    </span>
+                  </div>
+
+                  <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+                    <span className="text-4xl mb-1">🏆</span>
+                    <h4 className="text-sm font-bold text-white">KR Global Learning Certified Full Stack Professional</h4>
+                    <p className="text-xs text-slate-300 mt-1">Conferred upon {user?.name || "Aditya Sharma"}</p>
+                    <span className="text-[10px] text-purple-300 mt-1">Issued: {cert.issueDate}</span>
+                    <div className="flex flex-wrap gap-1 mt-3 justify-center">
+                      {cert.skills?.map((s, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-slate-800 text-[10px] rounded text-slate-300">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                    <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                      <span>✓</span> Cryptographically Verified on Ledger
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadCertificate(cert)}
+                      className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-lg cursor-pointer flex items-center gap-2"
+                    >
+                      <span>📥</span> Download Certificate
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -803,9 +993,160 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
         )}
 
         {/* ─────────────────────────────────────────────────────────────────────────────
-            TAB 6: STUDENT PROFILE & SETTINGS
+            TAB 7: UPCOMING LIVE One-on-One CLASSES
         ───────────────────────────────────────────────────────────────────────────── */}
-        {activeTab === "settings" && (
+        {activeTab === "classes" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl text-white">Upcoming One-on-One Live Classes & Clinics</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Private pairing sessions with your assigned senior staff mentor
+                </p>
+              </div>
+              <Link
+                to="/free-demo"
+                className="px-4 py-2 bg-purple-600/20 text-purple-300 hover:bg-purple-600 hover:text-white rounded-xl text-xs font-bold border border-purple-500/30 transition no-underline"
+              >
+                + Schedule Extra One-on-One Clinic
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {upcomingClasses.map((cls) => (
+                <div
+                  key={cls.id}
+                  className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition shadow-xl space-y-4 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="px-3 py-1 bg-red-500/10 text-red-400 text-[10px] font-bold rounded-full border border-red-500/20 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+                        Live Mentorship Session
+                      </span>
+                      <span className="text-xs font-bold text-purple-300">{cls.date}</span>
+                    </div>
+
+                    <h3 className="font-bold text-base text-white">{cls.title}</h3>
+                    <p className="text-xs text-slate-400">Course: <strong className="text-slate-300">{cls.course}</strong></p>
+
+                    <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1 text-xs text-slate-300">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Timing</span>
+                        <span className="font-bold text-white">{cls.time}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Mentor</span>
+                        <span className="font-bold text-purple-300">{cls.instructor}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a
+                    href={cls.meetLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-lg text-center block no-underline"
+                  >
+                    Join Live Class Room 🔴
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 8: PAYMENTS & INVOICES (Integrated from Step 5.1)
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "payments" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl text-white flex items-center gap-2">
+                  <span>💳</span> Payment History & Tax Invoices
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Official Razorpay payment receipts and active course enrollments registered to your account
+                </p>
+              </div>
+              <Link
+                to="/courses"
+                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl text-xs shadow-md transition no-underline"
+              >
+                Browse More Courses →
+              </Link>
+            </div>
+
+            {myPayments.length > 0 ? (
+              <div className="space-y-4">
+                {myPayments.map((pay) => (
+                  <div
+                    key={pay._id || pay.paymentId}
+                    className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/30 transition shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                          ✓ Paid & Enrolled
+                        </span>
+                        <span className="font-mono text-xs text-cyan-300">
+                          {pay.paymentId}
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white">{pay.courseTitle}</h4>
+                      <p className="text-xs text-slate-400">
+                        Order Ref: <span className="font-mono text-slate-300">{pay.orderId}</span> · Date:{" "}
+                        {new Date(pay.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
+                      <div className="text-right">
+                        <span className="text-xs text-slate-400 block">Amount Paid</span>
+                        <span className="text-2xl font-black text-white">
+                          ₹{(pay.amount || 0).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => window.print()}
+                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span>📄</span> Download Invoice
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-12 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-2xl mx-auto">
+                  💳
+                </div>
+                <h3 className="text-lg font-bold text-white">No Payment History Yet</h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  When you purchase or enroll in a One-on-One mentorship course using Razorpay, your payment receipt and tax invoice will appear here automatically.
+                </p>
+                <Link
+                  to="/courses"
+                  className="inline-block px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs rounded-xl shadow-lg transition no-underline"
+                >
+                  Explore Course Catalog
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 9: STUDENT PROFILE & SETTINGS
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "profile" && (
           <div className="max-w-3xl space-y-6">
             <div>
               <h2 className="font-sans font-extrabold text-2xl text-white">Student Profile & Credentials</h2>
@@ -822,24 +1163,24 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
                 />
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-sans font-bold text-lg text-white">{user?.name || "Student"}</h3>
+                    <h3 className="font-sans font-bold text-lg text-white">{user?.name || "Aditya Sharma"}</h3>
                     <span className="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
                       Verified Student
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">{user?.email}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{user?.email || "aditya.sharma@krtech.edu"}</p>
                   <p className="text-[11px] text-slate-500 font-mono mt-1">Atlas ID: #{user?.id || "6aa3..."}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="text-center px-4 py-2 bg-slate-950 rounded-2xl border border-slate-800">
-                  <div className="text-lg font-bold text-purple-300">{userCourses.length || enrolledCourses.length}</div>
+                  <div className="text-lg font-bold text-purple-300">{enrollments.length}</div>
                   <div className="text-[10px] text-slate-400">Courses</div>
                 </div>
                 <div className="text-center px-4 py-2 bg-slate-950 rounded-2xl border border-slate-800">
-                  <div className="text-lg font-bold text-emerald-400">{myBookings.length}</div>
-                  <div className="text-[10px] text-slate-400">Demos</div>
+                  <div className="text-lg font-bold text-emerald-400">{certificates.length}</div>
+                  <div className="text-[10px] text-slate-400">Certificates</div>
                 </div>
               </div>
             </div>
@@ -913,14 +1254,14 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
                     authService.logout();
                     window.location.href = "/login";
                   }}
-                  className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl border border-red-500/20 transition-all cursor-pointer"
+                  className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl border border-red-500/20 transition cursor-pointer"
                 >
                   Log Out
                 </button>
                 <button
                   type="submit"
                   disabled={savingProfile}
-                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition-all shadow-lg cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-lg cursor-pointer flex items-center gap-2"
                 >
                   {savingProfile ? "Saving to Atlas..." : "Save Profile Changes"}
                 </button>
@@ -928,73 +1269,179 @@ Accreditation:    ISO 9001:2015 & Industry Cloud Consortium Verified
             </form>
           </div>
         )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: PROGRESS & XP TRACKER (KR GLOBAL LEARNING)
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "progress" && (
+          <StudentProgressTrackerView
+            userEmail={user?.email}
+            userName={user?.name}
+            onToast={showToast}
+          />
+        )}
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          MODAL: RESUME LEARNING / LESSON VIEWER
+          MODAL 1: INTERACTIVE VIDEO PLAYER MODAL
       ───────────────────────────────────────────────────────────────────────────── */}
-      {resumeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl bg-slate-900 border border-purple-500/30 rounded-3xl p-6 md:p-8 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      {activeLectureModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+          <div className="w-full max-w-3xl bg-slate-900 border border-purple-500/30 rounded-3xl p-6 md:p-8 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
-                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">{resumeModal.category}</span>
-                <h3 className="font-bold text-lg text-white">{resumeModal.title}</h3>
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                  {activeLectureModal.moduleTitle} · Lecture #{activeLectureModal.lectureNumber}
+                </span>
+                <h3 className="font-bold text-lg text-white">{activeLectureModal.title}</h3>
               </div>
               <button
                 type="button"
-                onClick={() => setResumeModal(null)}
-                className="text-slate-400 hover:text-white text-lg cursor-pointer"
+                onClick={() => setActiveLectureModal(null)}
+                className="text-slate-400 hover:text-white text-lg cursor-pointer p-1"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div className="relative h-48 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 flex flex-col items-center justify-center">
-                <img src={resumeModal.thumbnail} alt={resumeModal.title} className="w-full h-full object-cover opacity-40" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                  <div className="w-14 h-14 rounded-full bg-purple-600/90 text-white flex items-center justify-center text-2xl shadow-xl shadow-purple-600/40 cursor-pointer hover:scale-110 transition-transform">
-                    ▶
-                  </div>
-                  <h4 className="text-xs font-bold text-white mt-3">{resumeModal.currentLesson}</h4>
-                  <p className="text-[11px] text-slate-300">Live 1:1 Architecture Recording · Mentor: {resumeModal.mentor}</p>
-                </div>
-              </div>
+            {/* Video Frame */}
+            <div className="relative aspect-video rounded-2xl overflow-hidden border border-slate-800 bg-black shadow-inner">
+              <iframe
+                src={activeLectureModal.videoUrl}
+                title={activeLectureModal.title}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
-                <div className="flex justify-between text-xs text-slate-300">
-                  <span>Syllabus Completion</span>
-                  <span className="font-bold text-emerald-400">{resumeModal.progress}%</span>
-                </div>
-                <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-                  <div
-                    style={{ width: `${resumeModal.progress}%` }}
-                    className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full"
-                  />
-                </div>
+            <div className="space-y-3">
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {activeLectureModal.description}
+              </p>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 pt-2 border-t border-slate-800">
+                <span>Instructor: <strong className="text-purple-300">{activeLectureModal.instructor}</strong></span>
+                <span>Duration: <strong className="text-slate-200">{activeLectureModal.duration}</strong></span>
+                <span>Date: <strong className="text-slate-200">{activeLectureModal.recordedDate}</strong></span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            {/* Modal Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
               <button
                 type="button"
-                onClick={() => setResumeModal(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                onClick={() => handleToggleLectureComplete(activeLectureModal)}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition cursor-pointer"
               >
-                Close Player
+                ✓ Mark Lecture as Completed
               </button>
+
+              <div className="flex items-center gap-2">
+                {activeLectureModal.notesUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      showToast(`✓ Downloading notes: ${activeLectureModal.notesFileName}`);
+                    }}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition cursor-pointer"
+                  >
+                    📥 Download Notes
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setActiveLectureModal(null)}
+                  className="px-4 py-2 bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          MODAL 2: ASSIGNMENT SUBMISSION MODAL
+      ───────────────────────────────────────────────────────────────────────────── */}
+      {submittingAssignment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+          <div className="w-full max-w-lg bg-slate-900 border border-purple-500/30 rounded-3xl p-6 md:p-8 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                  Submit Capstone Assignment
+                </span>
+                <h3 className="font-bold text-base text-white">{submittingAssignment.title}</h3>
+              </div>
               <button
                 type="button"
-                onClick={() => {
-                  showToast("Launching interactive live coding sandbox...");
-                  setResumeModal(null);
-                }}
-                className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all cursor-pointer"
+                onClick={() => setSubmittingAssignment(null)}
+                className="text-slate-400 hover:text-white text-lg cursor-pointer p-1"
               >
-                Open Code Sandbox 💻
+                ✕
               </button>
             </div>
+
+            <form onSubmit={handleSubmitAssignment} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  GitHub Repository URL <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://github.com/your-username/my-capstone-project"
+                  value={githubUrlInput}
+                  onChange={(e) => setGithubUrlInput(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Live Demo / Deployment URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://my-app.vercel.app or AWS ALB Endpoint"
+                  value={liveDemoUrlInput}
+                  onChange={(e) => setLiveDemoUrlInput(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Architecture Notes & Highlights
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Brief explanation of design patterns, microservice discovery, caching strategy..."
+                  value={notesInput}
+                  onChange={(e) => setNotesInput(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 resize-none"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setSubmittingAssignment(null)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-lg cursor-pointer"
+                >
+                  {isSubmitting ? "Submitting..." : "Submit to Mentor 🚀"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

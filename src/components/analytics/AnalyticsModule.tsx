@@ -212,7 +212,7 @@ export default function AnalyticsModule({ isDark = true }: AnalyticsModuleProps)
                   <h3 className="font-bold text-base text-white flex items-center gap-2">
                     <span>👨‍🏫</span> Principal Mentor Reach & Ratings
                   </h3>
-                  <p className="text-xs text-slate-400">Total students coached across 1:1 live architectures</p>
+                  <p className="text-xs text-slate-400">Total students coached across One-on-One live architectures</p>
                 </div>
                 <span className="text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
                   {mentorsCount} Architects

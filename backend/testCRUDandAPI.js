@@ -80,7 +80,7 @@ async function runCRUDTests() {
   const newMentor = await Mentor.create({
     name: 'Dr. Test Mentor',
     role: 'Staff Infrastructure Architect',
-    company: 'Ex-Google Cloud',
+    company: 'Staff Software Engineer Cloud',
     experience: '15+ Years',
     skills: ['Kubernetes', 'Go', 'Distributed Systems'],
     languages: ['English', 'Hindi'],

@@ -1,54 +1,79 @@
 import React from "react";
 import Hero from "../components/Hero";
 import StudentSuccessMetrics from "../components/StudentSuccessMetrics";
+import CategoryGrid from "../components/CategoryGrid";
+import Courses from "../components/Courses";
+import Mentors from "../components/Mentors";
+import LearningJourney from "../components/LearningJourney";
+import Testimonials from "../components/Testimonials";
+import FreeResources from "../components/FreeResources";
 import UpcomingLiveSessions from "../components/UpcomingLiveSessions";
 import LearningFeatures from "../components/LearningFeatures";
-import Courses from "../components/Courses";
-import ProfessionalCertifications from "../components/ProfessionalCertifications";
-import LearningJourney from "../components/LearningJourney";
 import ProjectShowcase from "../components/ProjectShowcase";
-import FreeResources from "../components/FreeResources";
 import FreeDemoSection from "../components/FreeDemoSection";
-import Mentors from "../components/Mentors";
-import DashboardPreview from "../components/Dashboard";
-import Testimonials from "../components/Testimonials";
-import CommunitySection from "../components/CommunitySection";
-import AIMentor from "../components/AIMentor";
 import FAQ from "../components/FAQ";
 import Newsletter from "../components/Newsletter";
+import StickyDemoBanner from "../components/StickyDemoBanner";
 import SEO from "../components/common/SEO";
 import { SchemaBuilder } from "../utils/seo";
 
 export default function Home({ onOpenDemoModal }: { onOpenDemoModal: (courseOrMentor?: string) => void }) {
   return (
     <SEO
-      title="KR Tech — One-on-One Live Training & Project Support"
-      description="India's leading coding academy with personalized 1:1 live training from expert architects. Java, MERN, AI, AWS, Cyber Security, SAP, and Salesforce with job support."
-      canonical="https://krtech.in/"
-      keywords="1:1 coding classes, personalized tech training, java backend, spring boot, mern stack, react 19, aws certification, devops, cyber security, data analytics, sap fico, live tech mentorship"
+      title="KR GLOBAL LEARNING PRIVATE LIMITED — One-on-One Live Tech Mentorship | AI • Cloud • MERN • DevOps • Vendor Certifications"
+      description="KR GLOBAL LEARNING PRIVATE LIMITED is a technology-first education company that provides industry-focused training, certification programs, live One-on-One mentorship, project-based learning, and practical skill development in AI, Cloud Computing, Cyber Security, Full Stack Development, DevOps, SAP, Data Analytics, Microsoft Technologies, Cisco Networking, and other emerging technologies."
+      canonical="https://krgloballearning.com/"
+      keywords="Technology Training Institute, Certification Learning Platform, AI Learning Platform, Cloud Computing Training, Cyber Security Training, One-on-One Technology Learning, Professional Technology Courses, Practical Learning Platform, AWS Training, Azure Training, SAP Training, DevOps Training, Data Analytics Training"
       structuredData={[
         SchemaBuilder.getOrganizationSchema(),
         SchemaBuilder.getWebSiteSchema(),
       ]}
     >
-      <main>
+      <main className="bg-dark-obsidian text-white min-h-screen">
+        {/* 1. Software Learning Pair-Programming Hero */}
         <Hero onOpenDemoModal={() => onOpenDemoModal()} />
+
+        {/* 2. Animated Stats Bar (55+ Courses, 10+ Mentors, One-on-One Ratio, 100+ Certifications) */}
         <StudentSuccessMetrics />
-        <UpcomingLiveSessions onJoinDemo={(course) => onOpenDemoModal(course)} />
-        <LearningFeatures />
+
+        {/* 3. Premium Course Category Grid (8 Specialization Domains) */}
+        <CategoryGrid />
+
+        {/* 4. Featured Live Courses (Top 6 Live Synced from MongoDB Atlas) */}
         <Courses limit={6} showFilter={false} />
-        <ProfessionalCertifications />
-        <LearningJourney onOpenDemo={() => onOpenDemoModal()} />
-        <ProjectShowcase onOpenDemo={() => onOpenDemoModal()} />
-        <FreeResources />
-        <FreeDemoSection onOpenModal={() => onOpenDemoModal()} />
+
+        {/* 5. Senior Industry Mentors (Enterprise Tech Specialists) */}
         <Mentors onOpenDemo={(mentor) => onOpenDemoModal(mentor)} />
-        <DashboardPreview onOpenDemo={() => onOpenDemoModal()} />
+
+        {/* 6. Apple/Scaler-Style Interactive Learning Roadmap Timeline */}
+        <LearningJourney onOpenDemo={() => onOpenDemoModal()} />
+
+        {/* 7. Student Learning & Transformation Stories (Skills, Architecture, Reviews) */}
         <Testimonials />
-        <CommunitySection />
-        <AIMentor />
+
+        {/* 7B. Verified Student Completed Projects Showcase (Phase 13 Section 5) */}
+        <ProjectShowcase onOpenDemo={() => onOpenDemoModal()} />
+
+        {/* 8. Developer Free Resources & Architecture Cheat Sheets */}
+        <FreeResources />
+
+        {/* 9. Upcoming Live Interactive Evaluation Cohorts */}
+        <UpcomingLiveSessions onJoinDemo={(course) => onOpenDemoModal(course)} />
+
+        {/* 10. Platform Pillars & One-on-One Methodology */}
+        <LearningFeatures />
+
+        {/* 11. Free Free One-on-One Learning Consultation Booking Spotlight */}
+        <FreeDemoSection onOpenModal={() => onOpenDemoModal()} />
+
+        {/* 12. Frequently Asked Questions */}
         <FAQ />
+
+        {/* 13. Newsletter / Community Updates */}
         <Newsletter />
+
+        {/* 14. Sticky Floating Free Demo CTA Dock */}
+        <StickyDemoBanner onOpenDemo={() => onOpenDemoModal()} />
       </main>
     </SEO>
   );

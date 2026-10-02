@@ -95,7 +95,7 @@ export default function FreeDemoPage() {
       } else {
         analytics.trackDemoBooking(course, timeSlot);
         setToast({
-          message: `1:1 Live Demo booked successfully! Booking ID: #${result.bookingId}`,
+          message: `Free One-on-One Learning Consultation booked successfully! Booking ID: #${result.bookingId}`,
           type: "success",
         });
       }
@@ -120,14 +120,14 @@ export default function FreeDemoPage() {
   };
 
   const activeBookingId = bookingResult?.bookingId || "KRDEMO-PENDING";
-  const waUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
-    `Hi KR Tech, I have booked a Free 1:1 Live Demo for "${course}" (Booking ID: #${activeBookingId}). Please confirm my mentor session slot!`
+  const waUrl = `https://wa.me/919311073936?text=${encodeURIComponent(
+    `Hi KR Global Learning, I have booked a Free Free One-on-One Learning Consultation for "${course}" (Booking ID: #${activeBookingId}). Please confirm my mentor session slot!`
   )}`;
 
   const perks = [
     {
       title: "100% Free & Zero Commitment",
-      desc: "No payment or credit card required. Experience our 1:1 pair-programming mentorship methodology first-hand.",
+      desc: "No payment or credit card required. Experience our One-on-One pair-programming mentorship methodology first-hand.",
       icon: <I.Award />,
     },
     {
@@ -149,8 +149,8 @@ export default function FreeDemoPage() {
 
   return (
     <SEO
-      title="Book a Free 1:1 Live Demo Class & Career Roadmap Assessment"
-      description="Experience KR Tech's 1:1 live tech mentorship for free. Private 45-minute coding session with a senior mentor, customized study roadmap, zero commitment."
+      title="Book a Free Free One-on-One Learning Consultation Class & learning roadmap Assessment"
+      description="Experience KR Global Learning's One-on-One live tech mentorship for free. Private 45-minute coding session with a senior mentor, customized study roadmap, zero commitment."
       canonical="https://krtech.in/free-demo"
     >
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -169,7 +169,7 @@ export default function FreeDemoPage() {
           <div className="orb" style={{ width: 450, height: 450, top: -160, right: -60, background: "rgba(124,58,237,0.3)" }} />
           <div className="container-xl" style={{ position: "relative", zIndex: 1 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-              <span className="badge badge-dark">100% Free · 1:1 Live Demo</span>
+              <span className="badge badge-dark">100% Free · Free One-on-One Learning Consultation</span>
               <span
                 style={{
                   fontSize: 11,
@@ -196,7 +196,7 @@ export default function FreeDemoPage() {
                 marginBottom: 16,
               }}
             >
-              Experience KR Tech with a <span className="gradient-text-warm">Free Live Demo</span>
+              Experience KR Global Learning with a <span className="gradient-text-warm">Free Live Demo</span>
             </h1>
             <p
               style={{
@@ -207,7 +207,7 @@ export default function FreeDemoPage() {
                 lineHeight: 1.7,
               }}
             >
-              Schedule a personalized 1:1 session with an expert trainer. Understand our curriculum, write real code, and
+              Schedule a personalized One-on-One session with an expert trainer. Understand our curriculum, write real code, and
               plan your engineering roadmap.
             </p>
           </div>
@@ -317,7 +317,7 @@ export default function FreeDemoPage() {
                         marginBottom: 8,
                       }}
                     >
-                      {bookingResult.isDuplicate ? "Demo Already Registered" : "1:1 Live Demo Confirmed!"}
+                      {bookingResult.isDuplicate ? "Demo Already Registered" : "Free One-on-One Learning Consultation Confirmed!"}
                     </h3>
                     <p style={{ color: "#4B5563", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
                       {bookingResult.isDuplicate
@@ -471,7 +471,7 @@ export default function FreeDemoPage() {
                         </h3>
                       </div>
                       <p style={{ fontSize: 13, color: "#6B7280" }}>
-                        Fill out the form below to reserve your 1:1 live mentor slot directly in our live cloud portal.
+                        Fill out the form below to reserve your One-on-One live mentor slot directly in our live cloud portal.
                       </p>
                     </div>
 
@@ -722,7 +722,7 @@ export default function FreeDemoPage() {
                         ) : (
                           <>
                             <I.Check />
-                            Confirm Free 1:1 Live Demo Booking
+                            Confirm Free Free One-on-One Learning Consultation Booking
                           </>
                         )}
                       </button>

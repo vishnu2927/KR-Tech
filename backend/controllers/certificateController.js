@@ -1,5 +1,27 @@
 const mongoose = require('mongoose');
+const QRCode = require('qrcode');
 const Certificate = require('../models/Certificate');
+const { sendCertificateEmail } = require('../services/emailService');
+const { sendCertificateReadyWA } = require('../services/whatsappService');
+const {
+  streamCertificatePdfResponse,
+  generateCertificatePdfBuffer,
+} = require('../utils/pdfCertificateGenerator');
+
+const CLIENT_URL =
+  process.env.CLIENT_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://krgloballearning.com'
+    : 'http://localhost:5173');
+
+/**
+ * Generate a unique credential ID with format: KRT-2026-CAT-XXXXX
+ */
+const generateUniqueCredentialId = (category = 'TECH') => {
+  const cleanCat = category.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 4) || 'TECH';
+  const randomDigits = Math.floor(10000 + Math.random() * 90000);
+  return `KRT-2026-${cleanCat}-${randomDigits}`;
+};
 
 // @desc    Get all certificates with search and category filtering
 // @route   GET /api/certificates
@@ -73,11 +95,32 @@ const verifyCertificate = async (req, res) => {
     }
 
     if (certificate) {
+      const verifyUrl = `${CLIENT_URL}/certificates?verify=${encodeURIComponent(certificate.credentialId)}`;
+      let qrCodeDataUrl = certificate.qrCodeDataUrl;
+
+      // Dynamically generate QR code if not stored
+      if (!qrCodeDataUrl) {
+        try {
+          qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, {
+            width: 200,
+            margin: 1,
+            color: { dark: '#0f172a', light: '#ffffff' },
+          });
+        } catch (qrErr) {
+          console.warn('QR generation in verify warning:', qrErr.message);
+        }
+      }
+
       return res.json({
         success: true,
         verified: certificate.verified !== false,
         message: 'Official KR Tech Credential Verified',
-        certificate,
+        certificate: {
+          ...certificate.toObject(),
+          qrCodeDataUrl,
+          verifyUrl,
+          downloadPdfUrl: `/api/certificates/${certificate.credentialId}/pdf`,
+        },
       });
     }
 
@@ -92,60 +135,264 @@ const verifyCertificate = async (req, res) => {
   }
 };
 
-// @desc    Issue / create a new certificate
-// @route   POST /api/certificates
-// @access  Private/Admin
-const createCertificate = async (req, res) => {
+// @desc    Download / Stream Vector PDF Certificate
+// @route   GET /api/certificates/:credentialId/pdf or GET /api/certificates/download/:credentialId
+// @access  Public
+const downloadCertificatePdf = async (req, res) => {
+  try {
+    const credentialId = (req.params.credentialId || req.params.id || '').trim();
+
+    if (!credentialId) {
+      return res.status(400).json({ success: false, message: 'Credential ID is required.' });
+    }
+
+    let certificate = await Certificate.findOne({
+      credentialId: { $regex: new RegExp(`^${credentialId}$`, 'i') },
+    });
+
+    if (!certificate && mongoose.Types.ObjectId.isValid(credentialId)) {
+      certificate = await Certificate.findById(credentialId);
+    }
+
+    if (!certificate) {
+      return res.status(404).json({
+        success: false,
+        message: `Certificate "${credentialId}" not found in KR Tech registry.`,
+      });
+    }
+
+    await streamCertificatePdfResponse(certificate, res, CLIENT_URL);
+  } catch (error) {
+    console.error('Download Certificate PDF Error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+};
+
+// @desc    Generate a new certificate with unique ID, QR code, and optional email
+// @route   POST /api/certificates/generate
+// @access  Public / Admin
+const generateCertificate = async (req, res) => {
   try {
     const {
-      title,
-      category,
       studentName,
+      title,
+      category = 'Tech',
+      studentEmail,
+      grade = 'Grade A+ (96%)',
       completionDate,
-      credentialId,
-      grade,
       skills,
-      verified,
+      sendEmail = false,
     } = req.body;
 
-    if (!title || !category || !studentName || !credentialId) {
+    const certTitle = (title || req.body.courseTitle || '').trim();
+
+    if (!studentName || !certTitle) {
       return res.status(400).json({
         success: false,
-        message: 'Title, category, student name, and credential ID are required.',
+        message: 'Student name and course title are required.',
       });
     }
 
-    const existing = await Certificate.findOne({
-      credentialId: { $regex: new RegExp(`^${credentialId.trim()}$`, 'i') },
+    // Generate unique credential ID
+    let credentialId = req.body.credentialId ? req.body.credentialId.trim().toUpperCase() : null;
+    if (!credentialId) {
+      let isUnique = false;
+      let attempts = 0;
+      while (!isUnique && attempts < 10) {
+        attempts++;
+        const candidate = generateUniqueCredentialId(category);
+        const exists = await Certificate.findOne({ credentialId: candidate });
+        if (!exists) {
+          credentialId = candidate;
+          isUnique = true;
+        }
+      }
+    }
+
+    const verifyUrl = `${CLIENT_URL}/certificates?verify=${encodeURIComponent(credentialId)}`;
+    const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#0f172a', light: '#ffffff' },
     });
 
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message: `A certificate with credential ID ${credentialId} already exists.`,
-      });
-    }
+    const parsedSkills = Array.isArray(skills)
+      ? skills
+      : typeof skills === 'string'
+      ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : ['Architecture', 'Enterprise Code', 'Production Ready'];
+
+    const formattedDate = completionDate || new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
     const certificate = await Certificate.create({
-      title: title.trim(),
-      category: category.trim(),
       studentName: studentName.trim(),
-      completionDate: completionDate || new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      credentialId: credentialId.trim().toUpperCase(),
-      grade: grade || 'Grade A+ (96%)',
-      skills: Array.isArray(skills)
-        ? skills
-        : (skills || '').split(',').map((s) => s.trim()).filter(Boolean),
-      verified: verified !== false,
+      studentEmail: studentEmail ? studentEmail.trim().toLowerCase() : undefined,
+      title: certTitle,
+      category: category.trim(),
+      completionDate: formattedDate,
+      credentialId,
+      grade,
+      skills: parsedSkills,
+      verified: true,
+      qrCodeDataUrl,
+      pdfUrl: `/api/certificates/${credentialId}/pdf`,
+      issuer: 'KR GLOBAL LEARNING PRIVATE LIMITED',
+      accreditation: 'KR Global Learning Verified Training Credential',
     });
+
+    // Generate PDF Buffer for Email Attachment if requested
+    let mailResult = null;
+    if (sendEmail && studentEmail) {
+      try {
+        const pdfBuffer = await generateCertificatePdfBuffer(certificate, CLIENT_URL);
+        mailResult = await sendCertificateEmail({
+          recipientEmail: studentEmail.trim().toLowerCase(),
+          studentName: certificate.studentName,
+          courseTitle: certificate.title,
+          certId: certificate.credentialId,
+          grade: certificate.grade,
+          issueDate: certificate.completionDate,
+          pdfBuffer,
+        });
+      } catch (mailErr) {
+        console.warn('Notice sending certificate delivery email:', mailErr.message);
+      }
+    }
 
     res.status(201).json({
       success: true,
-      message: 'Certificate registered successfully in MongoDB Atlas.',
+      message: `Certificate ${credentialId} generated successfully!`,
       certificate,
+      verifyUrl,
+      downloadPdfUrl: `/api/certificates/${credentialId}/pdf`,
+      emailSent: !!mailResult?.success,
     });
   } catch (error) {
-    console.error('Create Certificate Error:', error);
+    console.error('Generate Certificate Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Issue / create a new certificate (Admin legacy)
+// @route   POST /api/certificates
+// @access  Private/Admin
+const createCertificate = async (req, res) => {
+  return generateCertificate(req, res);
+};
+
+// @desc    Email Certificate to student / recipient with PDF attached
+// @route   POST /api/certificates/send-email
+// @access  Public
+const emailCertificate = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const credentialId = req.body.credentialId || req.body.certId;
+
+    if (!email || !credentialId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipient email and Credential ID are required.',
+      });
+    }
+
+    const cert = await Certificate.findOne({
+      credentialId: { $regex: new RegExp(`^${credentialId.trim()}$`, 'i') },
+    });
+
+    if (!cert) {
+      return res.status(404).json({
+        success: false,
+        message: `Certificate with credential ID "${credentialId}" was not found in MongoDB Atlas.`,
+      });
+    }
+
+    // Generate PDF buffer to attach directly in email
+    let pdfBuffer = null;
+    try {
+      pdfBuffer = await generateCertificatePdfBuffer(cert, CLIENT_URL);
+    } catch (pdfErr) {
+      console.warn('PDF buffer generation warning for email:', pdfErr.message);
+    }
+
+    const mailResult = await sendCertificateEmail({
+      recipientEmail: email.toLowerCase().trim(),
+      studentName: cert.studentName,
+      courseTitle: cert.title,
+      certId: cert.credentialId,
+      grade: cert.grade,
+      issueDate: cert.completionDate,
+      pdfBuffer,
+    });
+
+    // Optionally dispatch WhatsApp alert if student phone is provided
+    if (req.body.phone) {
+      sendCertificateReadyWA({
+        phone: req.body.phone,
+        name: cert.studentName,
+        courseTitle: cert.title,
+        certId: cert.credentialId,
+        grade: cert.grade,
+        issueDate: cert.completionDate,
+      }).catch((waErr) => {
+        console.warn('Certificate WhatsApp Notice:', waErr.message);
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Certificate ${cert.credentialId} dispatched with PDF attachment to ${email}!`,
+      mailResult,
+    });
+  } catch (error) {
+    console.error('Email Certificate Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Send Certificate Ready alert via WhatsApp
+// @route   POST /api/certificates/send-whatsapp
+// @access  Public
+const whatsappCertificate = async (req, res) => {
+  try {
+    const phone = req.body.phone;
+    const credentialId = req.body.credentialId || req.body.certId;
+
+    if (!phone || !credentialId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipient phone and Credential ID are required.',
+      });
+    }
+
+    const cert = await Certificate.findOne({
+      credentialId: { $regex: new RegExp(`^${credentialId.trim()}$`, 'i') },
+    });
+
+    if (!cert) {
+      return res.status(404).json({
+        success: false,
+        message: `Certificate with credential ID "${credentialId}" was not found in MongoDB Atlas.`,
+      });
+    }
+
+    const waResult = await sendCertificateReadyWA({
+      phone,
+      name: cert.studentName,
+      courseTitle: cert.title,
+      certId: cert.credentialId,
+      grade: cert.grade,
+      issueDate: cert.completionDate,
+    });
+
+    res.json({
+      success: true,
+      message: `WhatsApp notification for Certificate ${cert.credentialId} dispatched to ${phone}!`,
+      waResult,
+    });
+  } catch (error) {
+    console.error('WhatsApp Certificate Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -153,5 +400,9 @@ const createCertificate = async (req, res) => {
 module.exports = {
   getCertificates,
   verifyCertificate,
+  downloadCertificatePdf,
+  generateCertificate,
   createCertificate,
+  emailCertificate,
+  whatsappCertificate,
 };

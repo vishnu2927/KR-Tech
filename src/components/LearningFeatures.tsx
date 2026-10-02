@@ -1,120 +1,133 @@
 import { I } from "./Icons";
-import SectionHeading from "./SectionHeading";
 
 interface Feature {
   icon: string;
   badge: string;
-  badgeColor: string;
+  badgeAccent: string;
   title: string;
   desc: string;
   bullets: string[];
-  gradient: string;
 }
 
 export default function LearningFeatures() {
   const features: Feature[] = [
     {
       icon: "🎯",
-      badge: "1:1 Live",
-      badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
+      badge: "One-on-One Live",
+      badgeAccent: "#06B6D4",
       title: "One-on-One Live Training",
       desc: "Learn directly from mentors with 10+ years of enterprise experience. 100% individual focus, live screen shares, and instant feedback.",
-      bullets: ["Private 1:1 coding sessions", "Direct line-by-line code review", "Customized pacing for your level"],
-      gradient: "from-purple-500/10 to-transparent",
+      bullets: ["Private One-on-One coding sessions", "Direct line-by-line code review", "Customized pacing for your level"],
     },
     {
       icon: "🕒",
-      badge: "Custom Timings",
-      badgeColor: "bg-cyan-50 text-cyan-700 border-cyan-200",
-      title: "Flexible Time Zones",
+      badge: "Flexible Timings",
+      badgeAccent: "#A78BFA",
+      title: "Global Time Zones",
       desc: "Classes are scheduled around your availability. Convenient morning, evening, and weekend slots across US, UK, Gulf, and Indian time zones.",
       bullets: ["Reschedule with 1 click", "Weekend special cohorts", "Global timezone synchronization"],
-      gradient: "from-cyan-500/10 to-transparent",
     },
     {
       icon: "📊",
       badge: "Analytics UI",
-      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-      title: "Dashboard Access",
+      badgeAccent: "#38BDF8",
+      title: "Student LMS Dashboard",
       desc: "Get your private student dashboard with weekly learning analytics, upcoming class schedules, live links, and direct mentor chat.",
       bullets: ["Real-time completion tracking", "One-click live classroom join", "Doubt portal with 30m response"],
-      gradient: "from-blue-500/10 to-transparent",
     },
     {
       icon: "🎥",
       badge: "Lifetime Access",
-      badgeColor: "bg-amber-50 text-amber-800 border-amber-200",
-      title: "Recorded Lectures",
+      badgeAccent: "#F59E0B",
+      title: "Recorded HD Sessions",
       desc: "Every live class is recorded in high definition and archived with comprehensive notes and code repositories for lifetime review.",
       bullets: ["HD class video recordings", "Downloadable starter code repos", "Interactive PDF study materials"],
-      gradient: "from-amber-500/10 to-transparent",
     },
     {
       icon: "📄",
-      badge: "ATS Scored",
-      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      title: "Resume Building",
-      desc: "Transform your resume with personalized 1:1 guidance. Optimize project bullet points and certifications to easily pass recruiter ATS filters.",
-      bullets: ["ATS score 95+ optimization", "LinkedIn profile enhancement", "Live portfolio GitHub polish"],
-      gradient: "from-emerald-500/10 to-transparent",
+      badge: "Portfolio Ready",
+      badgeAccent: "#10B981",
+      title: "Technical Project Portfolio",
+      desc: "Showcase your real-world technical capabilities with personalized One-on-One guidance. Document architecture decisions, clean code standards, and vendor certifications.",
+      bullets: ["Production project documentation", "GitHub repository enhancement", "Architecture design reviews"],
     },
     {
       icon: "🚀",
-      badge: "Production Capstones",
-      badgeColor: "bg-rose-50 text-rose-700 border-rose-200",
-      title: "Project Support",
+      badge: "Enterprise Defense",
+      badgeAccent: "#EC4899",
+      title: "Capstone Project Support",
       desc: "Build full-scale enterprise capstones from design to cloud deployment. Get end-to-end support on college and professional work projects.",
       bullets: ["Microservices & cloud architecture", "Kafka, Docker, & CI/CD deployment", "Live portfolio demonstration ready"],
-      gradient: "from-rose-500/10 to-transparent",
     },
   ];
 
   return (
-    <section id="features" className="py-20 bg-gradient-to-b from-white via-purple-50/20 to-white relative overflow-hidden">
+    <section id="features" className="py-24 bg-dark-obsidian relative overflow-hidden text-white border-t border-purple-500/15">
+      {/* Background radial glows */}
+      <div className="orb" style={{ width: 500, height: 500, top: -80, right: -40, background: "rgba(124,58,237,0.2)" }} />
+      <div className="orb" style={{ width: 450, height: 450, bottom: -100, left: -60, background: "rgba(6,182,212,0.18)" }} />
+
       <div className="container-xl relative z-10">
-        <div className="mb-12 text-center max-w-3xl mx-auto">
-          <SectionHeading
-            badge="Personalized Learning"
-            title="Six Core Pillars of"
-            accent="KR Tech Platform"
-            desc="Engineered specifically to give you the fastest, most personalized path to technical mastery."
-            center={true}
-          />
+        <div className="mb-14 text-center max-w-3xl mx-auto">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-3">
+            <I.Sparkles /> THE KR GLOBAL LEARNING DIFFERENCE
+          </span>
+          <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+            Six Core Pillars of <span className="gradient-text-warm">Personalized Mastery</span>
+          </h2>
+          <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-xl mx-auto">
+            Engineered specifically to give you the fastest, most personalized path to technical mastery.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
             <div
               key={i}
-              className="group relative flex flex-col justify-between p-7 bg-white rounded-3xl border border-purple-100/80 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-900/5 hover:border-purple-300 overflow-hidden"
+              className="glass-card-dark p-7 flex flex-col justify-between group hover:border-purple-400/50 text-left"
+              style={{
+                background: "rgba(18, 12, 38, 0.8)",
+                border: "1px solid rgba(167, 139, 250, 0.2)",
+                boxShadow: "0 15px 35px rgba(0,0,0,0.4)",
+              }}
             >
-              {/* Subtle top gradient accent */}
-              <div className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${f.gradient} rounded-t-3xl pointer-events-none`} />
-
-              <div className="relative z-10">
+              <div>
                 {/* Header: Icon + Badge */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl p-3 bg-purple-50/60 rounded-2xl border border-purple-100 group-hover:scale-110 transition-transform">
+                  <span
+                    className="text-2xl p-3 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110"
+                    style={{
+                      background: `${f.badgeAccent}18`,
+                      border: `1px solid ${f.badgeAccent}40`,
+                    }}
+                  >
                     {f.icon}
                   </span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${f.badgeColor}`}>
+                  <span
+                    className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                    style={{
+                      background: "rgba(255,255,255,0.06)",
+                      color: f.badgeAccent,
+                      border: `1px solid ${f.badgeAccent}40`,
+                    }}
+                  >
                     {f.badge}
                   </span>
                 </div>
 
                 {/* Title & Desc */}
-                <h3 className="font-sans font-extrabold text-lg text-gray-900 mb-2 group-hover:text-purple-700 transition-colors">
+                <h3 className="font-display font-bold text-lg text-white mb-2 group-hover:text-cyan-300 transition-colors">
                   {f.title}
                 </h3>
-                <p className="text-xs text-gray-600 leading-relaxed mb-5">
+                <p className="text-xs text-gray-300 leading-relaxed mb-5">
                   {f.desc}
                 </p>
 
                 {/* Bullets */}
                 <ul className="space-y-2 mb-6">
                   {f.bullets.map((b, bIdx) => (
-                    <li key={bIdx} className="flex items-center gap-2 text-xs text-gray-700">
-                      <span className="text-emerald-500 font-bold">✓</span>
+                    <li key={bIdx} className="flex items-center gap-2 text-xs text-gray-300">
+                      <span className="text-emerald-400 font-bold">✓</span>
                       <span>{b}</span>
                     </li>
                   ))}
@@ -122,9 +135,9 @@ export default function LearningFeatures() {
               </div>
 
               {/* Card Footer */}
-              <div className="relative z-10 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-purple-700">
-                <span>Included in All 1:1 Programs</span>
-                <span className="text-purple-500">→</span>
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-cyan-400">
+                <span>Included in All One-on-One Programs</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
           ))}

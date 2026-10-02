@@ -47,7 +47,7 @@ async function seedComplete55Courses() {
       id: title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       title,
       category: cat,
-      description: `Comprehensive 1:1 live industry training for ${title} with real-world capstone projects and placement preparation.`,
+      description: `Comprehensive 1:1 live industry training for ${title} with real-world capstone projects and certification preparation.`,
       duration: idx % 2 === 0 ? "3 Months" : "4.5 Months",
       level: idx % 3 === 0 ? "Beginner" : (idx % 3 === 1 ? "Intermediate" : "Advanced"),
       rating: +(4.85 + (idx % 15) * 0.01).toFixed(2),
@@ -55,7 +55,7 @@ async function seedComplete55Courses() {
       price: 11999 + (idx % 8) * 1000,
       originalPrice: 22000 + (idx % 8) * 1500,
       isPopular: idx < 12,
-      highlights: ["1:1 Live Mentorship", "Real-World Industry Capstones", "Flexible Scheduling", "Placement Support"],
+      highlights: ["1:1 Live Mentorship", "Real-World Industry Capstones", "Flexible Scheduling", "Certification Preparation"],
     };
   });
 

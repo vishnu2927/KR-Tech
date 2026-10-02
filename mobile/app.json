@@ -1,0 +1,79 @@
+{
+  "expo": {
+    "name": "KR Global Learning",
+    "slug": "kr-global-learning",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#060811"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.krtech.learning",
+      "infoPlist": {
+        "NSCameraUsageDescription": "KR Global Learning needs camera access to upload assignment solutions and profile avatars.",
+        "NSPhotoLibraryUsageDescription": "KR Global Learning needs gallery access to upload assignment PDFs and certificates.",
+        "NSFaceIDUsageDescription": "KR Global Learning uses Face ID for fast and secure biometric login.",
+        "NSMicrophoneUsageDescription": "KR Global Learning uses microphone for voice questions with your AI Study Assistant.",
+        "UIBackgroundModes": ["audio", "fetch", "remote-notification"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#060811"
+      },
+      "package": "in.krtech.learning",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "RECORD_AUDIO",
+        "POST_NOTIFICATIONS",
+        "VIBRATE",
+        "WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#7C3AED",
+          "sounds": ["./assets/notification.wav"]
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow KR Global Learning to authenticate using Face ID."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you upload assignment documents."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "kr-global-learning-mobile-production"
+      },
+      "apiBaseUrl": "http://10.0.2.2:5000/api",
+      "companyName": "KR GLOBAL LEARNING PRIVATE LIMITED",
+      "tagline": "Learn. Build. Grow. Globally.",
+      "supportPhone": "+91 9311073936",
+      "supportEmail": "krglobal0713@gmail.com"
+    }
+  }
+}

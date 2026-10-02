@@ -2,6 +2,8 @@ const Lead = require('../models/Lead');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const Mentor = require('../models/Mentor');
+const { sendDemoBookingEmail } = require('../services/emailService');
+const { sendDemoConfirmationWA } = require('../services/whatsappService');
 
 // @desc    Create a new free demo lead
 // @route   POST /api/leads
@@ -64,6 +66,14 @@ const createLead = async (req, res) => {
       message: message || '',
       status: 'New',
       bookingId,
+    });
+
+    // Trigger automated Demo Booking confirmation email & WhatsApp
+    sendDemoBookingEmail(lead).catch((mailErr) => {
+      console.warn('Demo Booking Email Dispatch Notice:', mailErr.message);
+    });
+    sendDemoConfirmationWA(lead).catch((waErr) => {
+      console.warn('Demo Booking WhatsApp Dispatch Notice:', waErr.message);
     });
 
     res.status(201).json({

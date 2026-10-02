@@ -132,8 +132,8 @@ export default function FreeDemoModal({ isOpen, onClose, defaultCourse }: FreeDe
   };
 
   const activeBookingId = bookingResult?.bookingId || "KRDEMO-PENDING";
-  const waUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
-    `Hi KR Tech, I have booked a Free 1:1 Live Demo for "${course}" (Booking ID: #${activeBookingId}). Please confirm my live mentor session slot!`
+  const waUrl = `https://wa.me/919311073936?text=${encodeURIComponent(
+    `Hi KR Global Learning, I have booked a Free Free One-on-One Learning Consultation for "${course}" (Booking ID: #${activeBookingId}). Please confirm my live mentor session slot!`
   )}`;
 
   return (
@@ -196,7 +196,7 @@ export default function FreeDemoModal({ isOpen, onClose, defaultCourse }: FreeDe
                     borderRadius: 99,
                   }}
                 >
-                  {bookingResult?.isDuplicate ? "Active Session Found" : "100% Free · 1:1 Live Demo"}
+                  {bookingResult?.isDuplicate ? "Active Session Found" : "100% Free · Free One-on-One Learning Consultation"}
                 </span>
                 <span
                   style={{
@@ -226,8 +226,8 @@ export default function FreeDemoModal({ isOpen, onClose, defaultCourse }: FreeDe
                 {bookingResult?.isDuplicate
                   ? "Existing Demo Booking Found"
                   : bookingResult
-                  ? "1:1 Live Demo Reserved!"
-                  : "Book Your Free 1:1 Live Demo"}
+                  ? "Free One-on-One Learning Consultation Reserved!"
+                  : "Book Your Free Free One-on-One Learning Consultation"}
               </h3>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.88)" }}>
                 {bookingResult?.isDuplicate
@@ -289,7 +289,7 @@ export default function FreeDemoModal({ isOpen, onClose, defaultCourse }: FreeDe
                 <p style={{ color: "#4B5563", fontSize: 14, lineHeight: 1.6, maxWidth: 460, margin: "6px auto 18px" }}>
                   {bookingResult.isDuplicate
                     ? `A live demo is already scheduled for ${email}. We've saved your slot in MongoDB Atlas and assigned your dedicated senior mentor.`
-                    : `Your private 1:1 session for "${course}" has been confirmed in MongoDB Atlas. Check your official booking reference below:`}
+                    : `Your private One-on-One session for "${course}" has been confirmed in MongoDB Atlas. Check your official booking reference below:`}
                 </p>
 
                 {/* Booking ID Highlight Card */}
@@ -699,7 +699,7 @@ export default function FreeDemoModal({ isOpen, onClose, defaultCourse }: FreeDe
                   ) : (
                     <>
                       <I.Check />
-                      Confirm Free 1:1 Live Demo Booking
+                      Confirm Free Free One-on-One Learning Consultation Booking
                     </>
                   )}
                 </button>

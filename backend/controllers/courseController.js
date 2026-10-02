@@ -7,7 +7,7 @@ const FALLBACK_COURSES = [
     id: "java-backend",
     title: "Complete Java Backend Development with Spring Boot & Microservices",
     category: "Java Backend",
-    description: "Master Java 21, Spring Boot 3.x, Microservices, Kafka, Docker & 1:1 Capstone Architecture.",
+    description: "Master Java 21, Spring Boot 3.x, Microservices, Kafka, Docker & One-on-One Capstone Architecture.",
     duration: "6 Months",
     level: "Intermediate",
     rating: 4.95,
@@ -33,15 +33,16 @@ const FALLBACK_COURSES = [
   {
     _id: "c-103",
     id: "aws-solutions-architect",
-    title: "AWS Certified Solutions Architect Associate (SAA-C03)",
-    category: "Cloud Computing",
+    title: "AWS Certified Solutions Architect – Associate",
+    category: "Cloud & Cloud Architecture",
+    categoryGroup: "Cloud & Cloud Architecture",
     description: "EC2, S3, VPC, ECS Fargate, IAM, CloudFormation & official exam readiness simulator.",
-    duration: "3 Months",
+    duration: "8 Weeks",
     level: "Intermediate",
-    rating: 4.98,
-    studentsCount: 19400,
-    price: 13999,
-    originalPrice: 24999,
+    rating: 4.95,
+    studentsCount: 19800,
+    price: "$549",
+    originalPrice: "",
     isPopular: true,
   },
 ];
@@ -56,13 +57,17 @@ const getCourses = async (req, res) => {
     if (mongoose.connection.readyState === 1) {
       let query = {};
       if (category && category !== 'All') {
-        query.category = { $regex: category, $options: 'i' };
+        query.$or = [
+          { category: { $regex: category, $options: 'i' } },
+          { categoryGroup: { $regex: category, $options: 'i' } },
+        ];
       }
       if (search) {
         query.$or = [
           { title: { $regex: search, $options: 'i' } },
           { description: { $regex: search, $options: 'i' } },
           { category: { $regex: search, $options: 'i' } },
+          { categoryGroup: { $regex: search, $options: 'i' } },
         ];
       }
       const courses = await Course.find(query).sort({ createdAt: -1 });

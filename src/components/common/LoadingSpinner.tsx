@@ -8,7 +8,7 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({
   size = "md",
-  label = "Loading KR Tech...",
+  label = "Loading KR Global Learning...",
   fullScreen = false,
 }: LoadingSpinnerProps) {
   const sizeMap = {

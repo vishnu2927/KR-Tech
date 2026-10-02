@@ -87,7 +87,7 @@ export default function Newsletter() {
               <I.Check />
             </span>
             <span style={{ fontFamily: "Poppins,sans-serif", fontWeight: 600, color: "white" }}>
-              You're subscribed! Welcome to the KR Tech community.
+              You're subscribed! Welcome to the KR Global Learning community.
             </span>
           </div>
         ) : (

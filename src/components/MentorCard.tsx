@@ -26,7 +26,7 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
         <div className="absolute top-3 right-3 flex items-center gap-1.5">
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white backdrop-blur-md shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            1:1 Mentor
+            One-on-One Mentor
           </span>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
             className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold" title="Online for 1:1 Booking">
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold" title="Online for One-on-One Booking">
             ✓
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
       {/* Action Footer */}
       <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between gap-3">
         <div className="text-left">
-          <span className="text-[10px] text-gray-400 font-medium block">1:1 Live Students</span>
+          <span className="text-[10px] text-gray-400 font-medium block">One-on-One Live Students</span>
           <span className="text-xs font-extrabold text-gray-900">{mentor.studentsCount} Trained</span>
         </div>
 
@@ -130,7 +130,7 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
           onClick={handleBook}
           className="px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
         >
-          <I.Sparkles /> Book 1:1 Session
+          <I.Sparkles /> Book One-on-One Learning Session
         </button>
       </div>
     </div>

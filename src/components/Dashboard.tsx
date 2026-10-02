@@ -22,7 +22,7 @@ export default function DashboardPreview({ onOpenDemo }: { onOpenDemo?: () => vo
               Your Dedicated <span className="gradient-text">Learning Dashboard</span>
             </h2>
             <p className="section-desc">
-              Track your 1:1 progress, rewatch recorded sessions anytime, download class notes, submit project code,
+              Track your One-on-One progress, rewatch recorded sessions anytime, download class notes, submit project code,
               and resolve doubts directly with your mentor.
             </p>
             <ul style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -91,7 +91,7 @@ export default function DashboardPreview({ onOpenDemo }: { onOpenDemo?: () => vo
                 }}
               >
                 <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
-                KR Tech Learner Portal v2.0
+                KR Global Learning Portal v2.0
               </div>
             </div>
 
@@ -126,7 +126,7 @@ export default function DashboardPreview({ onOpenDemo }: { onOpenDemo?: () => vo
               {[
                 { t: "Spring Boot Microservices & Kafka", p: 85, c: "#7C3AED", date: "Last active: Today" },
                 { t: "DSA Problem Solving: Dynamic Programming", p: 60, c: "#06B6D4", date: "Last active: Yesterday" },
-                { t: "1:1 Capstone Project: E-Commerce Architecture", p: 40, c: "#A78BFA", date: "Milestone 2/4" },
+                { t: "One-on-One Capstone Project: E-Commerce Architecture", p: 40, c: "#A78BFA", date: "Milestone 2/4" },
               ].map((c, i) => (
                 <div
                   key={i}
@@ -160,7 +160,7 @@ export default function DashboardPreview({ onOpenDemo }: { onOpenDemo?: () => vo
               ))}
             </div>
 
-            {/* Next 1:1 Live Class Card */}
+            {/* Next One-on-One Live Class Card */}
             <div
               style={{
                 borderRadius: 16,
@@ -189,7 +189,7 @@ export default function DashboardPreview({ onOpenDemo }: { onOpenDemo?: () => vo
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 12, color: "white" }}>
-                  Next 1:1 Live Class
+                  Next One-on-One Live Class
                 </div>
                 <div style={{ fontSize: 11, color: "#DDD6FE", marginTop: 2, textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
                   Spring Security & JWT Auth · Today 7:30 PM IST

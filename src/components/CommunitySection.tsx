@@ -28,7 +28,7 @@ export default function CommunitySection() {
     {
       name: "WhatsApp Community",
       members: "12,000+ Learners",
-      desc: "Class schedules, 1:1 live demo alerts, scholarship notifications, and direct advisor support.",
+      desc: "Class schedules, One-on-One live demo alerts, scholarship notifications, and direct advisor support.",
       badge: "Instant Alerts",
       actionText: "Join WhatsApp Broadcast",
       url: "https://whatsapp.com",
@@ -39,7 +39,7 @@ export default function CommunitySection() {
     {
       name: "LinkedIn Network",
       members: "50,000+ Alumni",
-      desc: "Connect with KR Tech alumni working at top tech firms, read learner success stories, and network.",
+      desc: "Connect with KR Global Learning alumni working at top tech firms, read learner success stories, and network.",
       badge: "Alumni Network",
       actionText: "Follow on LinkedIn",
       url: "https://linkedin.com",
@@ -58,7 +58,7 @@ export default function CommunitySection() {
             badgeClass="badge-purple"
             title="Join the 50,000+ Member"
             accent="Developer Network"
-            desc="You never learn alone at KR Tech. Connect with fellow developers, share code, and get mentor support 24/7."
+            desc="You never learn alone at KR Global Learning. Connect with fellow developers, share code, and get mentor support 24/7."
           />
         </div>
 

@@ -36,6 +36,7 @@ export interface AuthResponse {
   success: boolean;
   user: User;
   token: string;
+  refreshToken?: string;
   message?: string;
 }
 
@@ -48,8 +49,21 @@ export interface RegisterPayload {
   role?: "student" | "admin";
 }
 
+export interface DeviceSession {
+  id: string;
+  deviceInfo: string;
+  browser: string;
+  os: string;
+  ipAddress: string;
+  lastActive: string;
+  expiresAt: string;
+  isCurrent: boolean;
+}
+
 const TOKEN_KEY = "krtech_token";
+const REFRESH_TOKEN_KEY = "krtech_refresh_token";
 const USER_KEY = "krtech_user";
+const REMEMBER_KEY = "krtech_remember_me";
 
 export const authService = {
   /**
@@ -60,6 +74,9 @@ export const authService = {
       const response = await api.post<AuthResponse>("/auth/register", data);
       if (response.data?.token) {
         localStorage.setItem(TOKEN_KEY, response.data.token);
+        if (response.data.refreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, response.data.refreshToken);
+        }
         localStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
       }
       return response.data;
@@ -70,14 +87,22 @@ export const authService = {
   },
 
   /**
-   * Login user with email and password in MongoDB Atlas
+   * Login user with email and password in MongoDB Atlas (supports rememberMe)
    */
-  async login(email: string, password?: string): Promise<AuthResponse> {
+  async login(email: string, password?: string, rememberMe: boolean = true): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>("/auth/login", { email, password });
+      const response = await api.post<AuthResponse>("/auth/login", {
+        email,
+        password,
+        rememberMe,
+      });
       if (response.data?.token) {
         localStorage.setItem(TOKEN_KEY, response.data.token);
+        if (response.data.refreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, response.data.refreshToken);
+        }
         localStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
+        localStorage.setItem(REMEMBER_KEY, JSON.stringify(rememberMe));
       }
       return response.data;
     } catch (err: any) {
@@ -203,11 +228,83 @@ export const authService = {
   },
 
   /**
-   * Log out user
+   * Log out user & invalidate refresh token
    */
   logout(): void {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (refreshToken) {
+      api.post("/auth/logout", { refreshToken }).catch(() => {});
+    }
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+  },
+
+  /**
+   * Refresh access token using stored refresh token
+   */
+  async refreshAccessToken(): Promise<string | null> {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!refreshToken) return null;
+
+    try {
+      const response = await api.post<{ success: boolean; token: string; refreshToken?: string; user?: any }>(
+        "/auth/refresh-token",
+        { refreshToken }
+      );
+      if (response.data?.token) {
+        localStorage.setItem(TOKEN_KEY, response.data.token);
+        if (response.data.refreshToken) {
+          localStorage.setItem(REFRESH_TOKEN_KEY, response.data.refreshToken);
+        }
+        if (response.data.user) {
+          localStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
+        }
+        return response.data.token;
+      }
+    } catch {
+      this.logout();
+    }
+    return null;
+  },
+
+  /**
+   * Get active sessions for current user (Security Page)
+   */
+  async getSessions(): Promise<DeviceSession[]> {
+    try {
+      const response = await api.get<{ success: boolean; sessions: DeviceSession[] }>("/auth/sessions");
+      return response.data?.sessions || [];
+    } catch {
+      return [];
+    }
+  },
+
+  /**
+   * Revoke specific device session
+   */
+  async revokeSession(sessionId: string): Promise<boolean> {
+    try {
+      const response = await api.delete<{ success: boolean; message: string }>(`/auth/sessions/${sessionId}`);
+      return !!response.data?.success;
+    } catch (err: any) {
+      throw new Error(err.response?.data?.message || err.message || "Failed to revoke device session");
+    }
+  },
+
+  /**
+   * Terminate all device sessions (Logout All)
+   */
+  async logoutAll(): Promise<string> {
+    try {
+      const response = await api.post<{ success: boolean; message: string }>("/auth/logout-all");
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      return response.data?.message || "Successfully logged out from all devices";
+    } catch (err: any) {
+      throw new Error(err.response?.data?.message || err.message || "Failed to log out all devices");
+    }
   },
 
   /**
@@ -252,4 +349,48 @@ export const authService = {
     }
     return token;
   },
+
+  /**
+   * Request 6-digit OTP code for password reset
+   */
+  async forgotPassword(email: string): Promise<{ success: boolean; message: string; expiresIn?: string }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; expiresIn?: string }>("/auth/forgot-password", { email });
+      return response.data;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || "Failed to dispatch password reset OTP";
+      throw new Error(msg);
+    }
+  },
+
+  /**
+   * Verify 6-digit OTP code to receive Reset Authorization Token
+   */
+  async verifyOtp(email: string, otp: string): Promise<{ success: boolean; message: string; resetToken?: string; remainingAttempts?: number }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; resetToken?: string; remainingAttempts?: number }>("/auth/verify-otp", { email, otp });
+      return response.data;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || "Invalid or expired OTP code";
+      throw new Error(msg);
+    }
+  },
+
+  /**
+   * Reset password using verified Reset Authorization Token
+   */
+  async resetPassword(email: string, resetToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string }>("/auth/reset-password", {
+        email,
+        resetToken,
+        newPassword,
+      });
+      return response.data;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || "Failed to reset password";
+      throw new Error(msg);
+    }
+  },
 };
+

@@ -1,145 +1,163 @@
 import { I } from "./Icons";
-import SectionHeading from "./SectionHeading";
 
 export default function LearningJourney({ onOpenDemo }: { onOpenDemo?: () => void }) {
   const steps = [
     {
       num: "01",
-      title: "Book Free 1:1 Live Demo",
-      desc: "Experience our teaching methodology first-hand. Meet with a senior advisor, understand the curriculum, and set your career goals with zero commitment.",
+      phase: "Phase 1",
+      title: "Skill Diagnostic & One-on-One Goal Calibration",
+      desc: "Experience our teaching methodology first-hand. Meet with a senior advisor, evaluate current gaps, and establish milestone targets with zero financial commitment.",
       icon: <I.Sparkles />,
-      badge: "Step 1",
-      color: "#7C3AED",
+      accent: "#06B6D4",
+      bg: "rgba(6,182,212,0.15)",
     },
     {
       num: "02",
-      title: "Meet Your Dedicated Mentor",
-      desc: "Get paired with an industry engineer (10+ years exp at Amazon, Google, Razorpay). They evaluate your skill level and craft a custom syllabus tailored to you.",
+      phase: "Phase 2",
+      title: "Dedicated Senior Technical Mentor Pairing",
+      desc: "Get matched One-on-One with an active staff engineer (10+ years at Amazon, Google, Razorpay). They design a customized syllabus aligned with your career goals.",
       icon: <I.Users />,
-      badge: "Step 2",
-      color: "#0891B2",
+      accent: "#A78BFA",
+      bg: "rgba(167,139,250,0.15)",
     },
     {
       num: "03",
-      title: "Personalized Live 1:1 Classes",
-      desc: "Interactive live screen-sharing classes scheduled around your availability. Write code together, debug in real-time, and get immediate feedback on architectural patterns.",
+      phase: "Phase 3",
+      title: "Personalized Live One-on-One Coding Sessions",
+      desc: "Interactive live screen-sharing scheduled at your flexibility. Write code together, master distributed design patterns, and solve production bottlenecks in real-time.",
       icon: <I.Play />,
-      badge: "Step 3",
-      color: "#7C3AED",
+      accent: "#38BDF8",
+      bg: "rgba(56,189,248,0.15)",
     },
     {
       num: "04",
-      title: "Hands-on Assignments & Code Review",
-      desc: "Build muscle memory with real programming challenges. Submit PRs on GitHub and receive line-by-line code reviews and refactoring suggestions from your mentor.",
+      phase: "Phase 4",
+      title: "Line-by-Line GitHub PR Code Reviews",
+      desc: "Develop production muscle memory. Submit pull requests on GitHub and receive thorough line-by-line code reviews, linting feedback, and performance refactoring from your mentor.",
       icon: <I.Code />,
-      badge: "Step 4",
-      color: "#0891B2",
+      accent: "#10B981",
+      bg: "rgba(16,185,129,0.15)",
     },
     {
       num: "05",
-      title: "Enterprise-Grade Capstone Project",
-      desc: "Architect and build high-scale production projects (Microservices, Full Stack Apps, AI Pipelines) ready to showcase on your portfolio and GitHub.",
+      phase: "Phase 5",
+      title: "Enterprise-Grade Capstone Deployment",
+      desc: "Architect scalable distributed systems (Microservices, Kafka Pipelines, AI Agents, Cloud Infra) ready for live production deployment and portfolio defense.",
       icon: <I.Award />,
-      badge: "Step 5",
-      color: "#7C3AED",
+      accent: "#F59E0B",
+      bg: "rgba(245,158,11,0.15)",
     },
     {
       num: "06",
-      title: "Verified Certificate & Resume Support",
-      desc: "Earn a globally verifiable KR Tech course completion certificate. Receive 1:1 ATS-friendly resume review and LinkedIn profile optimization from industry mentors.",
+      phase: "Phase 6",
+      title: "Industry Certification & Verifiable Credential",
+      desc: "Earn an official verified certificate of completion with unique Credential ID and live QR code. Master vendor exam objectives for AWS, Azure, Cisco, and SAP through structured capstone assessments.",
       icon: <I.Check />,
-      badge: "Step 6",
-      color: "#10B981",
+      accent: "#EC4899",
+      bg: "rgba(236,72,153,0.15)",
     },
   ];
 
   return (
-    <section id="journey" className="bg-lavender" style={{ padding: "80px 0" }}>
-      <div className="container-xl">
-        <div style={{ marginBottom: 52 }}>
-          <SectionHeading
-            badge="Your Roadmap"
-            badgeClass="badge-purple"
-            title="Your 6-Step"
-            accent="Learning Journey"
-            desc="From your very first free demo class to building enterprise applications with 10+ years mentors."
-          />
+    <section id="journey" className="py-24 bg-dark-purple relative overflow-hidden text-white border-t border-purple-500/15">
+      {/* Background ambient lighting */}
+      <div className="orb" style={{ width: 550, height: 550, top: -120, left: -60, background: "rgba(124,58,237,0.2)" }} />
+      <div className="orb" style={{ width: 450, height: 450, bottom: -80, right: -40, background: "rgba(6,182,212,0.18)" }} />
+
+      <div className="container-xl relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-3">
+            <I.Sparkles /> 6-PHASE SCALABLE ROADMAP
+          </span>
+          <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+            Your Accelerated <span className="gradient-text-warm">Learning Journey</span>
+          </h2>
+          <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-2xl mx-auto">
+            From your very first diagnostic demo class to building high-concurrency enterprise applications with 10+ years mentors.
+          </p>
         </div>
 
-        <div style={{ maxWidth: 840, margin: "0 auto", position: "relative" }}>
-          {/* Vertical glowing purple line */}
-          <div className="timeline-line hidden sm:block" />
+        <div className="max-w-4xl mx-auto relative">
+          {/* Vertical glowing timeline line */}
+          <div
+            className="hidden sm:block absolute left-8 top-6 bottom-6 w-1 rounded-full"
+            style={{
+              background: "linear-gradient(180deg, #06B6D4 0%, #7C3AED 50%, #EC4899 100%)",
+              boxShadow: "0 0 15px rgba(6, 182, 212, 0.4)",
+            }}
+          />
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+          <div className="space-y-6 sm:space-y-8">
             {steps.map((s, i) => (
               <div
                 key={i}
-                className="timeline-item"
-                style={{
-                  display: "flex",
-                  gap: 24,
-                  alignItems: "flex-start",
-                  position: "relative",
-                }}
+                className="flex items-start gap-4 sm:gap-8 relative group"
               >
                 {/* Node icon */}
-                <div className="timeline-node hidden sm:flex" style={{ color: s.color }}>
+                <div
+                  className="hidden sm:flex w-16 h-16 rounded-2xl items-center justify-center shrink-0 z-10 text-xl font-bold transition-transform group-hover:scale-110"
+                  style={{
+                    background: "rgba(18, 12, 38, 0.95)",
+                    border: `2px solid ${s.accent}`,
+                    boxShadow: `0 0 25px ${s.accent}40`,
+                    color: s.accent,
+                  }}
+                >
                   {s.icon}
                 </div>
 
-                {/* Card */}
+                {/* Glassmorphism Card */}
                 <div
-                  className="card"
+                  className="glass-card-dark p-6 sm:p-7 flex-1 text-left group-hover:border-purple-400/50"
                   style={{
-                    flex: 1,
-                    padding: "26px 28px",
-                    background: "white",
-                    borderRadius: 24,
-                    border: "1.5px solid #EDE9FE",
-                    boxShadow: "0 6px 24px rgba(124,58,237,0.06)",
+                    background: "rgba(18, 12, 38, 0.8)",
+                    border: "1px solid rgba(167, 139, 250, 0.18)",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div className="flex items-center justify-between mb-3">
                     <span
+                      className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider font-sans"
                       style={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: s.color,
-                        background: "#F5F3FF",
-                        padding: "3px 10px",
-                        borderRadius: 99,
+                        background: s.bg,
+                        color: s.accent,
+                        border: `1px solid ${s.accent}40`,
                       }}
                     >
-                      {s.badge}
+                      {s.phase}
                     </span>
-                    <span style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 16, color: "#C4B5FD" }}>
+                    <span className="font-display font-black text-xl text-gray-500 group-hover:text-purple-300 transition-colors">
                       {s.num}
                     </span>
                   </div>
-                  <h3
-                    style={{
-                      fontFamily: "Poppins, sans-serif",
-                      fontWeight: 700,
-                      fontSize: 17,
-                      color: "#0F0A1E",
-                      marginBottom: 8,
-                    }}
-                  >
+
+                  <h3 className="font-display font-bold text-lg sm:text-xl text-white mb-2 group-hover:text-cyan-300 transition-colors">
                     {s.title}
                   </h3>
-                  <p style={{ fontSize: 14, color: "#4B5563", lineHeight: 1.65, margin: 0 }}>{s.desc}</p>
+
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                    {s.desc}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Bottom CTA trigger */}
-          <div style={{ textAlign: "center", marginTop: 44 }}>
+          <div className="text-center mt-12">
             <button
+              type="button"
               onClick={onOpenDemo}
               className="btn-primary"
-              style={{ padding: "14px 34px", fontSize: 15, borderRadius: 16 }}
+              style={{
+                padding: "16px 36px",
+                fontSize: 15,
+                fontWeight: 700,
+                borderRadius: 16,
+                cursor: "pointer",
+                background: "linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)",
+                boxShadow: "0 10px 35px rgba(124, 58, 237, 0.45)",
+              }}
             >
               <I.Sparkles /> Start Your Learning Journey Today
             </button>

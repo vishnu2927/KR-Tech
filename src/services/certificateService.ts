@@ -5,11 +5,16 @@ export interface Certificate {
   title: string;
   category: string;
   studentName: string;
+  studentEmail?: string;
   completionDate: string;
   credentialId: string;
   grade: string;
   skills: string[];
   verified: boolean;
+  qrCodeDataUrl?: string;
+  pdfUrl?: string;
+  issuer?: string;
+  accreditation?: string;
   createdAt?: string;
   updatedAt?: string;
   thumbnailGradient?: string;
@@ -124,11 +129,53 @@ export const certificateService = {
     }
   },
 
+  // Get PDF Download URL
+  getPdfDownloadUrl(credentialId: string): string {
+    const baseUrl = api.defaults.baseURL || "/api";
+    return `${baseUrl}/certificates/${encodeURIComponent(credentialId.trim())}/pdf`;
+  },
+
+  // Trigger PDF Download
+  downloadPdf(credentialId: string) {
+    const url = this.getPdfDownloadUrl(credentialId);
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.download = `KR_Tech_Certificate_${credentialId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+
+  // Generate new certificate in Atlas
+  async generateCertificate(payload: {
+    studentName: string;
+    title: string;
+    category?: string;
+    studentEmail?: string;
+    grade?: string;
+    skills?: string[];
+    sendEmail?: boolean;
+  }): Promise<{ success: boolean; certificate: Certificate; downloadPdfUrl: string; verifyUrl: string }> {
+    const response = await api.post("/certificates/generate", payload);
+    return response.data;
+  },
+
+  // Send certificate email with PDF attachment
+  async sendCertificateEmail(payload: {
+    credentialId: string;
+    email: string;
+    phone?: string;
+  }): Promise<{ success: boolean; message: string }> {
+    const response = await api.post("/certificates/send-email", payload);
+    return response.data;
+  },
+
   // Client-side print / download helper
   downloadCertificateDoc(certificate: Certificate) {
-    const filename = `KR_Tech_Certificate_${certificate.credentialId}.txt`;
+    const filename = `KR_Global_Learning_Certificate_${certificate.credentialId}.txt`;
     const content = `================================================================================
-KR TECH ACADEMY — OFFICIAL VERIFIED CREDENTIAL
+KR GLOBAL LEARNING PRIVATE LIMITED — OFFICIAL VERIFIED CREDENTIAL
 Verified via MongoDB Atlas Academic Registry
 ================================================================================
 
@@ -144,13 +191,17 @@ SKILLS & COMPETENCIES VALIDATED:
 ${certificate.skills.map((s) => `  * ${s}`).join("\n")}
 
 VERIFICATION URL:
-https://krtech.in/certificates?verify=${encodeURIComponent(certificate.credentialId)}
+https://krtech.edu/certificates?verify=${encodeURIComponent(certificate.credentialId)}
 
 SECURITY HASH:
 SHA-256-${(certificate._id || certificate.credentialId).toUpperCase()}
 
 ================================================================================
-Academic Registrar: KR Tech Global Academic Council
+ISSUED BY: KR GLOBAL LEARNING PRIVATE LIMITED
+CORPORATE OFFICE: Unit No. 615, Artha Mart, Tech Zone IV, Greater Noida West – 201318
+STUDENT SUPPORT: +91 9311073936
+BUSINESS EMAIL: krglobal0713@gmail.com
+Academic Registrar: KR Global Learning Certification Authority
 Website: https://krtech.in | Verification Portal: https://krtech.in/certificates
 ================================================================================`;
 

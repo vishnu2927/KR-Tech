@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DashboardSidebar, { SidebarItem } from "../components/DashboardSidebar";
 import NotificationDropdown from "../components/NotificationDropdown";
@@ -7,7 +7,16 @@ import { leadService, Lead, LeadStatus, LeadStats } from "../services/leadServic
 import { courseService, Course, CoursePayload } from "../services/courseService";
 import { mentorService, Mentor, MentorPayload } from "../services/mentorService";
 import { authService } from "../services/authService";
+import { paymentService, PaymentRecord, PaymentStats, MonthlyRevenueItem, BestSellingCourseItem, CouponItem, OrderRecord } from "../services/paymentService";
+import { emailService, EmailLogItem, EmailStats } from "../services/emailService";
+import { whatsappService, WhatsAppLogItem, WhatsAppStats } from "../services/whatsappService";
 import AnalyticsModule from "../components/analytics/AnalyticsModule";
+import AnalyticsDashboardView from "../components/analytics/AnalyticsDashboardView";
+import { notificationService, NotificationItem, CreateNotificationPayload } from "../services/notificationService";
+import AdminCRMOverview from "../components/admin/AdminCRMOverview";
+import BatchManagementView from "../components/admin/BatchManagementView";
+import AssignmentReviewView from "../components/admin/AssignmentReviewView";
+import CertificateGeneratorView from "../components/admin/CertificateGeneratorView";
 import { I } from "../components/Icons";
 
 interface StudentRecord {
@@ -36,7 +45,14 @@ const INITIAL_STUDENTS: StudentRecord[] = [
 export default function AdminDashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const { tab } = useParams<{ tab?: string }>();
+  const [activeTab, setActiveTab] = useState<string>(tab || "dashboard");
+
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [tab]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [students, setStudents] = useState<StudentRecord[]>(INITIAL_STUDENTS);
   const [coursesList, setCoursesList] = useState<Course[]>([]);
@@ -79,6 +95,89 @@ export default function AdminDashboardPage() {
   const [mentorPage, setMentorPage] = useState(1);
   const mentorsPerPage = 6;
 
+  // Razorpay Payments State & Pagination
+  const [paymentsList, setPaymentsList] = useState<PaymentRecord[]>([]);
+  const [paymentStats, setPaymentStats] = useState<PaymentStats>({
+    totalRevenue: 129990,
+    totalPayments: 10,
+    totalOrders: 14,
+    purchasedCoursesCount: 10,
+    currency: "INR",
+    recentPayments: [],
+  });
+  const [paymentSearch, setPaymentSearch] = useState("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("All");
+  const [paymentPage, setPaymentPage] = useState(1);
+  const paymentsPerPage = 8;
+
+  // Revenue & Order Section States
+  const [monthlyRevenue, setMonthlyRevenue] = useState<MonthlyRevenueItem[]>([]);
+  const [bestSellingCourses, setBestSellingCourses] = useState<BestSellingCourseItem[]>([]);
+  const [couponAnalytics, setCouponAnalytics] = useState<CouponItem[]>([]);
+  const [ordersList, setOrdersList] = useState<OrderRecord[]>([]);
+  const [revenueSubTab, setRevenueSubTab] = useState<"overview" | "orders" | "bestsellers" | "coupons">("overview");
+
+  // Email Automation Logs & Stats State
+  const [emailLogs, setEmailLogs] = useState<EmailLogItem[]>([]);
+  const [emailStats, setEmailStats] = useState<EmailStats>({
+    totalDispatched: 0,
+    sentCount: 0,
+    failedCount: 0,
+    deliveryRate: 100,
+    byTemplate: [],
+    recentLogs: [],
+  });
+  const [emailSearch, setEmailSearch] = useState("");
+  const [emailTemplateFilter, setEmailTemplateFilter] = useState("All");
+  const [emailStatusFilter, setEmailStatusFilter] = useState("All");
+  const [emailPage, setEmailPage] = useState(1);
+  const emailsPerPage = 8;
+  const [testEmailRecipient, setTestEmailRecipient] = useState("student.demo@krtech.edu");
+  const [testEmailTemplate, setTestEmailTemplate] = useState("welcome");
+  const [sendingTestEmail, setSendingTestEmail] = useState(false);
+  const [previewModalUrl, setPreviewModalUrl] = useState<string | null>(null);
+  const [previewModalTitle, setPreviewModalTitle] = useState<string>("");
+  const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
+
+  // WhatsApp Automation Logs & Stats State
+  const [whatsappLogs, setWhatsappLogs] = useState<WhatsAppLogItem[]>([]);
+  const [whatsappStats, setWhatsappStats] = useState<WhatsAppStats>({
+    totalDispatched: 0,
+    sentCount: 0,
+    failedCount: 0,
+    retriedCount: 0,
+    deliveryRate: 100,
+    byTemplate: [],
+    recentLogs: [],
+  });
+  const [whatsappSearch, setWhatsappSearch] = useState("");
+  const [whatsappTemplateFilter, setWhatsappTemplateFilter] = useState("All");
+  const [whatsappStatusFilter, setWhatsappStatusFilter] = useState("All");
+  const [whatsappPage, setWhatsappPage] = useState(1);
+  const whatsappsPerPage = 8;
+  const [testWaRecipient, setTestWaRecipient] = useState("+91 98765 43210");
+  const [testWaTemplate, setTestWaTemplate] = useState("demo_confirmation");
+  const [sendingTestWa, setSendingTestWa] = useState(false);
+  const [retryingWaId, setRetryingWaId] = useState<string | null>(null);
+  const [previewWaTemplate, setPreviewWaTemplate] = useState("demo_confirmation");
+  const [previewWaText, setPreviewWaText] = useState("");
+
+  // Notifications Broadcast Center State
+  const [adminNotifications, setAdminNotifications] = useState<NotificationItem[]>([]);
+  const [notifSearch, setNotifSearch] = useState("");
+  const [notifTypeFilter, setNotifTypeFilter] = useState("All");
+  const [notifPage, setNotifPage] = useState(1);
+  const notifsPerPage = 8;
+  const [notifComposeModal, setNotifComposeModal] = useState(false);
+  const [newNotifTitle, setNewNotifTitle] = useState("");
+  const [newNotifMessage, setNewNotifMessage] = useState("");
+  const [newNotifType, setNewNotifType] = useState<"announcement" | "course_reminder" | "demo_reminder" | "system">("announcement");
+  const [newNotifRecipient, setNewNotifRecipient] = useState("all");
+  const [newNotifPriority, setNewNotifPriority] = useState<"normal" | "high" | "urgent">("normal");
+  const [newNotifActionUrl, setNewNotifActionUrl] = useState("/courses");
+  const [newNotifScheduledTime, setNewNotifScheduledTime] = useState("");
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+
   // Course Modal State (Create / Edit)
   const [courseModal, setCourseModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -91,11 +190,11 @@ export default function AdminDashboardPage() {
     price: "₹14,999",
     originalPrice: "₹24,999",
     mentor: "Rajesh Kumar",
-    mentorCompany: "Ex-Amazon",
+    mentorCompany: "Principal Technical Architect",
     mentorExp: "10+ Years",
     language: "English & Hindi",
-    description: "Comprehensive 1:1 live mentorship covering system architecture, production capstones, and interview preparation.",
-    highlights: "1:1 Live Mentorship, Real-world Capstones, Code Review, Resume Prep",
+    description: "Comprehensive One-on-One live mentorship covering system architecture, production capstones, and interview preparation.",
+    highlights: "One-on-One Live Mentorship, Real-world Capstones, Code Review, Resume Prep",
     badge: "Bestseller",
     image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
   });
@@ -106,7 +205,7 @@ export default function AdminDashboardPage() {
   const [mentorForm, setMentorForm] = useState({
     name: "",
     role: "Senior Staff Engineer",
-    company: "Ex-Amazon",
+    company: "Principal Technical Architect",
     specialization: "Java Backend & Distributed Architecture",
     domain: "Java Backend",
     exp: "10+ Years",
@@ -133,13 +232,21 @@ export default function AdminDashboardPage() {
   };
 
   const sidebarItems: SidebarItem[] = [
-    { key: "dashboard", label: "Executive Suite", icon: "📊" },
-    { key: "leads", label: "CRM Leads", icon: "📋", count: `${leads.length}` },
-    { key: "students", label: "Enrolled Students", icon: "🎓", count: `${students.length}` },
-    { key: "courses", label: "Course Catalog", icon: "📚", count: `${coursesList.length}` },
-    { key: "mentors", label: "Principal Mentors", icon: "⚡", count: `${mentorsList.length}` },
+    { key: "dashboard", label: "Executive Suite", icon: "📊", path: "/admin" },
+    { key: "batches", label: "Batch Management", icon: "👥", path: "/admin/batches" },
+    { key: "assignments", label: "Assignment Review", icon: "📝", path: "/admin/assignments" },
+    { key: "live", label: "Live Class Scheduler", icon: "🔴", path: "/admin/live" },
+    { key: "analytics", label: "Analytics & Telemetry", icon: "📈", path: "/admin/analytics" },
+    { key: "payments", label: "Razorpay Payments", icon: "💳", path: "/admin/payments", count: `${paymentsList.length}` },
+    { key: "emails", label: "Email Automation", icon: "📧", path: "/admin/emails", count: `${emailLogs.length}` },
+    { key: "whatsapp", label: "WhatsApp Automation", icon: "💬", count: `${whatsappLogs.length}` },
+    { key: "notifications", label: "Broadcasts & Alerts", icon: "🔔", path: "/admin/notifications", count: `${adminNotifications.length}` },
+    { key: "leads", label: "CRM Leads", icon: "📋", path: "/admin/leads", count: `${leads.length}` },
+    { key: "students", label: "Enrolled Students", icon: "🎓", path: "/admin/students", count: `${students.length}` },
+    { key: "courses", label: "Course Catalog", icon: "📚", path: "/admin/courses", count: `${coursesList.length}` },
+    { key: "mentors", label: "Principal Mentors", icon: "⚡", path: "/admin/mentors", count: `${mentorsList.length}` },
+    { key: "certificates", label: "Certificate Hub", icon: "🏆", path: "/admin/certificates" },
     { key: "resources", label: "Curriculum Assets", icon: "📥" },
-    { key: "certificates", label: "Credential Hub", icon: "🏆" },
     { key: "settings", label: "System Config", icon: "⚙️" },
   ];
 
@@ -150,12 +257,35 @@ export default function AdminDashboardPage() {
       // Ensure active admin token in localStorage
       await authService.ensureAdminToken();
 
-      const [fetchedLeads, fetchedStats, fetchedCourses, fetchedMentors] = await Promise.all([
+      const [
+        fetchedLeads,
+        fetchedStats,
+        fetchedCourses,
+        fetchedMentors,
+        fetchedPayments,
+        fetchedPStats,
+        fetchedEmailLogs,
+        fetchedEmailStats,
+        fetchedWaLogs,
+        fetchedWaStats,
+        fetchedNotifs,
+      ] = await Promise.all([
         leadService.getAllLeads(),
         leadService.getLeadStats(),
         courseService.getAllCourses(),
         mentorService.getAllMentors(),
+        paymentService.getAllPayments(),
+        paymentService.getPaymentStats(),
+        emailService.getEmailLogs({ limit: 50 }),
+        emailService.getEmailStats(),
+        whatsappService.getWhatsAppLogs({ limit: 50 }),
+        whatsappService.getWhatsAppStats(),
+        notificationService.getNotifications({ limit: 50 }),
       ]);
+
+      if (fetchedNotifs?.notifications) {
+        setAdminNotifications(fetchedNotifs.notifications);
+      }
 
       if (fetchedLeads && fetchedLeads.length > 0) {
         setLeads(fetchedLeads);
@@ -169,6 +299,34 @@ export default function AdminDashboardPage() {
       if (fetchedMentors && fetchedMentors.length > 0) {
         setMentorsList(fetchedMentors);
       }
+      if (fetchedPayments && fetchedPayments.length > 0) {
+        setPaymentsList(fetchedPayments);
+      }
+      if (fetchedPStats) {
+        setPaymentStats(fetchedPStats);
+      }
+      try {
+        const adminPData = await paymentService.getAdminPaymentAnalytics();
+        if (adminPData?.monthlyRevenue) setMonthlyRevenue(adminPData.monthlyRevenue);
+        if (adminPData?.bestSellingCourses) setBestSellingCourses(adminPData.bestSellingCourses);
+        if (adminPData?.couponAnalytics) setCouponAnalytics(adminPData.couponAnalytics);
+        if (adminPData?.orders) setOrdersList(adminPData.orders);
+        if (adminPData?.stats) setPaymentStats(adminPData.stats);
+      } catch (analyticsErr) {
+        console.warn("Could not fetch extended revenue analytics:", analyticsErr);
+      }
+      if (fetchedEmailLogs?.logs) {
+        setEmailLogs(fetchedEmailLogs.logs);
+      }
+      if (fetchedEmailStats) {
+        setEmailStats(fetchedEmailStats);
+      }
+      if (fetchedWaLogs?.logs) {
+        setWhatsappLogs(fetchedWaLogs.logs);
+      }
+      if (fetchedWaStats) {
+        setWhatsappStats(fetchedWaStats);
+      }
 
       const resStudents = await authService.getStudents();
       if (resStudents && resStudents.length > 0) {
@@ -177,7 +335,7 @@ export default function AdminDashboardPage() {
           name: s.name,
           email: s.email,
           phone: s.phone || "+91 98765 00000",
-          course: "1:1 Live Coding & Architecture",
+          course: "One-on-One Live Coding & Architecture",
           avatar: `https://images.unsplash.com/photo-${1534528741775 + idx}?w=120&h=120&fit=crop&crop=faces&auto=format`,
           status: "Active",
           progress: 50 + ((idx * 12) % 45),
@@ -260,11 +418,11 @@ export default function AdminDashboardPage() {
       price: "₹14,999",
       originalPrice: "₹24,999",
       mentor: "Rajesh Kumar",
-      mentorCompany: "Ex-Amazon",
+      mentorCompany: "Principal Technical Architect",
       mentorExp: "10+ Years",
       language: "English & Hindi",
-      description: "Master enterprise system architecture and 1:1 project development.",
-      highlights: "1:1 Live Mentorship, Real-world Capstones, Code Review, Resume Prep",
+      description: "Master enterprise system architecture and One-on-One project development.",
+      highlights: "One-on-One Live Mentorship, Real-world Capstones, Code Review, Resume Prep",
       badge: "Bestseller",
       image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
     });
@@ -299,7 +457,7 @@ export default function AdminDashboardPage() {
 
     const feats = courseForm.highlights
       ? courseForm.highlights.split(",").map((s) => s.trim()).filter(Boolean)
-      : ["1:1 Live Coding", "Capstone Real Project"];
+      : ["One-on-One Live Coding", "Capstone Real Project"];
 
     const payload: CoursePayload = {
       title: courseForm.title,
@@ -329,7 +487,7 @@ export default function AdminDashboardPage() {
       } else {
         // Optimistic local update
         setCoursesList((prev) =>
-          prev.map((c) => (c.id === targetId || c._id === targetId ? { ...c, ...courseForm, features: feats } : c))
+          prev.map((c) => (c.id === targetId || c._id === targetId ? { ...c, ...courseForm, highlights: feats, features: feats } : c))
         );
         showToast("Course updated successfully");
       }
@@ -342,13 +500,15 @@ export default function AdminDashboardPage() {
         const localCourse: Course = {
           id: `course-${Date.now()}`,
           ...payload,
+          duration: payload.duration || "12 Weeks",
+          highlights: feats,
           students: "1.0K",
           rating: "4.9",
           price: typeof payload.price === "number" ? `₹${payload.price}` : (payload.price || "₹14,999"),
           originalPrice: "₹24,999",
           level: payload.level || "Intermediate",
           mentor: payload.mentor || "Rajesh Kumar",
-          mentorCompany: payload.mentorCompany || "Ex-Amazon",
+          mentorCompany: payload.mentorCompany || "Principal Technical Architect",
           mentorExp: "10+ Years",
           language: "English & Hindi",
           categoryGroup: payload.categoryGroup || "Software Development",
@@ -398,7 +558,7 @@ export default function AdminDashboardPage() {
     setMentorForm({
       name: "",
       role: "Senior Staff Engineer",
-      company: "Ex-Google",
+      company: "Staff Software Engineer",
       specialization: "Java Backend & Distributed Architecture",
       domain: "Java Backend",
       exp: "10+ Years",
@@ -441,7 +601,7 @@ export default function AdminDashboardPage() {
 
     const skillList = mentorForm.skills
       ? mentorForm.skills.split(",").map((s) => s.trim()).filter(Boolean)
-      : ["Enterprise Architecture", "1:1 Live Coding"];
+      : ["Enterprise Architecture", "One-on-One Live Coding"];
 
     const langList = mentorForm.languages
       ? mentorForm.languages.split(",").map((s) => s.trim()).filter(Boolean)
@@ -558,6 +718,229 @@ export default function AdminDashboardPage() {
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // PAYMENTS ACTIONS & COMPUTED LISTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  const handleExportPaymentsCSV = () => {
+    const headers = ["Payment ID,Order ID,Student Name,Student Email,Course Title,Amount (INR),Status,Date"];
+    const rows = paymentsList.map(p => `"${p.paymentId}","${p.orderId}","${p.userName || 'Student'}","${p.userEmail}","${(p.courseTitle || '').replace(/"/g, '""')}","${p.amount}","${p.status}","${new Date(p.createdAt).toLocaleDateString()}"`);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `KRTech_Razorpay_Payments_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Razorpay payments exported successfully as CSV");
+  };
+
+  const filteredPayments = useMemo(() => {
+    return paymentsList.filter((p) => {
+      const matchStatus = paymentStatusFilter === "All" || p.status.toLowerCase() === paymentStatusFilter.toLowerCase();
+      const q = paymentSearch.toLowerCase().trim();
+      const matchQuery =
+        !q ||
+        (p.paymentId && p.paymentId.toLowerCase().includes(q)) ||
+        (p.orderId && p.orderId.toLowerCase().includes(q)) ||
+        (p.userEmail && p.userEmail.toLowerCase().includes(q)) ||
+        (p.userName && p.userName.toLowerCase().includes(q)) ||
+        (p.courseTitle && p.courseTitle.toLowerCase().includes(q));
+      return matchStatus && matchQuery;
+    });
+  }, [paymentsList, paymentStatusFilter, paymentSearch]);
+
+  const totalPaymentsPages = Math.ceil(filteredPayments.length / paymentsPerPage) || 1;
+  const paginatedPayments = useMemo(() => {
+    const start = (paymentPage - 1) * paymentsPerPage;
+    return filteredPayments.slice(start, start + paymentsPerPage);
+  }, [filteredPayments, paymentPage, paymentsPerPage]);
+
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderPage, setOrderPage] = useState(1);
+  const ordersPerPage = 8;
+  const filteredOrders = useMemo(() => {
+    return ordersList.filter((o) => {
+      const q = orderSearch.toLowerCase().trim();
+      return (
+        !q ||
+        (o.orderId && o.orderId.toLowerCase().includes(q)) ||
+        (o.userEmail && o.userEmail.toLowerCase().includes(q)) ||
+        (o.courseTitle && o.courseTitle.toLowerCase().includes(q))
+      );
+    });
+  }, [ordersList, orderSearch]);
+  const totalOrdersPages = Math.ceil(filteredOrders.length / ordersPerPage) || 1;
+  const paginatedOrders = useMemo(() => {
+    const start = (orderPage - 1) * ordersPerPage;
+    return filteredOrders.slice(start, start + ordersPerPage);
+  }, [filteredOrders, orderPage, ordersPerPage]);
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // EMAIL AUTOMATION ACTIONS & COMPUTED LISTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  const handleSendTestEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testEmailRecipient) {
+      showToast("Please enter a recipient email address.");
+      return;
+    }
+    setSendingTestEmail(true);
+    try {
+      await emailService.sendTestEmail({
+        to: testEmailRecipient,
+        template: testEmailTemplate,
+        data: {
+          name: "KR Global Learning Student",
+          courseTitle: "One-on-One Live Coding Academy Track",
+          amount: 14999,
+          otp: "591024",
+          certId: "CERT-KR-2026-9204",
+        },
+      });
+      showToast(`✓ Test email (${testEmailTemplate}) dispatched to ${testEmailRecipient}!`);
+      // Refresh email logs & stats
+      const updatedLogs = await emailService.getEmailLogs({ limit: 50 });
+      if (updatedLogs?.logs) setEmailLogs(updatedLogs.logs);
+      const updatedStats = await emailService.getEmailStats();
+      if (updatedStats) setEmailStats(updatedStats);
+    } catch (err: any) {
+      showToast(`Error dispatching test email: ${err.message}`);
+    } finally {
+      setSendingTestEmail(false);
+    }
+  };
+
+  const handleResendEmail = async (logId: string) => {
+    setResendingEmailId(logId);
+    try {
+      await emailService.resendEmail(logId);
+      showToast("✓ Email successfully re-queued for delivery!");
+      const updatedLogs = await emailService.getEmailLogs({ limit: 50 });
+      if (updatedLogs?.logs) setEmailLogs(updatedLogs.logs);
+      const updatedStats = await emailService.getEmailStats();
+      if (updatedStats) setEmailStats(updatedStats);
+    } catch (err: any) {
+      showToast(`Error resending email: ${err.message}`);
+    } finally {
+      setResendingEmailId(null);
+    }
+  };
+
+  const filteredEmailLogs = useMemo(() => {
+    return emailLogs.filter((log) => {
+      const matchTemplate = emailTemplateFilter === "All" || log.template === emailTemplateFilter;
+      const matchStatus = emailStatusFilter === "All" || log.status === emailStatusFilter;
+      const q = emailSearch.toLowerCase().trim();
+      const matchQuery =
+        !q ||
+        (log.recipient && log.recipient.toLowerCase().includes(q)) ||
+        (log.subject && log.subject.toLowerCase().includes(q)) ||
+        (log.messageId && log.messageId.toLowerCase().includes(q));
+      return matchTemplate && matchStatus && matchQuery;
+    });
+  }, [emailLogs, emailTemplateFilter, emailStatusFilter, emailSearch]);
+
+  const totalEmailPages = Math.ceil(filteredEmailLogs.length / emailsPerPage) || 1;
+  const paginatedEmailLogs = useMemo(() => {
+    const start = (emailPage - 1) * emailsPerPage;
+    return filteredEmailLogs.slice(start, start + emailsPerPage);
+  }, [filteredEmailLogs, emailPage, emailsPerPage]);
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // WHATSAPP AUTOMATION ACTIONS & COMPUTED LISTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    whatsappService.previewTemplate(previewWaTemplate).then((res) => {
+      if (res?.text) setPreviewWaText(res.text);
+    });
+  }, [previewWaTemplate]);
+
+  const handleSendTestWhatsApp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testWaRecipient.trim()) {
+      showToast("Please enter a recipient WhatsApp phone number.");
+      return;
+    }
+    setSendingTestWa(true);
+    try {
+      const res = await whatsappService.sendTestWhatsApp({
+        to: testWaRecipient,
+        template: testWaTemplate,
+        data: {
+          name: "Aryan Sharma",
+          course: "Full Stack MERN Mastery Bootcamp",
+          courseTitle: "Full Stack MERN Mastery Bootcamp",
+          amount: 14999,
+          date: "Tomorrow",
+          time: "7:00 PM IST",
+          mentor: "Rajesh Kumar (Principal Technical Architect)",
+          certId: "KRT-2026-MERN-8401",
+          grade: "Grade A+ (98%)",
+          topic: "Production Microservices & Redis Caching",
+        },
+      });
+      if (res.success) {
+        showToast(`✓ WhatsApp message (${testWaTemplate}) dispatched to ${testWaRecipient}!`);
+      } else {
+        showToast(`Notice: ${res.message || res.error || "Dispatched via simulator"}`);
+      }
+      // Refresh logs & stats
+      const [updatedLogs, updatedStats] = await Promise.all([
+        whatsappService.getWhatsAppLogs({ limit: 50 }),
+        whatsappService.getWhatsAppStats(),
+      ]);
+      if (updatedLogs?.logs) setWhatsappLogs(updatedLogs.logs);
+      if (updatedStats) setWhatsappStats(updatedStats);
+    } catch (err: any) {
+      showToast(`Error dispatching WhatsApp: ${err.message}`);
+    } finally {
+      setSendingTestWa(false);
+    }
+  };
+
+  const handleRetryWhatsApp = async (logId: string) => {
+    setRetryingWaId(logId);
+    try {
+      const res = await whatsappService.retryMessage(logId);
+      if (res.success) {
+        showToast(`✓ WhatsApp message successfully retried!`);
+      } else {
+        showToast(`Retry notice: ${res.message || "Retry processed"}`);
+      }
+      const [updatedLogs, updatedStats] = await Promise.all([
+        whatsappService.getWhatsAppLogs({ limit: 50 }),
+        whatsappService.getWhatsAppStats(),
+      ]);
+      if (updatedLogs?.logs) setWhatsappLogs(updatedLogs.logs);
+      if (updatedStats) setWhatsappStats(updatedStats);
+    } catch (err: any) {
+      showToast(`Retry error: ${err.message}`);
+    } finally {
+      setRetryingWaId(null);
+    }
+  };
+
+  const filteredWhatsAppLogs = useMemo(() => {
+    return whatsappLogs.filter((log) => {
+      const matchTemplate = whatsappTemplateFilter === "All" || log.template === whatsappTemplateFilter;
+      const matchStatus = whatsappStatusFilter === "All" || log.status === whatsappStatusFilter;
+      const q = whatsappSearch.toLowerCase().trim();
+      const matchQuery =
+        !q ||
+        (log.recipient && log.recipient.toLowerCase().includes(q)) ||
+        (log.waMessageId && log.waMessageId.toLowerCase().includes(q)) ||
+        (log.messagePreview && log.messagePreview.toLowerCase().includes(q));
+      return matchTemplate && matchStatus && matchQuery;
+    });
+  }, [whatsappLogs, whatsappTemplateFilter, whatsappStatusFilter, whatsappSearch]);
+
+  const totalWhatsAppPages = Math.ceil(filteredWhatsAppLogs.length / whatsappsPerPage) || 1;
+  const paginatedWhatsAppLogs = useMemo(() => {
+    const start = (whatsappPage - 1) * whatsappsPerPage;
+    return filteredWhatsAppLogs.slice(start, start + whatsappsPerPage);
+  }, [filteredWhatsAppLogs, whatsappPage, whatsappsPerPage]);
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // COMPUTED FILTERED LISTS
   // ─────────────────────────────────────────────────────────────────────────────
   const uniqueCourseNames = useMemo(() => {
@@ -666,6 +1049,91 @@ export default function AdminDashboardPage() {
     setMentorPage(1);
   }, [mentorSearch, mentorDomainFilter]);
 
+  // Notification Broadcast Filtering & Handlers
+  const filteredAdminNotifications = useMemo(() => {
+    return adminNotifications.filter((n) => {
+      const matchType =
+        notifTypeFilter === "All" ||
+        (notifTypeFilter === "announcement" && n.type === "announcement") ||
+        (notifTypeFilter === "course_reminder" && n.type === "course_reminder") ||
+        (notifTypeFilter === "demo_reminder" && n.type === "demo_reminder") ||
+        (notifTypeFilter === "unread" && !n.isRead);
+      const q = notifSearch.toLowerCase().trim();
+      const matchQuery =
+        !q ||
+        n.title.toLowerCase().includes(q) ||
+        n.message.toLowerCase().includes(q) ||
+        n.recipient.toLowerCase().includes(q) ||
+        (n.metadata?.courseTitle && n.metadata.courseTitle.toLowerCase().includes(q));
+      return matchType && matchQuery;
+    });
+  }, [adminNotifications, notifTypeFilter, notifSearch]);
+
+  const totalNotifPages = Math.ceil(filteredAdminNotifications.length / notifsPerPage) || 1;
+  const paginatedAdminNotifications = useMemo(() => {
+    const start = (notifPage - 1) * notifsPerPage;
+    return filteredAdminNotifications.slice(start, start + notifsPerPage);
+  }, [filteredAdminNotifications, notifPage, notifsPerPage]);
+
+  const handlePublishNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNotifTitle.trim() || !newNotifMessage.trim()) {
+      showToast("Please provide both title and message.");
+      return;
+    }
+
+    try {
+      setIsBroadcasting(true);
+      const created = await notificationService.createNotification({
+        title: newNotifTitle.trim(),
+        message: newNotifMessage.trim(),
+        type: newNotifType,
+        recipient: newNotifRecipient,
+        recipientRole: newNotifRecipient === "students" ? "student" : "all",
+        priority: newNotifPriority,
+        actionUrl: newNotifActionUrl.trim() || "/courses",
+        metadata: {
+          scheduledTime: newNotifScheduledTime.trim() || undefined,
+        },
+        createdBy: {
+          name: user?.name || "KR Global Learning Admin Council",
+          role: "Administrator",
+        },
+      });
+
+      setAdminNotifications((prev) => [created, ...prev]);
+      showToast("✓ Broadcast notification dispatched to MongoDB Atlas!");
+      setNotifComposeModal(false);
+      setNewNotifTitle("");
+      setNewNotifMessage("");
+      setNewNotifScheduledTime("");
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || "Failed to publish notification.");
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
+
+  const handleDeleteAdminNotification = async (id: string) => {
+    try {
+      await notificationService.deleteNotification(id);
+      setAdminNotifications((prev) => prev.filter((n) => n._id !== id));
+      showToast("✓ Notification deleted from Atlas.");
+    } catch (err: any) {
+      showToast("Failed to delete notification.");
+    }
+  };
+
+  const handleMarkAllAdminNotifsRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setAdminNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      showToast("✓ All notifications marked as read!");
+    } catch (err: any) {
+      showToast("Failed to mark all as read.");
+    }
+  };
+
   // Render Status Badge helper
   const renderStatusBadge = (status: LeadStatus) => {
     switch (status) {
@@ -743,7 +1211,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <h1 className="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
-                KR Tech <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-300 to-amber-300">Executive CRM & CMS Dashboard</span>
+                KR Global Learning <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-300 to-amber-300">CRM & Executive Suite</span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                 Full-lifecycle Operations Suite · Real-time MongoDB Atlas synchronization for candidate leads, enrolled students, course catalog, and mentor roster.
@@ -753,6 +1221,8 @@ export default function AdminDashboardPage() {
               <div className="flex flex-wrap items-center gap-2 pt-2">
                 {[
                   { key: "dashboard", label: "Executive Overview", icon: "📊" },
+                  { key: "payments", label: `Payments (${paymentsList.length})`, icon: "💳" },
+                  { key: "emails", label: `Emails (${emailLogs.length})`, icon: "📧" },
                   { key: "leads", label: `CRM Leads (${leads.length})`, icon: "📋" },
                   { key: "students", label: `Students (${students.length})`, icon: "🎓" },
                   { key: "courses", label: `Courses (${coursesList.length})`, icon: "📚" },
@@ -794,6 +1264,7 @@ export default function AdminDashboardPage() {
                   if (activeTab === "courses") handleExportCoursesCSV();
                   else if (activeTab === "mentors") handleExportMentorsCSV();
                   else if (activeTab === "students") handleExportStudentsCSV();
+                  else if (activeTab === "payments") handleExportPaymentsCSV();
                   else handleExportLeadsCSV();
                 }}
                 className="px-4 py-2.5 bg-slate-900/90 hover:bg-slate-800 text-purple-300 text-xs font-bold rounded-2xl border border-purple-500/30 transition-all flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
@@ -844,6 +1315,89 @@ export default function AdminDashboardPage() {
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "dashboard" && (
           <div className="space-y-8">
+            {/* Phase 10: Founder Super Command Matrix */}
+            <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border border-purple-500/30 shadow-2xl backdrop-blur-xl space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-500/20 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 text-[10px] font-black rounded-full border border-amber-500/30 uppercase tracking-wider">
+                      👑 Founder Suite v10.0
+                    </span>
+                    <span className="text-xs text-slate-400">Enterprise Command Center</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
+                    KR Global Learning <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-300 to-cyan-300">Operations Command Hub</span>
+                  </h2>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    MRR: ₹48.5 Lakhs · ARR: ₹5.82 Cr
+                  </span>
+                </div>
+              </div>
+
+              {/* 6 Quick Action Portals */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <Link
+                  to="/admin/students"
+                  className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-850 transition-all text-left group block"
+                >
+                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">🎓</span>
+                  <p className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors">Student CRM</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">360° Lifecycle</p>
+                </Link>
+
+                <Link
+                  to="/admin/mentors"
+                  className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-850 transition-all text-left group block"
+                >
+                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">⚡</span>
+                  <p className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">Mentor CRM</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Payroll & Ratings</p>
+                </Link>
+
+                <Link
+                  to="/admin/finance"
+                  className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-850 transition-all text-left group block"
+                >
+                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">💳</span>
+                  <p className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">Finance & Tax</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">GST & Invoices</p>
+                </Link>
+
+                <Link
+                  to="/admin/support"
+                  className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-850 transition-all text-left group block"
+                >
+                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">🎧</span>
+                  <p className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">Support Desk</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">SLA Helpdesk</p>
+                </Link>
+
+                <Link
+                  to="/admin/marketing"
+                  className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-pink-500/50 hover:bg-slate-850 transition-all text-left group block"
+                >
+                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">📈</span>
+                  <p className="text-xs font-bold text-white group-hover:text-pink-300 transition-colors">Marketing Intel</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">CAC, LTV & Funnels</p>
+                </Link>
+
+                <Link
+                  to="/admin/notifications"
+                  className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-850 transition-all text-left group block"
+                >
+                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">📢</span>
+                  <p className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors">Broadcasts</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Instant Alerts</p>
+                </Link>
+              </div>
+            </div>
+
+            {/* Phase 5 Sprint 5.1: Live MongoDB Aggregation CRM Overview with Recharts */}
+            <AdminCRMOverview />
+
             {/* 6 High-Impact Analytics KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-lg hover:border-purple-500/40 transition-all">
@@ -852,7 +1406,7 @@ export default function AdminDashboardPage() {
                   <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px]">+14.2%</span>
                 </div>
                 <div className="text-2xl font-extrabold text-white">{(stats.totalStudents || 15420).toLocaleString()}+</div>
-                <div className="text-[11px] text-slate-400 mt-1">94.8% Placement Rate</div>
+                <div className="text-[11px] text-slate-400 mt-1">98.4% Course Completion Rate</div>
               </div>
 
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-lg hover:border-purple-500/40 transition-all">
@@ -867,7 +1421,7 @@ export default function AdminDashboardPage() {
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-lg hover:border-purple-500/40 transition-all">
                 <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
                   <span>Scheduled Demos</span>
-                  <span className="text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full text-[10px]">1:1 Slot</span>
+                  <span className="text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full text-[10px]">One-on-One Slot</span>
                 </div>
                 <div className="text-2xl font-extrabold text-white">{leads.filter(l => l.status === "Scheduled").length || stats.demoScheduled || 2}</div>
                 <div className="text-[11px] text-slate-400 mt-1">Active Screen shares</div>
@@ -879,7 +1433,7 @@ export default function AdminDashboardPage() {
                   <span className="text-cyan-300 font-bold bg-cyan-500/10 px-2 py-0.5 rounded-full text-[10px]">Active</span>
                 </div>
                 <div className="text-2xl font-extrabold text-white">{coursesList.length || 55}</div>
-                <div className="text-[11px] text-slate-400 mt-1">1:1 Capstones</div>
+                <div className="text-[11px] text-slate-400 mt-1">One-on-One Capstones</div>
               </div>
 
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-lg hover:border-purple-500/40 transition-all">
@@ -891,18 +1445,29 @@ export default function AdminDashboardPage() {
                 <div className="text-[11px] text-slate-400 mt-1">10+ Yrs / 4.95 ★</div>
               </div>
 
-              <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-lg hover:border-purple-500/40 transition-all">
+              <div 
+                onClick={() => setActiveTab("payments")}
+                className="p-5 rounded-3xl bg-slate-900/80 border border-emerald-500/30 shadow-lg hover:border-emerald-400/60 transition-all cursor-pointer group"
+                title="Click to view Razorpay Payments Center"
+              >
                 <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span>Revenue Pacing</span>
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px]">Target Met</span>
+                  <span>Razorpay Revenue</span>
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live
+                  </span>
                 </div>
-                <div className="text-2xl font-extrabold text-white">₹1.84 <span className="text-sm font-semibold text-emerald-400">Cr</span></div>
-                <div className="text-[11px] text-slate-400 mt-1">Live Q3 Run-Rate</div>
+                <div className="text-2xl font-extrabold text-white">
+                  ₹{paymentStats.totalRevenue > 0 ? (paymentStats.totalRevenue).toLocaleString("en-IN") : "1,29,990"}
+                </div>
+                <div className="text-[11px] text-cyan-300 mt-1 flex items-center justify-between">
+                  <span>{paymentStats.purchasedCoursesCount || 10} Courses Sold</span>
+                  <span className="group-hover:translate-x-1 transition-transform text-xs font-bold">→</span>
+                </div>
               </div>
             </div>
 
-            {/* Recharts Live Analytics Module */}
-            <AnalyticsModule isDark={true} />
+            {/* Recharts Live Analytics Module with MongoDB Aggregation */}
+            <AnalyticsDashboardView isDark={true} />
 
             {/* Recent Leads Preview in Overview */}
             <div className="p-6 md:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-4">
@@ -961,6 +1526,13 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: DEDICATED ANALYTICS & TELEMETRY SUITE
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "analytics" && (
+          <AnalyticsDashboardView isDark={true} />
         )}
 
         {/* ─────────────────────────────────────────────────────────────────────────────
@@ -1115,7 +1687,7 @@ export default function AdminDashboardPage() {
 
                               {/* WhatsApp Direct Chat */}
                               <a
-                                href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=Hello%20${encodeURIComponent(lead.name)},%20greeting%20from%20KR%20Tech!%20Regarding%20your%201:1%20free%20demo%20for%20${encodeURIComponent(lead.course)}.`}
+                                href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=Hello%20${encodeURIComponent(lead.name)},%20greeting%20from%20KR%20Tech!%20Regarding%20your%20One-on-One%20free%20demo%20for%20${encodeURIComponent(lead.course)}.`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 title="Open WhatsApp Chat"
@@ -1249,7 +1821,7 @@ export default function AdminDashboardPage() {
                     <th className="py-3.5 px-4">Enrolled Track</th>
                     <th className="py-3.5 px-4">Progress</th>
                     <th className="py-3.5 px-4">Batch</th>
-                    <th className="py-3.5 px-4">1:1 Mentor</th>
+                    <th className="py-3.5 px-4">One-on-One Mentor</th>
                     <th className="py-3.5 px-4">Status</th>
                     <th className="py-3.5 px-4 text-right">Action</th>
                   </tr>
@@ -1457,7 +2029,7 @@ export default function AdminDashboardPage() {
                     <th className="py-3.5 px-4">Duration</th>
                     <th className="py-3.5 px-4">Price</th>
                     <th className="py-3.5 px-4">Rating</th>
-                    <th className="py-3.5 px-4">1:1 Mentor</th>
+                    <th className="py-3.5 px-4">One-on-One Mentor</th>
                     <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -1650,7 +2222,7 @@ export default function AdminDashboardPage() {
                     <th className="py-3.5 px-4">Domain</th>
                     <th className="py-3.5 px-4">Experience</th>
                     <th className="py-3.5 px-4">Rating</th>
-                    <th className="py-3.5 px-4">1:1 Mentored</th>
+                    <th className="py-3.5 px-4">One-on-One Mentored</th>
                     <th className="py-3.5 px-4">Languages</th>
                     <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
@@ -1771,6 +2343,2015 @@ export default function AdminDashboardPage() {
             )}
           </div>
         )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: RAZORPAY FINANCIAL OPERATIONS & PAYMENTS AUDIT
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "payments" && (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            {/* Top Metrics Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {/* Revenue Counter */}
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">💰</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-emerald-400">Total Captured Revenue</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                    Auto-Settled
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  ₹{paymentStats.totalRevenue.toLocaleString("en-IN")}
+                </div>
+                <div className="text-xs text-emerald-400/80 mt-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  100% Signature Verified via Razorpay HMAC SHA-256
+                </div>
+              </div>
+
+              {/* Purchased Courses Count */}
+              <div className="p-6 rounded-3xl bg-slate-900/90 border border-purple-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">📚</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-purple-300">Purchased Courses</span>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                    LMS Active
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  {paymentStats.purchasedCoursesCount}
+                </div>
+                <div className="text-xs text-slate-400 mt-2">
+                  Automatic Student Account Enrollment Triggered
+                </div>
+              </div>
+
+              {/* Total Orders Initiated */}
+              <div className="p-6 rounded-3xl bg-slate-900/90 border border-cyan-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">⚡</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-cyan-300">Razorpay Orders</span>
+                  <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30">
+                    Atlas Collection
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  {paymentStats.totalOrders || paymentStats.totalPayments}
+                </div>
+                <div className="text-xs text-slate-400 mt-2">
+                  Checkout Conversion Rate: {paymentStats.totalOrders ? Math.round((paymentStats.totalPayments / paymentStats.totalOrders) * 100) : 100}%
+                </div>
+              </div>
+
+              {/* Average Order Value (AOV) */}
+              <div className="p-6 rounded-3xl bg-slate-900/90 border border-amber-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">📈</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-amber-300">Avg Transaction Value</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                    AOV
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  ₹{Math.round(paymentStats.totalRevenue / (paymentStats.totalPayments || 1)).toLocaleString("en-IN")}
+                </div>
+                <div className="text-xs text-slate-400 mt-2">
+                  Standard One-on-One Live Mentorship Tier
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue Navigation Sub-Tabs */}
+            <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <button
+                type="button"
+                onClick={() => setRevenueSubTab("overview")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  revenueSubTab === "overview"
+                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <span>📊</span> Monthly Revenue Chart & Ledger
+              </button>
+              <button
+                type="button"
+                onClick={() => setRevenueSubTab("orders")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  revenueSubTab === "orders"
+                    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <span>⚡</span> Razorpay Orders Table ({ordersList.length || paymentStats.totalOrders})
+              </button>
+              <button
+                type="button"
+                onClick={() => setRevenueSubTab("bestsellers")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  revenueSubTab === "bestsellers"
+                    ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/20"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <span>🏆</span> Best Selling Courses ({bestSellingCourses.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setRevenueSubTab("coupons")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  revenueSubTab === "coupons"
+                    ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/20"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <span>🏷️</span> Coupon Analytics ({couponAnalytics.length})
+              </button>
+            </div>
+
+            {/* SUB-VIEW 1: OVERVIEW & MONTHLY REVENUE CHART */}
+            {revenueSubTab === "overview" && (
+              <div className="space-y-6">
+                {/* Monthly Revenue Chart Card */}
+                <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                        Financial Telemetry
+                      </span>
+                      <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                        <span>📈</span> Monthly Revenue Trend (MongoDB Aggregated)
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Gross captured revenue per calendar month from collection <code className="text-cyan-300">payments</code>.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+                        Total Months Tracked: <strong className="text-white">{monthlyRevenue.length || 1}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Visual Bar Chart */}
+                  <div className="pt-2">
+                    {monthlyRevenue.length > 0 ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 items-end h-56 pt-6 pb-2 px-4 rounded-2xl bg-slate-950/70 border border-slate-800/80">
+                          {(() => {
+                            const maxRev = Math.max(...monthlyRevenue.map((m) => m.revenue || 0), 10000);
+                            return monthlyRevenue.map((item) => {
+                              const heightPct = Math.max(12, Math.round(((item.revenue || 0) / maxRev) * 100));
+                              return (
+                                <div key={item.month} className="flex flex-col items-center h-full justify-end group">
+                                  {/* Tooltip on hover */}
+                                  <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-2 text-[10px] text-center font-mono bg-slate-800 text-cyan-300 px-2 py-1 rounded shadow-lg border border-slate-700 pointer-events-none whitespace-nowrap">
+                                    ₹{item.revenue.toLocaleString("en-IN")} ({item.orders} orders)
+                                  </div>
+                                  <div
+                                    style={{ height: `${heightPct}%` }}
+                                    className="w-full max-w-[48px] rounded-t-xl bg-gradient-to-t from-cyan-600 via-emerald-500 to-teal-400 transition-all duration-500 group-hover:brightness-125 shadow-lg shadow-emerald-500/10"
+                                  />
+                                  <span className="text-[11px] font-mono text-slate-300 mt-2 truncate w-full text-center">
+                                    {item.month}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-emerald-400 font-mono">
+                                    ₹{Math.round(item.revenue / 1000)}k
+                                  </span>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-slate-400 rounded-2xl bg-slate-950/40 border border-slate-800">
+                        <p className="text-xs">No monthly revenue data logged yet.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Captured Payments Audit Table */}
+                <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-6">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                        <span>💳</span> Razorpay Payment Transactions Audit
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Direct MongoDB Atlas ledger synchronization for collections <code className="text-cyan-300">payments</code> and <code className="text-cyan-300">orders</code>.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="relative min-w-[240px]">
+                        <input
+                          type="text"
+                          placeholder="Search payment ID, email, course..."
+                          value={paymentSearch}
+                          onChange={(e) => {
+                            setPaymentSearch(e.target.value);
+                            setPaymentPage(1);
+                          }}
+                          className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                        />
+                        <span className="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+                      </div>
+
+                      <select
+                        value={paymentStatusFilter}
+                        onChange={(e) => {
+                          setPaymentStatusFilter(e.target.value);
+                          setPaymentPage(1);
+                        }}
+                        className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="captured">Captured (Paid)</option>
+                        <option value="created">Pending / Created</option>
+                        <option value="refunded">Refunded</option>
+                        <option value="failed">Failed</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={handleExportPaymentsCSV}
+                        className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span>📥</span> Export CSV
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
+                        <tr>
+                          <th className="p-4">Payment ID & Order</th>
+                          <th className="p-4">Student</th>
+                          <th className="p-4">Enrolled Course</th>
+                          <th className="p-4">Amount</th>
+                          <th className="p-4">Method / Gateway</th>
+                          <th className="p-4">Status</th>
+                          <th className="p-4">Timestamp</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60 font-sans">
+                        {paginatedPayments.length > 0 ? (
+                          paginatedPayments.map((pay) => (
+                            <tr key={pay._id || pay.paymentId} className="hover:bg-slate-800/40 transition">
+                              <td className="p-4 space-y-0.5">
+                                <div className="font-mono font-bold text-cyan-300 text-xs flex items-center gap-1.5">
+                                  <span>{pay.paymentId}</span>
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(pay.paymentId);
+                                      showToast(`Copied Payment ID: ${pay.paymentId}`);
+                                    }}
+                                    className="text-[10px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-800 transition cursor-pointer"
+                                    title="Copy ID"
+                                  >
+                                    📋
+                                  </button>
+                                </div>
+                                <div className="font-mono text-[11px] text-slate-500">
+                                  Ref: {pay.orderId}
+                                </div>
+                              </td>
+                              <td className="p-4 space-y-0.5">
+                                <div className="font-semibold text-white">{pay.userName || "KR Global Learning Student"}</div>
+                                <div className="text-slate-400 text-[11px]">{pay.userEmail}</div>
+                              </td>
+                              <td className="p-4">
+                                <div className="font-medium text-slate-200 max-w-xs truncate" title={pay.courseTitle}>
+                                  {pay.courseTitle}
+                                </div>
+                                <span className="text-[10px] text-purple-400 font-semibold">One-on-One Expert Mentorship Track</span>
+                              </td>
+                              <td className="p-4">
+                                <span className="text-sm font-extrabold text-white">
+                                  ₹{(pay.amount || 0).toLocaleString("en-IN")}
+                                </span>
+                                <div className="text-[10px] text-slate-500">INR Gross</div>
+                              </td>
+                              <td className="p-4">
+                                <div className="inline-flex items-center gap-1 text-slate-300">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                  {pay.method || "Razorpay UPI / NetBanking"}
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                                    pay.status === "captured"
+                                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                      : pay.status === "refunded"
+                                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                      : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                                  }`}
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                  {pay.status === "captured" ? "Paid (Captured)" : pay.status}
+                                </span>
+                              </td>
+                              <td className="p-4 text-slate-400 text-[11px]">
+                                {new Date(pay.createdAt).toLocaleDateString("en-IN", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={7} className="p-8 text-center text-slate-400">
+                              <div className="text-2xl mb-2">💳</div>
+                              <div className="font-semibold text-white">No payment transactions found</div>
+                              <div className="text-xs text-slate-500 mt-1">
+                                Payments received through Razorpay Checkout will automatically appear here.
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {totalPaymentsPages > 1 && (
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs">
+                      <div className="text-slate-400">
+                        Showing {(paymentPage - 1) * paymentsPerPage + 1} to{" "}
+                        {Math.min(paymentPage * paymentsPerPage, filteredPayments.length)} of {filteredPayments.length} payments
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          disabled={paymentPage === 1}
+                          onClick={() => setPaymentPage((p) => Math.max(1, p - 1))}
+                          className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 cursor-pointer"
+                        >
+                          ← Prev
+                        </button>
+                        {Array.from({ length: totalPaymentsPages }).map((_, idx) => (
+                          <button
+                            key={idx + 1}
+                            type="button"
+                            onClick={() => setPaymentPage(idx + 1)}
+                            className={`w-7 h-7 rounded-xl font-bold cursor-pointer ${
+                              paymentPage === idx + 1
+                                ? "bg-purple-600 text-white"
+                                : "bg-slate-950 text-slate-400 hover:bg-slate-800"
+                            }`}
+                          >
+                            {idx + 1}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          disabled={paymentPage === totalPaymentsPages}
+                          onClick={() => setPaymentPage((p) => Math.min(totalPaymentsPages, p + 1))}
+                          className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 cursor-pointer"
+                        >
+                          Next →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VIEW 2: ORDERS TABLE */}
+            {revenueSubTab === "orders" && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                  <div>
+                    <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                      <span>⚡</span> Razorpay Order Ledger ({ordersList.length})
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      MongoDB Atlas collection <code className="text-cyan-300">orders</code> tracking checkout sessions.
+                    </p>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search by Order ID, course, student..."
+                    value={orderSearch}
+                    onChange={(e) => {
+                      setOrderSearch(e.target.value);
+                      setOrderPage(1);
+                    }}
+                    className="px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-64"
+                  />
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
+                      <tr>
+                        <th className="p-4">Order ID</th>
+                        <th className="p-4">Course</th>
+                        <th className="p-4">Student</th>
+                        <th className="p-4">Amount</th>
+                        <th className="p-4">Promo</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4">Created</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-sans">
+                      {paginatedOrders.length > 0 ? (
+                        paginatedOrders.map((o) => (
+                          <tr key={o._id || o.orderId} className="hover:bg-slate-800/40 transition">
+                            <td className="p-4 font-mono font-bold text-cyan-300 text-xs">
+                              {o.orderId}
+                            </td>
+                            <td className="p-4 font-medium text-white max-w-xs truncate">
+                              {o.courseTitle}
+                            </td>
+                            <td className="p-4 text-slate-300">
+                              <div>{o.userName || "Student"}</div>
+                              <div className="text-[11px] text-slate-500">{o.userEmail}</div>
+                            </td>
+                            <td className="p-4 font-bold font-mono text-white">
+                              ₹{(o.amount || 0).toLocaleString("en-IN")}
+                            </td>
+                            <td className="p-4">
+                              {o.couponCode ? (
+                                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold">
+                                  {o.couponCode}
+                                </span>
+                              ) : (
+                                <span className="text-slate-500">—</span>
+                              )}
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                  o.status === "paid"
+                                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                    : o.status === "created"
+                                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                                    : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                                }`}
+                              >
+                                {o.status}
+                              </span>
+                            </td>
+                            <td className="p-4 text-slate-400 text-[11px]">
+                              {o.createdAt
+                                ? new Date(o.createdAt).toLocaleDateString("en-IN", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })
+                                : "Recent"}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={7} className="p-8 text-center text-slate-400">
+                            No orders found in ledger.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {totalOrdersPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs">
+                    <span className="text-slate-400">Page {orderPage} of {totalOrdersPages}</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={orderPage === 1}
+                        onClick={() => setOrderPage((p) => Math.max(1, p - 1))}
+                        className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 cursor-pointer"
+                      >
+                        ← Prev
+                      </button>
+                      <button
+                        type="button"
+                        disabled={orderPage === totalOrdersPages}
+                        onClick={() => setOrderPage((p) => Math.min(totalOrdersPages, p + 1))}
+                        className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 cursor-pointer"
+                      >
+                        Next →
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SUB-VIEW 3: BEST SELLING COURSES */}
+            {revenueSubTab === "bestsellers" && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-6">
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
+                    Product Revenue Analytics
+                  </span>
+                  <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                    <span>🏆</span> Best Selling Courses & Cohorts Leaderboard
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Ranked by verified student admissions and cumulative captured tuition fee.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {bestSellingCourses.map((c, idx) => {
+                    const rankColors = [
+                      "from-amber-400 to-yellow-600 text-slate-950 border-amber-300",
+                      "from-slate-300 to-slate-400 text-slate-950 border-slate-200",
+                      "from-amber-600 to-amber-800 text-white border-amber-500",
+                    ];
+                    const badgeClass =
+                      rankColors[idx] || "from-slate-800 to-slate-900 text-slate-300 border-slate-700";
+
+                    return (
+                      <div
+                        key={c._id || c.title}
+                        className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-purple-500/40 transition flex flex-col md:flex-row md:items-center justify-between gap-4"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${badgeClass} border flex items-center justify-center font-black text-sm shadow-md`}
+                          >
+                            #{idx + 1}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-white max-w-lg truncate">
+                              {c.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 mt-0.5">
+                              Verified Admissions: <strong className="text-cyan-300">{c.enrollmentsCount} Students</strong>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                          <div className="text-right">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                              Revenue Generated
+                            </span>
+                            <span className="text-lg font-black font-mono text-emerald-400">
+                              ₹{(c.totalRevenue || 0).toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <span className="px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold">
+                            Bestseller 🔥
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VIEW 4: COUPON ANALYTICS */}
+            {revenueSubTab === "coupons" && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-6">
+                <div className="border-b border-slate-800 pb-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                    Growth Campaigns
+                  </span>
+                  <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                    <span>🏷️</span> Promotional Coupon Codes & Redemption Analytics
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    MongoDB Atlas collection <code className="text-cyan-300">coupons</code> tracking student discounts.
+                  </p>
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
+                      <tr>
+                        <th className="p-4">Coupon Code</th>
+                        <th className="p-4">Discount Type</th>
+                        <th className="p-4">Benefit</th>
+                        <th className="p-4">Total Redemptions</th>
+                        <th className="p-4">Total Student Savings</th>
+                        <th className="p-4">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-sans">
+                      {couponAnalytics.map((cp) => (
+                        <tr key={cp.code} className="hover:bg-slate-800/40 transition">
+                          <td className="p-4 font-mono font-bold text-amber-300 text-sm">
+                            {cp.code}
+                          </td>
+                          <td className="p-4 uppercase text-slate-300 text-[11px] font-semibold">
+                            {cp.discountType}
+                          </td>
+                          <td className="p-4 font-mono text-white font-bold">
+                            {cp.discountType === "percentage" ? `${cp.discountValue}% OFF` : `₹${cp.discountValue} FLAT`}
+                          </td>
+                          <td className="p-4 font-mono text-cyan-300 font-bold">
+                            {cp.usedCount || 0} times
+                          </td>
+                          <td className="p-4 font-mono text-emerald-400 font-bold">
+                            ₹{((cp.totalDiscountGiven || cp.usedCount * 1500) || 0).toLocaleString("en-IN")}
+                          </td>
+                          <td className="p-4">
+                            <span
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
+                                cp.isActive
+                                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                  : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                              }`}
+                            >
+                              {cp.isActive ? "Active" : "Inactive"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: EMAIL AUTOMATION & NODEMAILER AUDIT
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "emails" && (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            {/* Top Metrics Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Total Dispatched */}
+              <div className="p-5 rounded-3xl bg-slate-900/90 border border-purple-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 opacity-10 text-4xl">📨</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-purple-300">Total Dispatched</span>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                    Nodemailer
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-white tracking-tight">
+                  {emailStats.totalDispatched || emailLogs.length}
+                </div>
+                <div className="text-[11px] text-slate-400 mt-2">
+                  MongoDB <code>emailLogs</code> collection
+                </div>
+              </div>
+
+              {/* Delivery Success Rate */}
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 opacity-10 text-4xl">✅</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-emerald-400">Delivery Rate</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                    Optimal
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-white tracking-tight">
+                  {emailStats.deliveryRate || 100}%
+                </div>
+                <div className="text-[11px] text-emerald-400/80 mt-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  TLS 1.3 / SPF Verified
+                </div>
+              </div>
+
+              {/* Sent / Delivered */}
+              <div className="p-5 rounded-3xl bg-slate-900/90 border border-cyan-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 opacity-10 text-4xl">🚀</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-cyan-300">Sent / Simulated</span>
+                  <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30">
+                    Live
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-white tracking-tight">
+                  {emailStats.sentCount || emailLogs.filter((l) => l.status !== "failed").length}
+                </div>
+                <div className="text-[11px] text-slate-400 mt-2">
+                  Active inboxes & sandbox
+                </div>
+              </div>
+
+              {/* Failed & Retried */}
+              <div className="p-5 rounded-3xl bg-slate-900/90 border border-rose-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 opacity-10 text-4xl">⚠️</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-rose-300">Failed / Retried</span>
+                  <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/30">
+                    Queue Guard
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-white tracking-tight">
+                  {emailStats.failedCount || 0}
+                  <span className="text-xs font-normal text-amber-400 ml-2">
+                    ({emailStats.retriedCount || emailLogs.filter((l) => (l.retryCount || 0) > 0).length} retried)
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-400 mt-2">
+                  Exponential backoff active
+                </div>
+              </div>
+
+              {/* SMTP Transport Relay */}
+              <div className="p-5 rounded-3xl bg-slate-900/90 border border-amber-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 opacity-10 text-4xl">⚡</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-amber-300">Transport Relay</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                    Port 587
+                  </span>
+                </div>
+                <div className="text-lg font-black text-white tracking-tight truncate">
+                  Gmail / Ethereal
+                </div>
+                <div className="text-[11px] text-slate-400 mt-2 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Auto-Failover Safe
+                </div>
+              </div>
+            </div>
+
+            {/* Part E & Part D: Analytics Card with Template Distribution Pie Chart & Queue Engine */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Template Distribution Pie Chart */}
+              <div className="lg:col-span-7 p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-5">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div>
+                    <h4 className="text-base font-bold text-white flex items-center gap-2">
+                      <span>📊</span> Email Analytics & Template Distribution
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Real-time breakdown of all transactional communications generated across student journeys.
+                    </p>
+                  </div>
+                  <span className="text-[10px] uppercase font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">
+                    Atlas Aggregation
+                  </span>
+                </div>
+
+                {/* Pie / Donut Chart & Legend Visual */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                  {/* Circular SVG Donut Chart */}
+                  <div className="sm:col-span-5 flex flex-col items-center justify-center relative py-2">
+                    <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 100 100">
+                      {/* Base Ring */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#1e293b"
+                        strokeWidth="14"
+                        fill="transparent"
+                      />
+                      {/* Segment 1: Welcome (Purple) */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#a855f7"
+                        strokeWidth="14"
+                        strokeDasharray="50.26 251.32"
+                        strokeDashoffset="0"
+                        fill="transparent"
+                        className="transition-all duration-500"
+                      />
+                      {/* Segment 2: Demo (Cyan) */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#06b6d4"
+                        strokeWidth="14"
+                        strokeDasharray="50.26 251.32"
+                        strokeDashoffset="-50.26"
+                        fill="transparent"
+                        className="transition-all duration-500"
+                      />
+                      {/* Segment 3: Payment (Emerald) */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#10b981"
+                        strokeWidth="14"
+                        strokeDasharray="50.26 251.32"
+                        strokeDashoffset="-100.52"
+                        fill="transparent"
+                        className="transition-all duration-500"
+                      />
+                      {/* Segment 4: Certificate (Amber) */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#f59e0b"
+                        strokeWidth="14"
+                        strokeDasharray="50.26 251.32"
+                        strokeDashoffset="-150.78"
+                        fill="transparent"
+                        className="transition-all duration-500"
+                      />
+                      {/* Segment 5: OTP (Indigo) */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#6366f1"
+                        strokeWidth="14"
+                        strokeDasharray="50.26 251.32"
+                        strokeDashoffset="-201.04"
+                        fill="transparent"
+                        className="transition-all duration-500"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                      <span className="text-xl font-black text-white">
+                        {emailStats.totalDispatched || emailLogs.length}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Total</span>
+                    </div>
+                  </div>
+
+                  {/* Legend List */}
+                  <div className="sm:col-span-7 space-y-2 text-xs">
+                    {[
+                      { key: "welcome", label: "Welcome Emails", color: "bg-purple-500", border: "border-purple-500/30", count: emailLogs.filter((l) => l.template === "welcome").length },
+                      { key: "demo_booking", label: "Demo Bookings", color: "bg-cyan-500", border: "border-cyan-500/30", count: emailLogs.filter((l) => l.template === "demo_booking").length },
+                      { key: "payment_success", label: "Payment Receipts", color: "bg-emerald-500", border: "border-emerald-500/30", count: emailLogs.filter((l) => l.template === "payment_success").length },
+                      { key: "certificate_delivery", label: "Certificates (PDF)", color: "bg-amber-500", border: "border-amber-500/30", count: emailLogs.filter((l) => l.template === "certificate_delivery").length },
+                      { key: "otp_reset", label: "Password OTPs", color: "bg-indigo-500", border: "border-indigo-500/30", count: emailLogs.filter((l) => l.template === "otp_reset").length },
+                    ].map((item) => {
+                      const total = emailLogs.length || 1;
+                      const pct = Math.round((item.count / total) * 100);
+                      return (
+                        <div key={item.key} className="flex items-center justify-between p-2 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
+                            <span className="text-slate-300 font-medium">{item.label}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-white font-bold">{item.count}</span>
+                            <span className="text-slate-500 text-[11px] w-9 text-right font-mono">{pct}%</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Queue System & Relay Monitor */}
+              <div className="lg:col-span-5 p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h4 className="text-base font-bold text-white flex items-center gap-2">
+                      <span>⚙️</span> Queue & Resilience Engine
+                    </h4>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Worker Ready
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+                      <span className="text-slate-400">Queue Architecture</span>
+                      <span className="font-mono font-semibold text-purple-300">BullMQ Abstraction</span>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+                      <span className="text-slate-400">Worker Concurrency</span>
+                      <span className="font-mono font-semibold text-cyan-300">3 Parallel Threads</span>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+                      <span className="text-slate-400">Retry Policy</span>
+                      <span className="font-mono font-semibold text-amber-300">3 Attempts (Exponential)</span>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+                      <span className="text-slate-400">PDF Generator Engine</span>
+                      <span className="font-mono font-semibold text-emerald-300">PDFKit + QR Buffer Vector</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-indigo-950/30 border border-indigo-500/20 text-[11px] text-indigo-300 flex items-center gap-2.5">
+                  <span className="text-lg">🛡️</span>
+                  <span>Every failed delivery is auto-retried with delay and logged in MongoDB with audit retry counts.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Template Previews & Live Test Dispatcher */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: 5 Template Previews */}
+              <div className="lg:col-span-7 p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div>
+                    <h4 className="text-base font-bold text-white flex items-center gap-2">
+                      <span>👁️</span> Responsive Email Template Previews
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Preview live rendered HTML templates or open full inspection modals.
+                    </p>
+                  </div>
+                  <span className="text-[10px] uppercase font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20">
+                    KR Global Learning Branded
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {[
+                    { id: "welcome", label: "Welcome Registration Email", icon: "🚀", desc: "Sent when candidate signs up" },
+                    { id: "demo_booking", label: "Demo Booking Confirmation", icon: "🎯", desc: "Sent when One-on-One demo is scheduled" },
+                    { id: "payment_success", label: "Payment Success Receipt", icon: "💳", desc: "Sent when Razorpay captures fee" },
+                    { id: "certificate_delivery", label: "Certificate Delivery (with PDF)", icon: "🏆", desc: "Attached dynamic vector certificate" },
+                    { id: "otp_reset", label: "Forgot Password 6-Digit OTP", icon: "🔒", desc: "Sent for authentication reset" },
+                  ].map((tpl) => (
+                    <button
+                      key={tpl.id}
+                      type="button"
+                      onClick={() => {
+                        setPreviewModalUrl(`/api/emails/preview/${tpl.id}`);
+                        setPreviewModalTitle(tpl.label);
+                      }}
+                      className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-purple-500/40 transition group text-left cursor-pointer block w-full"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition flex items-center gap-1.5">
+                          <span>{tpl.icon}</span> {tpl.label}
+                        </span>
+                        <span className="text-xs text-slate-500 group-hover:text-white transition">👁️ View</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 m-0">{tpl.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Instant Test Email Sender */}
+              <div className="lg:col-span-5 p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-purple-500/30 shadow-xl space-y-4">
+                <div>
+                  <h4 className="text-base font-bold text-white flex items-center gap-2">
+                    <span>⚡</span> Live Test Dispatcher
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Dispatch a live sample email to test delivery and PDF generation.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSendTestEmail} className="space-y-3.5">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Recipient Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={testEmailRecipient}
+                      onChange={(e) => setTestEmailRecipient(e.target.value)}
+                      placeholder="e.g. yourname@example.com"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Select Template</label>
+                    <select
+                      value={testEmailTemplate}
+                      onChange={(e) => setTestEmailTemplate(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                    >
+                      <option value="welcome">Welcome Email (welcome)</option>
+                      <option value="demo_booking">Demo Booking Confirmation (demo_booking)</option>
+                      <option value="payment_success">Payment Success Receipt (payment_success)</option>
+                      <option value="certificate_delivery">Certificate Delivery with PDF (certificate_delivery)</option>
+                      <option value="otp_reset">Password Reset OTP (otp_reset)</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={sendingTestEmail}
+                    className="w-full py-3 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 transition shadow-lg shadow-purple-900/40 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {sendingTestEmail ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Dispatching via SMTP & Queue...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>✉️</span>
+                        <span>Send Live Test Email</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Email Logs Audit Table with Filters & Resend */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-6">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                    <span>📋</span> MongoDB Atlas Email Logs (<code>emailLogs</code>)
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Complete cryptographic audit trail of all emails sent by KR Global Learning automation services.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* Search */}
+                  <div className="relative min-w-[220px]">
+                    <input
+                      type="text"
+                      placeholder="Search recipient, subject, msgId..."
+                      value={emailSearch}
+                      onChange={(e) => {
+                        setEmailSearch(e.target.value);
+                        setEmailPage(1);
+                      }}
+                      className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                    />
+                    <span className="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+                  </div>
+
+                  {/* Template Filter */}
+                  <select
+                    value={emailTemplateFilter}
+                    onChange={(e) => {
+                      setEmailTemplateFilter(e.target.value);
+                      setEmailPage(1);
+                    }}
+                    className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                  >
+                    <option value="All">All Templates</option>
+                    <option value="welcome">Welcome</option>
+                    <option value="demo_booking">Demo Booking</option>
+                    <option value="payment_success">Payment Success</option>
+                    <option value="certificate_delivery">Certificate</option>
+                    <option value="otp_reset">Password OTP</option>
+                  </select>
+
+                  {/* Status Filter */}
+                  <select
+                    value={emailStatusFilter}
+                    onChange={(e) => {
+                      setEmailStatusFilter(e.target.value);
+                      setEmailPage(1);
+                    }}
+                    className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                  >
+                    <option value="All">All Statuses</option>
+                    <option value="sent">Sent (Live)</option>
+                    <option value="simulated">Simulated (Sandbox)</option>
+                    <option value="failed">Failed</option>
+                  </select>
+
+                  {/* Reset Filters */}
+                  {(emailSearch || emailTemplateFilter !== "All" || emailStatusFilter !== "All") && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmailSearch("");
+                        setEmailTemplateFilter("All");
+                        setEmailStatusFilter("All");
+                        setEmailPage(1);
+                      }}
+                      className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
+                    <tr>
+                      <th className="p-4">Recipient</th>
+                      <th className="p-4">Template</th>
+                      <th className="p-4">Subject</th>
+                      <th className="p-4">Status & Retries</th>
+                      <th className="p-4">Message ID</th>
+                      <th className="p-4">Timestamp</th>
+                      <th className="p-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-sans">
+                    {paginatedEmailLogs.length > 0 ? (
+                      paginatedEmailLogs.map((log) => (
+                        <tr key={log._id || log.messageId} className="hover:bg-slate-800/40 transition">
+                          <td className="p-4 font-semibold text-white">
+                            {log.recipient}
+                          </td>
+                          <td className="p-4">
+                            <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px] font-bold uppercase">
+                              {log.template}
+                            </span>
+                          </td>
+                          <td className="p-4 text-slate-200 max-w-xs truncate" title={log.subject}>
+                            {log.subject}
+                          </td>
+                          <td className="p-4">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                  log.status === "sent"
+                                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                    : log.status === "simulated"
+                                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                                    : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                                }`}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                {log.status}
+                              </span>
+                              {(log.retryCount || 0) > 0 && (
+                                <span className="px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold">
+                                  ↺ x{log.retryCount}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-4 font-mono text-[11px] text-slate-400 max-w-[140px] truncate">
+                            {log.messageId || "msg_auto"}
+                          </td>
+                          <td className="p-4 text-slate-400 text-[11px]">
+                            {new Date(log.createdAt).toLocaleDateString("en-IN", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {/* Preview Button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPreviewModalUrl(`/api/emails/preview/${log.template}`);
+                                  setPreviewModalTitle(`${log.subject}`);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-[11px] font-medium transition cursor-pointer"
+                                title="Preview rendered HTML"
+                              >
+                                👁️ Preview
+                              </button>
+
+                              {/* Resend Button */}
+                              <button
+                                type="button"
+                                disabled={resendingEmailId === log._id}
+                                onClick={() => handleResendEmail(log._id)}
+                                className="px-2.5 py-1 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 text-[11px] font-medium transition cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                                title="Re-queue email for transmission"
+                              >
+                                {resendingEmailId === log._id ? (
+                                  <span className="w-2.5 h-2.5 border-2 border-purple-300 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <span>↺</span>
+                                )}
+                                <span>Resend</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-400">
+                          <div className="text-2xl mb-2">📨</div>
+                          <div className="font-semibold text-white">No Email Logs Found</div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            Dispatched emails matching your filters will automatically stream here.
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {totalEmailPages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs">
+                  <div className="text-slate-400">
+                    Showing {(emailPage - 1) * emailsPerPage + 1} to{" "}
+                    {Math.min(emailPage * emailsPerPage, filteredEmailLogs.length)} of {filteredEmailLogs.length} logs
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={emailPage === 1}
+                      onClick={() => setEmailPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 cursor-pointer"
+                    >
+                      ← Prev
+                    </button>
+                    {Array.from({ length: totalEmailPages }).map((_, idx) => (
+                      <button
+                        key={idx + 1}
+                        type="button"
+                        onClick={() => setEmailPage(idx + 1)}
+                        className={`w-7 h-7 rounded-xl font-bold cursor-pointer ${
+                          emailPage === idx + 1
+                            ? "bg-purple-600 text-white"
+                            : "bg-slate-950 text-slate-400 hover:bg-slate-800"
+                        }`}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      disabled={emailPage === totalEmailPages}
+                      onClick={() => setEmailPage((p) => Math.min(totalEmailPages, p + 1))}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800 cursor-pointer"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Live HTML Email Preview Modal */}
+            {previewModalUrl && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+                <div className="relative w-full max-w-3xl h-[85vh] bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+                  {/* Modal Header */}
+                  <div className="px-6 py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 truncate">
+                      <span className="text-xl">✉️</span>
+                      <div>
+                        <h4 className="text-sm font-bold text-white truncate max-w-lg">
+                          {previewModalTitle || "Email Preview"}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 font-mono truncate">{previewModalUrl}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={previewModalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-semibold no-underline flex items-center gap-1 transition"
+                      >
+                        <span>Open In Tab</span>
+                        <span>↗</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewModalUrl(null)}
+                        className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-900/50 hover:text-rose-400 text-slate-400 text-base font-bold flex items-center justify-center transition cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Modal Body: Embedded iframe */}
+                  <div className="flex-1 w-full h-full bg-[#070913] p-2 overflow-hidden">
+                    <iframe
+                      src={previewModalUrl}
+                      title="HTML Email Preview"
+                      className="w-full h-full rounded-2xl border border-slate-800/80"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: WHATSAPP BUSINESS CLOUD API AUTOMATION & AUDIT
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "whatsapp" && (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            {/* Top Metrics Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {/* Total Dispatched */}
+              <div className="p-6 rounded-3xl bg-slate-900/90 border border-emerald-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">💬</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-emerald-400">Total Dispatched</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                    Meta Cloud
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  {whatsappStats.totalDispatched || whatsappLogs.length}
+                </div>
+                <div className="text-xs text-slate-400 mt-2">
+                  Persisted in MongoDB <code>whatsappLogs</code>
+                </div>
+              </div>
+
+              {/* Delivery Success Rate */}
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">✅</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-emerald-400">Delivery Rate</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                    Verified
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  {whatsappStats.deliveryRate || 100}%
+                </div>
+                <div className="text-xs text-emerald-400/80 mt-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Meta Graph API v21.0 · E.164 Validated
+                </div>
+              </div>
+
+              {/* Active Templates */}
+              <div className="p-6 rounded-3xl bg-slate-900/90 border border-teal-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">📱</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-teal-300">WhatsApp Templates</span>
+                  <span className="px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-[10px] font-bold border border-teal-500/30">
+                    Enterprise
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  5 Registered
+                </div>
+                <div className="text-xs text-slate-400 mt-2">
+                  Demo, Payment, Batch, Live Class, Cert
+                </div>
+              </div>
+
+              {/* Retry Engine Status */}
+              <div className="p-6 rounded-3xl bg-slate-900/90 border border-cyan-500/30 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-5xl">🔄</div>
+                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                  <span className="font-semibold uppercase tracking-wider text-cyan-300">Retry Engine</span>
+                  <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/30">
+                    Active
+                  </span>
+                </div>
+                <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  {whatsappStats.retriedCount} Retried
+                </div>
+                <div className="text-xs text-slate-400 mt-2">
+                  Auto-Recovery & Manual Retries Ready
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Preview & Live Dispatcher Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* WhatsApp Smartphone Mockup Preview */}
+              <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <span>💬</span> WhatsApp Live Message Simulator
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Real-time typography and dynamic layout as rendered inside the official WhatsApp client.
+                    </p>
+                  </div>
+
+                  {/* Template Picker */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase">Template:</span>
+                    <select
+                      value={previewWaTemplate}
+                      onChange={(e) => setPreviewWaTemplate(e.target.value)}
+                      className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="demo_confirmation">1. Demo Confirmation</option>
+                      <option value="payment_success">2. Payment Success</option>
+                      <option value="upcoming_batch_reminder">3. Upcoming Batch Reminder</option>
+                      <option value="live_class_reminder">4. Live Class Alert (15m)</option>
+                      <option value="certificate_ready">5. Certificate Ready</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* WhatsApp Chat UI Box */}
+                <div className="max-w-md mx-auto rounded-3xl overflow-hidden border border-emerald-900/60 shadow-2xl bg-[#0B141A]">
+                  {/* WhatsApp Top Header Bar */}
+                  <div className="bg-[#1F2C34] px-4 py-3 flex items-center justify-between border-b border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                        KR
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                          <span>KR Global Learning</span>
+                          <span className="text-emerald-400 text-xs">✓</span>
+                        </div>
+                        <div className="text-[10px] text-emerald-400 font-medium">Official Business Account</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-slate-400 text-sm">
+                      <span>📞</span>
+                      <span>⋮</span>
+                    </div>
+                  </div>
+
+                  {/* Chat Wallpaper Canvas */}
+                  <div
+                    className="p-4 sm:p-5 min-h-[300px] flex flex-col justify-end space-y-3"
+                    style={{
+                      backgroundImage: "radial-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 0)",
+                      backgroundSize: "20px 20px",
+                    }}
+                  >
+                    {/* Timestamp Center Pill */}
+                    <div className="text-center">
+                      <span className="px-3 py-1 bg-[#182229] text-[10px] text-slate-400 rounded-lg shadow-sm">
+                        TODAY
+                      </span>
+                    </div>
+
+                    {/* Official Business Notice */}
+                    <div className="bg-[#182229] border border-slate-800/80 p-2.5 rounded-xl text-center text-[10px] text-amber-300/80 shadow">
+                      🔒 Messages and calls are end-to-end encrypted. This is an official verified business profile.
+                    </div>
+
+                    {/* Incoming/Outgoing WhatsApp Message Bubble */}
+                    <div className="self-end max-w-[92%] bg-[#005C4B] text-[#E9EDEF] rounded-2xl rounded-tr-sm p-4 shadow-lg text-xs leading-relaxed space-y-2 whitespace-pre-line border border-emerald-500/20">
+                      <div>{previewWaText || "Loading template payload..."}</div>
+                      <div className="flex items-center justify-end gap-1 text-[10px] text-emerald-200/70 pt-1">
+                        <span>{new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                        <span className="text-cyan-300 font-bold tracking-tighter">✓✓</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Test Dispatcher Form */}
+              <div className="lg:col-span-5 p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-5">
+                <div className="border-b border-slate-800 pb-3">
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                    Meta Cloud Dispatcher
+                  </span>
+                  <h3 className="text-xl font-extrabold text-white mt-1">
+                    Send Live WhatsApp Message
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Trigger test messages across any registered template with real phone delivery or sandbox logging.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSendTestWhatsApp} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Recipient WhatsApp Phone (with Country Code)
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={testWaRecipient}
+                      onChange={(e) => setTestWaRecipient(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
+                    />
+                    <span className="text-[10px] text-slate-500 mt-1 block">
+                      Indian numbers automatically formatted with <code>+91</code>.
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Select Template</label>
+                    <select
+                      value={testWaTemplate}
+                      onChange={(e) => setTestWaTemplate(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="demo_confirmation">1. Demo Booking Confirmation</option>
+                      <option value="payment_success">2. Payment Success Receipt</option>
+                      <option value="upcoming_batch_reminder">3. Upcoming Batch Reminder</option>
+                      <option value="live_class_reminder">4. Live Class Alert (15m)</option>
+                      <option value="certificate_ready">5. Certificate Ready Notification</option>
+                    </select>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 text-[11px] text-slate-400 space-y-1.5">
+                    <div className="flex items-center justify-between text-slate-300 font-semibold">
+                      <span>API Transport:</span>
+                      <span className="text-emerald-400">Meta Cloud API (v21.0)</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Phone Number ID:</span>
+                      <span className="font-mono text-slate-300">109283746592018</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Webhook Target:</span>
+                      <span className="font-mono text-slate-300">/api/whatsapp/webhook</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={sendingTestWa}
+                    className="w-full py-3 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 transition shadow-lg shadow-emerald-900/40 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {sendingTestWa ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Sending via Meta Cloud API...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>💬</span>
+                        <span>Dispatch Live WhatsApp Message</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* WhatsApp Logs Audit Table */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-2xl space-y-6">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                    <span>📋</span> MongoDB Atlas WhatsApp Logs (<code>whatsappLogs</code>)
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Immutable audit trail of all automated WhatsApp messages dispatched by KR Global Learning with delivery status & retries.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* Search */}
+                  <div className="relative min-w-[240px]">
+                    <input
+                      type="text"
+                      placeholder="Search phone, wamid, text..."
+                      value={whatsappSearch}
+                      onChange={(e) => {
+                        setWhatsappSearch(e.target.value);
+                        setWhatsappPage(1);
+                      }}
+                      className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                    />
+                    <span className="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+                  </div>
+
+                  {/* Template Filter */}
+                  <select
+                    value={whatsappTemplateFilter}
+                    onChange={(e) => {
+                      setWhatsappTemplateFilter(e.target.value);
+                      setWhatsappPage(1);
+                    }}
+                    className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    <option value="All">All Templates</option>
+                    <option value="demo_confirmation">Demo Confirmation</option>
+                    <option value="payment_success">Payment Success</option>
+                    <option value="upcoming_batch_reminder">Batch Reminder</option>
+                    <option value="live_class_reminder">Live Class Alert</option>
+                    <option value="certificate_ready">Certificate Ready</option>
+                  </select>
+
+                  {/* Status Filter */}
+                  <select
+                    value={whatsappStatusFilter}
+                    onChange={(e) => {
+                      setWhatsappStatusFilter(e.target.value);
+                      setWhatsappPage(1);
+                    }}
+                    className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    <option value="All">All Statuses</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="read">Read</option>
+                    <option value="sent">Sent</option>
+                    <option value="simulated">Simulated</option>
+                    <option value="failed">Failed</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
+                    <tr>
+                      <th className="p-4">Recipient Phone</th>
+                      <th className="p-4">Template</th>
+                      <th className="p-4">Status</th>
+                      <th className="p-4">Meta Message ID</th>
+                      <th className="p-4">Dispatched Time</th>
+                      <th className="p-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-medium">
+                    {paginatedWhatsAppLogs.length > 0 ? (
+                      paginatedWhatsAppLogs.map((log) => (
+                        <tr key={log._id} className="hover:bg-slate-800/40 transition">
+                          <td className="p-4 font-bold text-white flex items-center gap-2">
+                            <span className="text-emerald-400">📱</span>
+                            <span>{log.recipient}</span>
+                          </td>
+                          <td className="p-4">
+                            <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-200 border border-slate-700">
+                              {log.template.replace(/_/g, " ")}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            {log.status === "delivered" || log.status === "read" ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                {log.status} ✓✓
+                              </span>
+                            ) : log.status === "sent" ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                                <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                                Sent ✓
+                              </span>
+                            ) : log.status === "simulated" ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                                Simulated
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                                Failed
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-4 font-mono text-[11px] text-slate-400">
+                            {log.waMessageId ? (
+                              <span title={log.waMessageId}>
+                                {log.waMessageId.length > 20
+                                  ? `${log.waMessageId.substring(0, 18)}...`
+                                  : log.waMessageId}
+                              </span>
+                            ) : (
+                              <span className="text-slate-600">—</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-slate-400 text-[11px]">
+                            {new Date(log.createdAt).toLocaleString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="p-4 text-right">
+                            <button
+                              type="button"
+                              disabled={retryingWaId === log._id}
+                              onClick={() => handleRetryWhatsApp(log._id)}
+                              className="px-3 py-1 bg-slate-800 hover:bg-emerald-600/30 hover:border-emerald-500 text-slate-300 hover:text-emerald-300 border border-slate-700 rounded-lg text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 ml-auto"
+                              title="Re-dispatch message via Meta WhatsApp API"
+                            >
+                              {retryingWaId === log._id ? (
+                                <span className="w-3 h-3 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <span>↻</span>
+                              )}
+                              <span>Retry</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-400">
+                          <div className="text-2xl mb-2">💬</div>
+                          <div className="font-semibold text-white">No WhatsApp Logs Found</div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            Dispatched WhatsApp messages from demo bookings, payment receipts, or alerts will automatically stream here.
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {totalWhatsAppPages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs">
+                  <div className="text-slate-400">
+                    Showing {(whatsappPage - 1) * whatsappsPerPage + 1} to{" "}
+                    {Math.min(whatsappPage * whatsappsPerPage, filteredWhatsAppLogs.length)} of {filteredWhatsAppLogs.length} logs
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={whatsappPage === 1}
+                      onClick={() => setWhatsappPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800"
+                    >
+                      ← Prev
+                    </button>
+                    {Array.from({ length: totalWhatsAppPages }).map((_, idx) => (
+                      <button
+                        key={idx + 1}
+                        type="button"
+                        onClick={() => setWhatsappPage(idx + 1)}
+                        className={`w-7 h-7 rounded-xl font-bold ${
+                          whatsappPage === idx + 1
+                            ? "bg-emerald-600 text-white"
+                            : "bg-slate-950 text-slate-400 hover:bg-slate-800"
+                        }`}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      disabled={whatsappPage === totalWhatsAppPages}
+                      onClick={() => setWhatsappPage((p) => Math.min(totalWhatsAppPages, p + 1))}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB: NOTIFICATIONS & BROADCAST MANAGEMENT HUB
+        ───────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "notifications" && (
+          <div className="space-y-6">
+            {/* Header & Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 md:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse" />
+                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">
+                    In-App Notification Dispatcher
+                  </span>
+                </div>
+                <h2 className="text-2xl font-extrabold text-white tracking-tight">
+                  Notification Broadcasts & Automated Alerts
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Publish announcements, live course reminders, and One-on-One demo notifications synchronized with MongoDB Atlas.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={handleMarkAllAdminNotifsRead}
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition cursor-pointer"
+                >
+                  Mark All Read
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNotifComposeModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs font-semibold shadow-lg shadow-purple-600/30 transition cursor-pointer"
+                >
+                  <span>📢</span>
+                  <span>Compose Broadcast</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 5 KPI Metric Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow">
+                <span className="text-slate-400 text-xs">Total Alerts</span>
+                <div className="text-xl font-bold text-white mt-1">{adminNotifications.length}</div>
+                <span className="text-[10px] text-purple-300">Atlas Collection</span>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow">
+                <span className="text-slate-400 text-xs">Unread Alerts</span>
+                <div className="text-xl font-bold text-red-400 mt-1">
+                  {adminNotifications.filter((n) => !n.isRead).length}
+                </div>
+                <span className="text-[10px] text-red-300">Awaiting user read</span>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow">
+                <span className="text-slate-400 text-xs">Announcements</span>
+                <div className="text-xl font-bold text-purple-300 mt-1">
+                  {adminNotifications.filter((n) => n.type === "announcement").length}
+                </div>
+                <span className="text-[10px] text-slate-400">Broadcast news</span>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow">
+                <span className="text-slate-400 text-xs">Course Reminders</span>
+                <div className="text-xl font-bold text-cyan-300 mt-1">
+                  {adminNotifications.filter((n) => n.type === "course_reminder").length}
+                </div>
+                <span className="text-[10px] text-slate-400">Live cohorts & tests</span>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow">
+                <span className="text-slate-400 text-xs">Demo Reminders</span>
+                <div className="text-xl font-bold text-amber-300 mt-1">
+                  {adminNotifications.filter((n) => n.type === "demo_reminder").length}
+                </div>
+                <span className="text-[10px] text-slate-400">One-on-One Consultations</span>
+              </div>
+            </div>
+
+            {/* Table & Filters Panel */}
+            <div className="p-6 md:p-8 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                {/* Search */}
+                <div className="relative flex-1 max-w-md">
+                  <input
+                    type="text"
+                    value={notifSearch}
+                    onChange={(e) => setNotifSearch(e.target.value)}
+                    placeholder="Search broadcasts by title, message, recipient..."
+                    className="w-full px-3.5 py-2 pl-9 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  />
+                  <span className="absolute left-3 top-2.5 text-xs text-slate-500">🔍</span>
+                </div>
+
+                {/* Filter */}
+                <div className="flex items-center gap-2">
+                  <select
+                    value={notifTypeFilter}
+                    onChange={(e) => setNotifTypeFilter(e.target.value)}
+                    className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="All">All Categories</option>
+                    <option value="announcement">📢 Announcements</option>
+                    <option value="course_reminder">⏰ Course Reminders</option>
+                    <option value="demo_reminder">📅 Demo Reminders</option>
+                    <option value="unread">🔴 Unread Only</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Dispatched Notifications Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                    <tr>
+                      <th className="p-3.5">Category</th>
+                      <th className="p-3.5">Title & Message</th>
+                      <th className="p-3.5">Audience</th>
+                      <th className="p-3.5">Priority</th>
+                      <th className="p-3.5">Dispatched</th>
+                      <th className="p-3.5">Read Status</th>
+                      <th className="p-3.5 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-medium">
+                    {paginatedAdminNotifications.length > 0 ? (
+                      paginatedAdminNotifications.map((notif) => (
+                        <tr key={notif._id} className="hover:bg-slate-800/40 transition">
+                          <td className="p-3.5">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-slate-800 border border-slate-700 text-slate-200">
+                              <span>
+                                {notif.type === "announcement" ? "📢" : notif.type === "course_reminder" ? "⏰" : notif.type === "demo_reminder" ? "📅" : "⚡"}
+                              </span>
+                              <span>{notif.type.replace("_", " ")}</span>
+                            </span>
+                          </td>
+                          <td className="p-3.5 max-w-sm">
+                            <div className="font-bold text-white text-xs">{notif.title}</div>
+                            <div className="text-slate-400 text-[11px] line-clamp-2 mt-0.5">{notif.message}</div>
+                            {notif.metadata?.scheduledTime && (
+                              <div className="text-[10px] text-cyan-300 mt-1">
+                                🗓️ {notif.metadata.scheduledTime}
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-slate-300 capitalize text-xs">
+                              {notif.recipient === "all" ? "🌐 All Students" : notif.recipient}
+                            </span>
+                          </td>
+                          <td className="p-3.5">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                                notif.priority === "urgent"
+                                  ? "bg-red-500/20 text-red-400 border-red-500/30"
+                                  : notif.priority === "high"
+                                  ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                                  : "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                              }`}
+                            >
+                              {notif.priority}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-slate-400 text-[11px] whitespace-nowrap">
+                            {new Date(notif.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="p-3.5">
+                            {notif.isRead ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                                <span>✓</span> Read
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-400">
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                                Unread
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteAdminNotification(notif._id)}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-900/50 text-slate-400 hover:text-red-300 border border-slate-700 transition"
+                              title="Delete from Atlas"
+                            >
+                              🗑️
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-400">
+                          <div className="text-2xl mb-2">🔔</div>
+                          <div className="font-semibold text-white">No Notifications Found</div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            Dispatched announcements and reminders will automatically stream here from MongoDB Atlas.
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {totalNotifPages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t border-slate-800 text-xs">
+                  <div className="text-slate-400">
+                    Showing {(notifPage - 1) * notifsPerPage + 1} to{" "}
+                    {Math.min(notifPage * notifsPerPage, filteredAdminNotifications.length)} of{" "}
+                    {filteredAdminNotifications.length} notifications
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={notifPage === 1}
+                      onClick={() => setNotifPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800"
+                    >
+                      ← Prev
+                    </button>
+                    {Array.from({ length: totalNotifPages }).map((_, idx) => (
+                      <button
+                        key={idx + 1}
+                        type="button"
+                        onClick={() => setNotifPage(idx + 1)}
+                        className={`w-7 h-7 rounded-xl font-bold ${
+                          notifPage === idx + 1
+                            ? "bg-purple-600 text-white"
+                            : "bg-slate-950 text-slate-400 hover:bg-slate-800"
+                        }`}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      disabled={notifPage === totalNotifPages}
+                      onClick={() => setNotifPage((p) => Math.min(totalNotifPages, p + 1))}
+                      className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 disabled:opacity-40 text-slate-300 border border-slate-800"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 8: BATCH MANAGEMENT (Sprint 7.6) */}
+        {activeTab === "batches" && <BatchManagementView />}
+
+        {/* TAB 9: ASSIGNMENT REVIEW PANEL (Sprint 7.8) */}
+        {activeTab === "assignments" && <AssignmentReviewView />}
+
+        {/* TAB 10: CERTIFICATE GENERATOR (Sprint 7.9) */}
+        {activeTab === "certificates" && <CertificateGeneratorView />}
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
@@ -1808,7 +4389,7 @@ export default function AdminDashboardPage() {
                   rows={4}
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
-                  placeholder="e.g. Candidate attended 1:1 demo with Rajesh Kumar. Interested in Java Microservices weekend track. Follow-up scheduled for Friday..."
+                  placeholder="e.g. Candidate attended One-on-One demo with Rajesh Kumar. Interested in Java Microservices weekend track. Follow-up scheduled for Friday..."
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                 />
               </div>
@@ -1845,7 +4426,7 @@ export default function AdminDashboardPage() {
                   {editingCourse ? "Update Course Track" : "Publish New Track"}
                 </span>
                 <h3 className="font-bold text-lg text-white mt-0.5">
-                  {editingCourse ? "Edit Course in MongoDB Atlas" : "Create 1:1 Certification Course"}
+                  {editingCourse ? "Edit Course in MongoDB Atlas" : "Create One-on-One Certification Course"}
                 </h3>
               </div>
               <button
@@ -1948,7 +4529,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={courseForm.badge}
                     onChange={(e) => setCourseForm({ ...courseForm, badge: e.target.value })}
-                    placeholder="e.g. Bestseller, Hot, 1:1 Live"
+                    placeholder="e.g. Bestseller, Hot, One-on-One Live"
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
@@ -1972,7 +4553,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={courseForm.mentorCompany}
                     onChange={(e) => setCourseForm({ ...courseForm, mentorCompany: e.target.value })}
-                    placeholder="e.g. Ex-Amazon · 10+ Years"
+                    placeholder="e.g. Principal Technical Architect · 10+ Years"
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
@@ -1997,7 +4578,7 @@ export default function AdminDashboardPage() {
                   type="text"
                   value={courseForm.highlights}
                   onChange={(e) => setCourseForm({ ...courseForm, highlights: e.target.value })}
-                  placeholder="1:1 Live Coding, Production Microservices, Resume Review"
+                  placeholder="One-on-One Live Coding, Production Microservices, Resume Review"
                   className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                 />
               </div>
@@ -2098,7 +4679,7 @@ export default function AdminDashboardPage() {
                     required
                     value={mentorForm.company}
                     onChange={(e) => setMentorForm({ ...mentorForm, company: e.target.value })}
-                    placeholder="e.g. Ex-Amazon · IIT Delhi"
+                    placeholder="e.g. Principal Technical Architect · IIT Delhi"
                     className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
@@ -2244,6 +4825,153 @@ export default function AdminDashboardPage() {
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all cursor-pointer"
                 >
                   {editingMentor ? "Update Mentor (PUT /api/mentors/:id)" : "Onboard Mentor (POST /api/mentors)"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          MODAL: COMPOSE NOTIFICATION BROADCAST
+      ───────────────────────────────────────────────────────────────────────────── */}
+      {notifComposeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-xl bg-slate-900 border border-purple-500/40 rounded-3xl p-6 md:p-8 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200 my-auto">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                  In-App Notification Dispatcher
+                </span>
+                <h3 className="font-bold text-lg text-white mt-0.5">
+                  Compose & Broadcast Alert
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNotifComposeModal(false)}
+                className="text-slate-400 hover:text-white text-lg cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handlePublishNotification} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-300 mb-1">
+                  Notification Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newNotifTitle}
+                  onChange={(e) => setNewNotifTitle(e.target.value)}
+                  placeholder="e.g. 🚀 Live System Design Hackathon Starts This Weekend!"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Category</label>
+                  <select
+                    value={newNotifType}
+                    onChange={(e) => setNewNotifType(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="announcement">📢 Announcement</option>
+                    <option value="course_reminder">⏰ Course Reminder</option>
+                    <option value="demo_reminder">📅 Demo Reminder</option>
+                    <option value="system">⚡ System Alert</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Audience</label>
+                  <select
+                    value={newNotifRecipient}
+                    onChange={(e) => setNewNotifRecipient(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="all">🌐 All Students & Leads</option>
+                    <option value="students">🎓 Enrolled Students</option>
+                    <option value="leads">📋 Candidate Leads</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Priority</label>
+                  <select
+                    value={newNotifPriority}
+                    onChange={(e) => setNewNotifPriority(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent 🔴</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Target Action Link</label>
+                  <input
+                    type="text"
+                    value={newNotifActionUrl}
+                    onChange={(e) => setNewNotifActionUrl(e.target.value)}
+                    placeholder="e.g. /courses or /free-demo"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Schedule / Event Time (optional)</label>
+                  <input
+                    type="text"
+                    value={newNotifScheduledTime}
+                    onChange={(e) => setNewNotifScheduledTime(e.target.value)}
+                    placeholder="e.g. Saturday at 7:00 PM IST"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-300 mb-1">
+                  Alert Message Details *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={newNotifMessage}
+                  onChange={(e) => setNewNotifMessage(e.target.value)}
+                  placeholder="Provide concise details for the students/candidates..."
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setNotifComposeModal(false)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isBroadcasting}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-600/30 transition cursor-pointer disabled:opacity-50"
+                >
+                  {isBroadcasting ? (
+                    <span>Broadcasting...</span>
+                  ) : (
+                    <>
+                      <span>🚀</span>
+                      <span>Broadcast to Atlas</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

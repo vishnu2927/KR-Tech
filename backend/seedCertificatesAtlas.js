@@ -1,143 +1,117 @@
-const mongoose = require('mongoose');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const dotenv = require('dotenv');
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+const mongoose = require('mongoose');
+const QRCode = require('qrcode');
 const Certificate = require('./models/Certificate');
 
-const SEED_CERTIFICATES = [
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+const CERT_DATA = [
   {
-    title: 'Java Backend & Spring Boot Microservices Architecture',
+    title: 'Enterprise Java 21 & Distributed Microservices Engineering',
     category: 'Java Backend',
     studentName: 'Aditya Sharma',
-    completionDate: 'Aug 2026',
+    studentEmail: 'aditya.sharma@krtech.edu',
+    completionDate: 'Sep 12, 2026',
     credentialId: 'KRT-2026-JAVA-9102',
-    grade: 'Grade A+ (96%)',
-    skills: ['Java 21', 'Spring Boot 3.x', 'Microservices', 'Kafka', 'Docker'],
+    grade: 'Grade A+ (Distinction · 98%)',
+    skills: ['Java 21', 'Spring Boot 3', 'Kafka Event Streaming', 'Docker', 'Kubernetes', 'Redis Caching'],
+    issuer: 'KR GLOBAL LEARNING PRIVATE LIMITED',
+    accreditation: 'KR Global Learning Verified Training Credential',
     verified: true,
   },
   {
-    title: 'MERN Full Stack & Next.js 15 SaaS Engineering',
+    title: 'AWS Certified Solutions Architect – Associate (SAA-C03)',
+    category: 'AWS',
+    studentName: 'Aditya Sharma',
+    studentEmail: 'aditya.sharma@krtech.edu',
+    completionDate: 'Sep 01, 2026',
+    credentialId: 'KRT-2026-AWS-7729',
+    grade: 'Grade A+ (Distinction · 96%)',
+    skills: ['AWS VPC', 'ECS Fargate', 'Lambda', 'Terraform', 'CloudFront', 'S3 Glacier'],
+    issuer: 'KR GLOBAL LEARNING PRIVATE LIMITED',
+    accreditation: 'KR Global Learning Verified Training Credential',
+    verified: true,
+  },
+  {
+    title: 'MERN Stack Full Stack Web Development Mastery Bootcamp',
     category: 'MERN Stack',
     studentName: 'Kavya Patel',
-    completionDate: 'Jul 2026',
-    credentialId: 'KRT-2026-MERN-8401',
-    grade: 'Grade A (94%)',
-    skills: ['React 19', 'Node.js', 'Express', 'MongoDB', 'Next.js'],
+    studentEmail: 'kavya.patel@gmail.com',
+    completionDate: 'Aug 28, 2026',
+    credentialId: 'KRT-2026-MERN-8841',
+    grade: 'Grade A+ (Distinction · 95%)',
+    skills: ['React 19', 'Next.js 15', 'Node.js', 'Express.js', 'MongoDB Atlas', 'Tailwind CSS'],
+    issuer: 'KR GLOBAL LEARNING PRIVATE LIMITED',
+    accreditation: 'KR Global Learning Verified Training Credential',
     verified: true,
   },
   {
-    title: 'AWS Certified Solutions Architect Associate Track',
-    category: 'AWS',
-    studentName: 'Siddharth Verma',
-    completionDate: 'Aug 2026',
-    credentialId: 'KRT-2026-AWS-7729',
-    grade: 'Grade A+ (98%)',
-    skills: ['AWS VPC', 'EC2 & S3', 'IAM', 'ECS Fargate', 'CloudFormation'],
-    verified: true,
-  },
-  {
-    title: 'Microsoft Azure Administrator (AZ-104) & Hybrid Cloud',
-    category: 'Azure',
-    studentName: 'Meenakshi Iyer',
-    completionDate: 'Aug 2026',
-    credentialId: 'KRT-2026-AZ-6612',
-    grade: 'Grade A (92%)',
-    skills: ['Azure Entra ID', 'Virtual Networks', 'ARM Templates', 'Azure Backup'],
-    verified: true,
-  },
-  {
-    title: 'Certified Ethical Hacker (CEH) & SOC Threat Hunting',
+    title: 'Enterprise Cyber Security & Ethical Hacking Mastery (CEH v12)',
     category: 'Cyber Security',
-    studentName: 'Rohan Deshmukh',
-    completionDate: 'Jul 2026',
-    credentialId: 'KRT-2026-SEC-5503',
-    grade: 'Grade A+ (97%)',
-    skills: ['Ethical Hacking', 'Wireshark', 'Burp Suite', 'SIEM Splunk', 'Firewalls'],
-    verified: true,
-  },
-  {
-    title: 'Certified Ethical Hacker (CEH v12) Master Track',
-    category: 'Cyber Security',
-    studentName: 'Rohan Deshmukh',
-    completionDate: 'Jul 2026',
-    credentialId: 'KRT-2026-CEH-5503',
-    grade: 'Grade A+ (97%)',
-    skills: ['Burp Suite', 'Metasploit', 'Splunk', 'Nmap', 'Wireshark'],
-    verified: true,
-  },
-  {
-    title: 'Microsoft Power BI Data Analyst (PL-300) & Analytics',
-    category: 'Power BI',
-    studentName: 'Ananya Roy',
-    completionDate: 'Jun 2026',
-    credentialId: 'KRT-2026-PBI-4491',
-    grade: 'Grade A (95%)',
-    skills: ['Power BI', 'DAX Modeling', 'Advanced SQL', 'Tableau', 'ETL'],
-    verified: true,
-  },
-  {
-    title: 'SAP S/4HANA FICO Financial Accounting Consultant',
-    category: 'SAP',
-    studentName: 'Vikram Malhotra',
-    completionDate: 'Jul 2026',
-    credentialId: 'KRT-2026-SAP-3382',
-    grade: 'Grade A+ (99%)',
-    skills: ['SAP FICO', 'General Ledger', 'Accounts Payable', 'Asset Accounting', 'S/4HANA'],
-    verified: true,
-  },
-  {
-    title: 'SAP S/4HANA Financial Accounting (FICO) Specialist',
-    category: 'SAP',
-    studentName: 'Ananya Roy',
-    completionDate: 'Aug 2026',
-    credentialId: 'KRT-2026-SAP-4391',
-    grade: 'Grade A (95%)',
-    skills: ['SAP FICO', 'General Ledger', 'Accounts Payable', 'Asset Accounting'],
-    verified: true,
-  },
-  {
-    title: 'Salesforce Administrator & Platform Developer (PD1)',
-    category: 'Salesforce',
-    studentName: 'Pooja Hegde',
-    completionDate: 'Aug 2026',
-    credentialId: 'KRT-2026-SF-2210',
-    grade: 'Grade A (93%)',
-    skills: ['Salesforce Admin', 'Apex Programming', 'Lightning LWC', 'Flows', 'SOQL'],
+    studentName: 'Rahul Verma',
+    studentEmail: 'rahul.verma@outlook.com',
+    completionDate: 'Aug 20, 2026',
+    credentialId: 'KRT-2026-SEC-6612',
+    grade: 'Grade A (Distinction · 92%)',
+    skills: ['Penetration Testing', 'SIEM / Splunk', 'Network Hardening', 'OWASP Top 10', 'Wireshark'],
+    issuer: 'KR GLOBAL LEARNING PRIVATE LIMITED',
+    accreditation: 'KR Global Learning Verified Training Credential',
     verified: true,
   },
 ];
 
-async function seed() {
-  try {
-    console.log('Connecting to MongoDB Atlas...');
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 15000,
+async function seedCertificates() {
+  console.log('Connecting to MongoDB Atlas to synchronize certificates & QR codes...');
+  await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 15000 });
+  console.log(`Connected to: ${mongoose.connection.name}`);
+
+  for (const cert of CERT_DATA) {
+    const verifyUrl = `${CLIENT_URL}/certificates?verify=${encodeURIComponent(cert.credentialId)}`;
+    const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#0f172a', light: '#ffffff' },
     });
-    console.log('Connected to Atlas successfully!');
 
-    let inserted = 0;
-    let updated = 0;
-
-    for (const cert of SEED_CERTIFICATES) {
-      const existing = await Certificate.findOne({ credentialId: cert.credentialId });
-      if (existing) {
-        await Certificate.updateOne({ credentialId: cert.credentialId }, { $set: cert });
-        updated++;
-        console.log(`✓ Updated: ${cert.credentialId} (${cert.studentName})`);
-      } else {
-        await Certificate.create(cert);
-        inserted++;
-        console.log(`+ Inserted: ${cert.credentialId} (${cert.studentName})`);
-      }
-    }
-
-    const count = await Certificate.countDocuments();
-    console.log(`\nCertificates Sync Complete!`);
-    console.log(`Total in MongoDB Atlas: ${count} (Inserted: ${inserted}, Updated: ${updated})`);
-    process.exit(0);
-  } catch (err) {
-    console.error('Seeding error:', err);
-    process.exit(1);
+    await Certificate.findOneAndUpdate(
+      { credentialId: cert.credentialId },
+      {
+        ...cert,
+        qrCodeDataUrl,
+        pdfUrl: `/api/certificates/${cert.credentialId}/pdf`,
+      },
+      { upsert: true, new: true }
+    );
+    console.log(`✓ Synchronized Certificate: ${cert.credentialId} (${cert.studentName})`);
   }
+
+  // Also update any other existing certificates that lack qrCodeDataUrl
+  const existingWithoutQr = await Certificate.find({
+    $or: [{ qrCodeDataUrl: { $exists: false } }, { qrCodeDataUrl: null }],
+  });
+
+  for (const c of existingWithoutQr) {
+    const verifyUrl = `${CLIENT_URL}/certificates?verify=${encodeURIComponent(c.credentialId)}`;
+    const qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#0f172a', light: '#ffffff' },
+    });
+    c.qrCodeDataUrl = qrCodeDataUrl;
+    c.pdfUrl = `/api/certificates/${c.credentialId}/pdf`;
+    await c.save();
+    console.log(`✓ Backfilled QR Code for: ${c.credentialId}`);
+  }
+
+  const total = await Certificate.countDocuments();
+  console.log(`\n✅ Certificates Collection in MongoDB Atlas now contains ${total} verified records!`);
+  await mongoose.disconnect();
 }
 
-seed();
+seedCertificates().catch((err) => {
+  console.error('Seeding error:', err);
+  process.exit(1);
+});

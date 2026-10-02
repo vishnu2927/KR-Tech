@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { I } from "./Icons";
-import SectionHeading from "./SectionHeading";
 
 interface Resource {
   title: string;
@@ -10,8 +10,7 @@ interface Resource {
   downloads: string;
   desc: string;
   icon: React.ReactNode;
-  color: string;
-  bg: string;
+  accent: string;
 }
 
 export default function FreeResources() {
@@ -19,70 +18,64 @@ export default function FreeResources() {
 
   const resources: Resource[] = [
     {
-      title: "Core Java & Spring Boot Master Cheat Sheet",
+      title: "Core Java 21 & Spring Boot 3 Master Blueprint",
       category: "Backend",
       format: "PDF (42 Pages)",
       size: "4.8 MB",
       downloads: "14.2K Downloads",
-      desc: "Complete reference for Java 21 features, Spring Boot 3.x annotations, JPA/Hibernate mapping, and REST conventions.",
+      desc: "Complete reference for Java 21 records, virtual threads, Spring Boot 3.x annotations, JPA/Hibernate mapping, and REST conventions.",
       icon: <I.FileText />,
-      color: "#7C3AED",
-      bg: "#EDE9FE",
+      accent: "#06B6D4",
     },
     {
-      title: "React 19 & Next.js Full Stack Architecture Notes",
+      title: "React 19 & Next.js Architecture Cheat Sheet",
       category: "Frontend",
       format: "PDF (36 Pages)",
       size: "3.9 MB",
       downloads: "18.9K Downloads",
-      desc: "Server components, Actions, custom hooks, Tailwind CSS layout patterns, and client-side performance optimization.",
+      desc: "Server components, Actions, custom hooks, Tailwind layout patterns, and client-side performance benchmarks.",
       icon: <I.Code />,
-      color: "#0891B2",
-      bg: "#CFFAFE",
+      accent: "#A78BFA",
     },
     {
-      title: "DSA 250+ LeetCode Solutions & Pattern Guide",
+      title: "DSA 250+ LeetCode Patterns & Annotated Solutions",
       category: "DSA",
       format: "PDF (68 Pages)",
       size: "6.2 MB",
       downloads: "28.5K Downloads",
       desc: "14 essential coding patterns (Two Pointers, Sliding Window, DP, Graphs) with annotated code in Java, Python, and C++.",
       icon: <I.Award />,
-      color: "#7C3AED",
-      bg: "#EDE9FE",
+      accent: "#38BDF8",
     },
     {
-      title: "Top 100 System Design Interview Questions & Diagrams",
+      title: "Top 100 System Design Interview Blueprints",
       category: "System Design",
       format: "PDF (50 Pages)",
       size: "8.1 MB",
       downloads: "21.4K Downloads",
       desc: "Architectural blueprints for URL shorteners, Rate limiters, Distributed Caching, Message Queues, and Sharding.",
       icon: <I.Database />,
-      color: "#0891B2",
-      bg: "#CFFAFE",
+      accent: "#10B981",
     },
     {
-      title: "ATS-Friendly Tech Resume Template & Portfolio Checklist",
+      title: "ATS-Friendly Tech Resume Template & Portfolio Guide",
       category: "Career",
       format: "DOCX & Figma",
       size: "1.8 MB",
       downloads: "32.1K Downloads",
-      desc: "Battle-tested resume format vetted by top tech recruiters with action verb guides and bullet-point impact metrics.",
+      desc: "Battle-tested technical portfolio and profile template with action verb guides and bullet-point project impact metrics.",
       icon: <I.Briefcase />,
-      color: "#10B981",
-      bg: "#D1FAE5",
+      accent: "#F59E0B",
     },
     {
-      title: "Python Automation & Real-World Web Scraping Guide",
+      title: "Python Automation & Web Scraping Playbook",
       category: "Python",
       format: "PDF (28 Pages)",
       size: "3.2 MB",
       downloads: "12.7K Downloads",
       desc: "Step-by-step handbook covering BeautifulSoup, Selenium, async requests, API consumption, and automated bot workflows.",
       icon: <I.Bot />,
-      color: "#F59E0B",
-      bg: "#FEF3C7",
+      accent: "#EC4899",
     },
   ];
 
@@ -94,129 +87,99 @@ export default function FreeResources() {
   };
 
   return (
-    <section id="resources" style={{ padding: "80px 0", background: "white" }}>
-      <div className="container-xl">
-        <div style={{ marginBottom: 48 }}>
-          <SectionHeading
-            badge="Free Study Materials"
-            badgeClass="badge-cyan"
-            title="Free Developer Guides &"
-            accent="Study Notes"
-            desc="Level up your tech knowledge with our free curated cheat sheets, architecture blueprints, and resume templates."
-          />
+    <section id="resources" className="py-24 bg-dark-purple relative overflow-hidden text-white border-t border-purple-500/15">
+      {/* Background ambient lighting */}
+      <div className="orb" style={{ width: 500, height: 500, top: -100, left: -60, background: "rgba(6,182,212,0.18)" }} />
+      <div className="orb" style={{ width: 450, height: 450, bottom: -100, right: -40, background: "rgba(124,58,237,0.22)" }} />
+
+      <div className="container-xl relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+          <div>
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 backdrop-blur-md mb-3">
+              <I.Sparkles /> 100% FREE STUDY BLUEPRINTS
+            </span>
+            <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+              Developer Cheatsheets & <span className="gradient-text-warm">Free Resources</span>
+            </h2>
+            <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-xl">
+              Level up your tech knowledge with our free curated cheat sheets, architecture blueprints, and resume templates.
+            </p>
+          </div>
+          <Link
+            to="/resources"
+            className="btn-ghost-white flex items-center gap-2 self-start md:self-auto text-cyan-300 font-semibold no-underline text-sm hover:text-white px-5 py-2.5 rounded-xl"
+          >
+            Explore All Free Materials <I.ChevronRight />
+          </Link>
         </div>
 
         {/* Download Success Toast */}
         {downloadedItem && (
           <div
-            style={{
-              maxWidth: 580,
-              margin: "0 auto 32px",
-              padding: "14px 20px",
-              borderRadius: 16,
-              background: "#DCFCE7",
-              border: "1px solid #86EFAC",
-              color: "#166534",
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              animation: "scaleIn 0.25s ease-out",
-            }}
+            className="max-w-md mx-auto mb-8 p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 flex items-center gap-3 shadow-xl backdrop-blur-md animate-scaleIn text-left text-xs sm:text-sm"
           >
-            <I.Check />
-            <span style={{ fontSize: 13, fontWeight: 600 }}>
-              Downloading <strong>"{downloadedItem}"</strong>! Check your downloads folder.
+            <span className="text-emerald-400 text-lg shrink-0">✓</span>
+            <span>
+              Downloading <strong>"{downloadedItem}"</strong>! Check your browser downloads.
             </span>
           </div>
         )}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: 22,
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {resources.map((r, i) => (
             <div
               key={i}
-              className="card"
+              className="glass-card-dark p-6 flex flex-col justify-between text-left group hover:border-purple-400/50"
               style={{
-                padding: "26px",
-                borderRadius: 24,
-                background: "white",
-                border: "1.5px solid #EDE9FE",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                boxShadow: "0 4px 20px rgba(124,58,237,0.05)",
+                background: "rgba(18, 12, 38, 0.8)",
+                border: "1px solid rgba(167, 139, 250, 0.2)",
+                boxShadow: "0 15px 35px rgba(0,0,0,0.4)",
               }}
             >
               <div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                <div className="flex items-center justify-between mb-4">
                   <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl transition-transform group-hover:scale-110"
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
-                      background: r.bg,
-                      color: r.color,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      background: `${r.accent}20`,
+                      border: `1px solid ${r.accent}50`,
+                      color: r.accent,
                     }}
                   >
                     {r.icon}
                   </div>
-                  <span className="badge badge-purple">{r.category}</span>
+                  <span
+                    className="text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
+                    style={{
+                      background: "rgba(255,255,255,0.06)",
+                      color: r.accent,
+                      border: `1px solid ${r.accent}40`,
+                    }}
+                  >
+                    {r.category}
+                  </span>
                 </div>
 
-                <h3
-                  style={{
-                    fontFamily: "Poppins, sans-serif",
-                    fontWeight: 700,
-                    fontSize: 16,
-                    color: "#0F0A1E",
-                    lineHeight: 1.45,
-                    marginBottom: 8,
-                    minHeight: 46,
-                  }}
-                >
+                <h3 className="font-display font-bold text-base text-white leading-snug mb-2 group-hover:text-cyan-300 transition-colors min-h-[44px]">
                   {r.title}
                 </h3>
-                <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.6, marginBottom: 16 }}>{r.desc}</p>
+                <p className="text-xs text-gray-300 leading-relaxed mb-4 line-clamp-3">
+                  {r.desc}
+                </p>
               </div>
 
               <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    fontSize: 12,
-                    color: "#9CA3AF",
-                    marginBottom: 16,
-                    paddingTop: 12,
-                    borderTop: "1px solid #F3F4F6",
-                  }}
-                >
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-4 pt-3 border-t border-white/10">
                   <span>{r.format} · {r.size}</span>
-                  <span style={{ color: "#7C3AED", fontWeight: 600 }}>{r.downloads}</span>
+                  <span className="text-cyan-400 font-semibold">{r.downloads}</span>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => handleDownload(r.title)}
-                  className="btn-ghost"
-                  style={{
-                    width: "100%",
-                    justifyContent: "center",
-                    padding: "10px 16px",
-                    borderRadius: 12,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-white/10 hover:bg-purple-600/40 hover:border-purple-400/50 border border-white/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <I.Download /> Download Free PDF
+                  <I.Download /> Download Free Resource
                 </button>
               </div>
             </div>

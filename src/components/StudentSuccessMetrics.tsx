@@ -5,18 +5,68 @@ interface Metric {
   target: number;
   suffix: string;
   label: string;
+  sublabel: string;
   icon: string;
-  color: string;
-  bg: string;
+  accent: string;
+  glow: string;
 }
 
 export default function StudentSuccessMetrics() {
   const metrics: Metric[] = [
-    { target: 15000, suffix: "+", label: "Students Trained", icon: "🎓", color: "#7C3AED", bg: "rgba(124,58,237,0.1)" },
-    { target: 50, suffix: "+", label: "Professional Courses", icon: "📚", color: "#06B6D4", bg: "rgba(6,182,212,0.1)" },
-    { target: 10, suffix: "+", label: "Expert Mentors", icon: "⚡", color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
-    { target: 500, suffix: "+", label: "Projects Completed", icon: "🚀", color: "#10B981", bg: "rgba(16,185,129,0.1)" },
-    { target: 100, suffix: "+", label: "Live Sessions / Month", icon: "🔴", color: "#EC4899", bg: "rgba(236,72,153,0.1)" },
+    {
+      target: 55,
+      suffix: "+",
+      label: "Certified Live Courses",
+      sublabel: "Atlas MongoDB Synced",
+      icon: "📚",
+      accent: "#06B6D4",
+      glow: "rgba(6,182,212,0.25)",
+    },
+    {
+      target: 10,
+      suffix: "+",
+      label: "Expert Industry Mentors",
+      sublabel: "Google, Amazon, Razorpay",
+      icon: "⚡",
+      accent: "#A78BFA",
+      glow: "rgba(167,139,250,0.25)",
+    },
+    {
+      target: 1,
+      suffix: ":1",
+      label: "Live Mentorship Ratio",
+      sublabel: "Zero Mass Lecture Halls",
+      icon: "🎯",
+      accent: "#38BDF8",
+      glow: "rgba(56,189,248,0.25)",
+    },
+    {
+      target: 500,
+      suffix: "+",
+      label: "Capstone Projects Built",
+      sublabel: "Production-Grade SaaS & AI",
+      icon: "🚀",
+      accent: "#10B981",
+      glow: "rgba(16,185,129,0.25)",
+    },
+    {
+      target: 100,
+      suffix: "+",
+      label: "Industry Certifications",
+      sublabel: "Vendor-Aligned Syllabus",
+      icon: "🏆",
+      accent: "#F59E0B",
+      glow: "rgba(245,158,11,0.25)",
+    },
+    {
+      target: 98,
+      suffix: "%",
+      label: "Practical Learning Success",
+      sublabel: "One-on-One Mastery Rate",
+      icon: "⭐",
+      accent: "#EC4899",
+      glow: "rgba(236,72,153,0.25)",
+    },
   ];
 
   const [counts, setCounts] = useState<number[]>(metrics.map(() => 0));
@@ -45,40 +95,58 @@ export default function StudentSuccessMetrics() {
   }, []);
 
   return (
-    <section className="py-14 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white relative overflow-hidden">
-      {/* Background radial glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+    <section className="py-16 relative overflow-hidden bg-dark-obsidian text-white border-y border-purple-500/20">
+      {/* Background ambient lighting */}
+      <div className="orb" style={{ width: 480, height: 480, top: -100, right: "10%", background: "rgba(124,58,237,0.2)" }} />
+      <div className="orb" style={{ width: 400, height: 400, bottom: -120, left: "15%", background: "rgba(6,182,212,0.18)" }} />
 
       <div className="container-xl relative z-10">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-2">
-            <I.Sparkles /> Proven Track Record
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-3">
+            <I.Sparkles /> VERIFIED OUTCOMES & METRICS
           </span>
-          <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white">
-            Transforming Engineering Careers Across the Globe
+          <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+            Engineered for <span className="gradient-text-warm">High-Impact Tech Careers</span>
           </h2>
+          <p className="text-sm sm:text-base text-gray-400 mt-3 max-w-2xl mx-auto">
+            From zero to architecting distributed systems. Experience why 15,000+ engineers trust KR Global Learning for One-on-One mastery.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+        {/* Animated Metrics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
           {metrics.map((m, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-3xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition-all duration-300 hover:-translate-y-1 text-center flex flex-col items-center justify-center group"
+              className="glass-card-dark p-5 sm:p-6 text-center flex flex-col items-center justify-between group hover:border-purple-400/50"
+              style={{
+                boxShadow: `0 10px 30px rgba(0,0,0,0.4), inset 0 0 20px ${m.glow}`,
+              }}
             >
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform"
-                style={{ background: m.bg }}
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-3 transition-transform group-hover:scale-110"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: `1px solid ${m.accent}40`,
+                }}
               >
                 {m.icon}
               </div>
 
-              <div className="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight mb-1">
+              <div
+                className="font-display font-extrabold text-2xl sm:text-3xl lg:text-3xl text-white tracking-tight mb-1"
+                style={{ color: m.accent }}
+              >
                 {counts[idx].toLocaleString()}
-                <span className="text-purple-400">{m.suffix}</span>
+                <span>{m.suffix}</span>
               </div>
 
-              <div className="text-xs sm:text-sm text-purple-200/90 font-medium">
+              <div className="text-xs sm:text-sm text-white font-semibold mb-1">
                 {m.label}
+              </div>
+
+              <div className="text-[11px] text-gray-400 font-medium">
+                {m.sublabel}
               </div>
             </div>
           ))}

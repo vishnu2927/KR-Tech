@@ -1,4 +1,5 @@
 import api from "./api";
+import { ALL_COURSES } from "../data/coursesData";
 
 export interface Course {
   id: string;
@@ -52,9 +53,11 @@ export interface CoursePayload {
 
 function mapCategoryToGroup(cat: string = ""): string {
   const c = cat.toLowerCase();
-  if (c.includes("cloud") || c.includes("aws") || c.includes("azure") || c.includes("gcp")) return "Cloud Computing";
-  if (c.includes("security") || c.includes("cyber") || c.includes("ceh") || c.includes("soc") || c.includes("firewall")) return "Cyber Security";
-  if (c.includes("network") || c.includes("cisco") || c.includes("ccna") || c.includes("juniper") || c.includes("fortinet")) return "Networking";
+  if (c.includes("ai") || c.includes("machine learning") || c.includes("genai") || c.includes("databricks")) return "AI, Machine Learning & GenAI";
+  if (c.includes("cloud & cloud architecture")) return "Cloud & Cloud Architecture";
+  if (c.includes("cloud") || c.includes("aws") || c.includes("azure") || c.includes("gcp")) return "Cloud & Cloud Architecture";
+  if (c.includes("cybersecurity") || c.includes("cyber security") || c.includes("security") || c.includes("ceh") || c.includes("soc") || c.includes("firewall") || c.includes("comptia") || c.includes("cissp")) return "Cybersecurity";
+  if (c.includes("networking") || c.includes("network") || c.includes("cisco") || c.includes("ccna") || c.includes("ccnp") || c.includes("ccie") || c.includes("fortinet")) return "Networking";
   if (c.includes("data") || c.includes("power bi") || c.includes("tableau") || c.includes("sql") || c.includes("analytics")) return "Data & Analytics";
   if (c.includes("sap") || c.includes("salesforce") || c.includes("servicenow")) return "Enterprise Technologies";
   if (c.includes("pmp") || c.includes("scrum") || c.includes("togaf") || c.includes("itil") || c.includes("project")) return "Project Management";
@@ -63,12 +66,29 @@ function mapCategoryToGroup(cat: string = ""): string {
 }
 
 function normalizeCourse(raw: any): Course {
-  const priceStr = typeof raw.price === "number"
-    ? `₹${raw.price.toLocaleString("en-IN")}`
-    : (raw.price || "₹14,999");
-  const origPriceStr = typeof raw.originalPrice === "number"
-    ? `₹${raw.originalPrice.toLocaleString("en-IN")}`
-    : (raw.originalPrice || "₹24,999");
+  let priceStr = "";
+  if (typeof raw.price === "string") {
+    priceStr = raw.price.startsWith("$") || raw.price.startsWith("₹") ? raw.price : `$${raw.price}`;
+  } else if (typeof raw.price === "number") {
+    if (raw.currency === "USD" || raw.price <= 1500) {
+      priceStr = `$${raw.price}`;
+    } else {
+      priceStr = `₹${raw.price.toLocaleString("en-IN")}`;
+    }
+  } else {
+    priceStr = "$599";
+  }
+
+  let origPriceStr = "";
+  if (priceStr.startsWith("$")) {
+    // For USD catalog items, do NOT invent fake original prices or discounts
+    origPriceStr = "";
+  } else if (typeof raw.originalPrice === "string") {
+    origPriceStr = raw.originalPrice;
+  } else if (typeof raw.originalPrice === "number") {
+    origPriceStr = `₹${raw.originalPrice.toLocaleString("en-IN")}`;
+  }
+
   const ratingStr = typeof raw.rating === "number"
     ? raw.rating.toFixed(1)
     : (raw.rating || "4.9");
@@ -79,7 +99,7 @@ function normalizeCourse(raw: any): Course {
     ? raw.features
     : (Array.isArray(raw.highlights) && raw.highlights.length > 0
       ? raw.highlights
-      : ["1:1 Live Mentorship", "Real-World Projects", "Official Certification Prep"]);
+      : ["One-on-One Live Mentorship", "Real-World Projects", "Official Certification Prep"]);
 
   return {
     id: raw.id || raw._id || `course-${Date.now()}`,
@@ -87,17 +107,17 @@ function normalizeCourse(raw: any): Course {
     title: raw.title,
     category: raw.category,
     categoryGroup: raw.categoryGroup || mapCategoryToGroup(raw.category),
-    duration: raw.duration || "6 Months",
+    duration: raw.duration || "8-10 Weeks",
     students: studentsStr,
     rating: ratingStr,
     level: raw.level || "Intermediate",
-    mentor: raw.mentor || "Rajesh Kumar",
-    mentorCompany: raw.mentorCompany || "Ex-Amazon",
+    mentor: raw.mentor || "Technical Architect",
+    mentorCompany: raw.mentorCompany || "Senior Architect",
     mentorExp: raw.mentorExp || "10+ Years",
-    language: raw.language || "English & Hindi",
+    language: raw.language || "English",
     price: priceStr,
     originalPrice: origPriceStr,
-    badge: raw.badge || (raw.isPopular ? "Bestseller" : "Live Track"),
+    badge: raw.badge || (raw.isPopular ? "Bestseller" : "Verified Program"),
     image: raw.image || "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
     description: raw.description || "",
     features: feats,
@@ -125,13 +145,32 @@ export const courseService = {
   async getCourses(params?: { category?: string; search?: string }): Promise<Course[]> {
     try {
       const res = await api.get<{ success: boolean; courses: any[]; count?: number }>("/courses", { params });
-      if (res.data?.courses && Array.isArray(res.data.courses)) {
+      if (res.data?.courses && Array.isArray(res.data.courses) && res.data.courses.length > 0) {
         return res.data.courses.map(normalizeCourse);
       }
     } catch (err) {
       console.warn("API GET /courses notice:", err);
     }
-    return [];
+    // Reliable static catalog fallback
+    let list = ALL_COURSES;
+    if (params?.category && params.category !== "All") {
+      const catLower = params.category.toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.category.toLowerCase().includes(catLower) ||
+          c.categoryGroup.toLowerCase().includes(catLower)
+      );
+    }
+    if (params?.search) {
+      const q = params.search.toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          c.category.toLowerCase().includes(q) ||
+          c.categoryGroup.toLowerCase().includes(q)
+      );
+    }
+    return list;
   },
 
   /**

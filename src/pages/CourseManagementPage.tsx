@@ -28,31 +28,33 @@ const INITIAL_FORM_STATE: CourseFormData = {
   level: "Intermediate",
   price: "₹14,999",
   originalPrice: "₹26,999",
-  description: "Comprehensive 1:1 mentorship covering enterprise system design, real-world capstone projects, and direct placement support.",
-  highlights: "1:1 Live Mentorship, Real-world Capstones, Code Review, Resume & Interview Prep",
+  description: "Comprehensive One-on-One mentorship covering enterprise system design, real-world capstone projects, and official certification preparation.",
+  highlights: "One-on-One Live Mentorship, Real-world Capstones, Code Review, Certification Prep",
   roadmap: "Week 1-2: Core Architecture & Fundamentals\nWeek 3-4: Frameworks & APIs\nWeek 5-6: Microservices & Cloud Deployment",
   image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
   mentor: "Rajesh Kumar",
-  mentorCompany: "Ex-Amazon",
+  mentorCompany: "Principal Technical Architect",
   badge: "Bestseller",
 };
 
 const CATEGORIES = [
   "All",
+  "Cloud & Cloud Architecture",
+  "AI, Machine Learning & GenAI",
+  "Cybersecurity",
+  "Networking",
   "Java Backend",
   "MERN Stack",
+  "Software Development",
+  "Microsoft & IT",
+  "Data Analytics",
+  "Project Management",
+  "Enterprise Technologies",
   "AWS",
   "Azure",
   "GCP",
-  "Cyber Security",
-  "Cisco",
   "SAP",
   "Salesforce",
-  "Power BI",
-  "Tableau",
-  "ServiceNow",
-  "PMP",
-  "Scrum",
 ];
 
 export default function CourseManagementPage() {
@@ -140,7 +142,7 @@ export default function CourseManagementPage() {
     const roadmapItems = formData.roadmap.split("\n").filter(Boolean).map((line, idx) => ({
       week: `Week ${idx * 2 + 1}-${idx * 2 + 2}`,
       title: line,
-      topics: ["Architecture Review", "1:1 Live Coding"],
+      topics: ["Architecture Review", "One-on-One Live Coding"],
       milestone: "Capstone Delivery",
     }));
 
@@ -179,12 +181,12 @@ export default function CourseManagementPage() {
       level: (course.level as any) || "Intermediate",
       price: course.price,
       originalPrice: course.originalPrice || "₹24,999",
-      description: (course as any).description || "Comprehensive 1:1 tech mentorship with real-world capstone architecture.",
+      description: (course as any).description || "Comprehensive One-on-One tech mentorship with real-world capstone architecture.",
       highlights: (course.features || []).join(", "),
       roadmap: (course.roadmap || []).map((r) => r.title).join("\n"),
       image: course.image || INITIAL_FORM_STATE.image,
       mentor: course.mentor || "Rajesh Kumar",
-      mentorCompany: course.mentorCompany || "Ex-Amazon",
+      mentorCompany: course.mentorCompany || "Principal Technical Architect",
       badge: course.badge || "Live Track",
     });
     setIsEditModalOpen(true);
@@ -210,8 +212,9 @@ export default function CourseManagementPage() {
     });
 
     if (updated) {
+      const { roadmap: _rm, ...cleanFormData } = formData;
       setCourses((prev) =>
-        prev.map((c) => (c.id === formData.id ? { ...c, ...formData, features: highlightsArray } : c))
+        prev.map((c) => (c.id === formData.id ? { ...c, ...cleanFormData, highlights: highlightsArray, features: highlightsArray } : c))
       );
       showToast(`✓ Updated course: "${formData.title}" in MongoDB`);
     }
@@ -280,7 +283,7 @@ export default function CourseManagementPage() {
                 Curriculum & Course CMS
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
-                Manage all 55+ certification tracks, edit tuition pricing, upload thumbnails, update milestone roadmaps, and publish new 1:1 industry syllabi.
+                Manage all 55+ certification tracks, edit tuition pricing, upload thumbnails, update milestone roadmaps, and publish new One-on-One industry syllabi.
               </p>
             </div>
 
@@ -350,7 +353,7 @@ export default function CourseManagementPage() {
             <span>
               Showing <strong className="text-white">{filteredCourses.length}</strong> certification courses in catalog
             </span>
-            <span className="text-purple-400 font-semibold">1:1 Live Interactive Syllabi</span>
+            <span className="text-purple-400 font-semibold">One-on-One Live Interactive Syllabi</span>
           </div>
         </div>
 
@@ -392,7 +395,7 @@ export default function CourseManagementPage() {
 
                   <div className="flex items-center justify-between text-xs text-slate-400">
                     <span>Mentor: <strong className="text-slate-200">{course.mentor}</strong></span>
-                    <span className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-purple-300 font-semibold">{course.mentorCompany || "Ex-Amazon"}</span>
+                    <span className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-purple-300 font-semibold">{course.mentorCompany || "Principal Technical Architect"}</span>
                   </div>
 
                   {course.features && course.features.length > 0 && (
@@ -490,7 +493,7 @@ export default function CourseManagementPage() {
                   {isEditModalOpen ? "Modify Existing Track" : "Publish New Track"}
                 </span>
                 <h3 className="font-bold text-lg text-white">
-                  {isEditModalOpen ? `Edit: ${formData.title}` : "Add New 1:1 Certification Course"}
+                  {isEditModalOpen ? `Edit: ${formData.title}` : "Add New One-on-One Certification Course"}
                 </h3>
               </div>
               <button
@@ -608,7 +611,7 @@ export default function CourseManagementPage() {
                     type="text"
                     value={formData.mentorCompany}
                     onChange={(e) => setFormData({ ...formData, mentorCompany: e.target.value })}
-                    placeholder="e.g. Ex-Amazon"
+                    placeholder="e.g. Principal Technical Architect"
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
@@ -636,7 +639,7 @@ export default function CourseManagementPage() {
                   type="text"
                   value={formData.highlights}
                   onChange={(e) => setFormData({ ...formData, highlights: e.target.value })}
-                  placeholder="1:1 Live Mentorship, Kafka Streams, Docker Architecture"
+                  placeholder="One-on-One Live Mentorship, Kafka Streams, Docker Architecture"
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                 />
               </div>

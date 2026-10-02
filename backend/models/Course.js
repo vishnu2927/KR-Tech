@@ -16,6 +16,10 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Course category is required'],
     },
+    categoryGroup: {
+      type: String,
+      default: '',
+    },
     description: {
       type: String,
       required: [true, 'Course description is required'],
@@ -43,12 +47,12 @@ const courseSchema = new mongoose.Schema(
       },
     ],
     price: {
-      type: Number,
-      default: 19999,
+      type: mongoose.Schema.Types.Mixed,
+      default: 599,
     },
     originalPrice: {
-      type: Number,
-      default: 34999,
+      type: mongoose.Schema.Types.Mixed,
+      default: '',
     },
     image: {
       type: String,

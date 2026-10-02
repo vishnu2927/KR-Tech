@@ -15,243 +15,255 @@ export default function ContactPage() {
     setSubmitted(true);
   };
 
-  const contactCards = [
-    {
-      title: "Call Us Directly",
-      subtitle: "Toll-Free Learner Helpline",
-      contact: "1800-123-4567",
-      href: "tel:18001234567",
-      icon: <I.Phone />,
-      color: "#7C3AED",
-      bg: "#EDE9FE",
-      action: "Call Now",
-    },
-    {
-      title: "Email Support",
-      subtitle: "Fast response within 2 hours",
-      contact: "support@krtech.in",
-      href: "mailto:support@krtech.in",
-      icon: <I.Mail />,
-      color: "#0891B2",
-      bg: "#CFFAFE",
-      action: "Send Email",
-    },
-    {
-      title: "WhatsApp Chat",
-      subtitle: "Instant 1:1 guidance & queries",
-      contact: "+91 98765 43210",
-      href: "https://wa.me/919876543210",
-      icon: <I.MessageCircle />,
-      color: "#10B981",
-      bg: "#D1FAE5",
-      action: "Chat on WhatsApp",
-    },
-    {
-      title: "Office Hours",
-      subtitle: "Mon - Sun · 9 AM - 9 PM IST",
-      contact: "Always Open for Learners",
-      href: "#",
-      icon: <I.Clock />,
-      color: "#F59E0B",
-      bg: "#FEF3C7",
-      action: "View Schedule",
-    },
-  ];
-
   return (
     <SEO
-      title="Contact KR Tech — Learner Support & 1:1 Counseling"
-      description="Get in touch with KR Tech academic advisors. Toll-free support, direct WhatsApp chat, office visits, and 1:1 demo scheduling."
-      canonical="https://krtech.in/contact"
+      title="Contact Us — KR GLOBAL LEARNING PRIVATE LIMITED"
+      description="Need Help? We're Here for You. Official 24×7 customer support: +91 9311073936, email: krglobal0713@gmail.com. Corporate Office: Unit No. 615, Artha Mart, Tech Zone IV, Greater Noida West, Uttar Pradesh – 201318."
+      canonical="https://krgloballearning.com/contact"
     >
-      <main style={{ paddingTop: 90, minHeight: "100vh", background: "#FDFDFE" }}>
-      {/* Header */}
-      <section
-        style={{
-          background: "linear-gradient(135deg,#0F0A1E 0%,#1B0E33 100%)",
-          padding: "60px 0 70px",
-          position: "relative",
-          overflow: "hidden",
-          textAlign: "center",
-        }}
-      >
-        <div
-          className="orb"
-          style={{ width: 400, height: 400, top: -150, right: -50, background: "rgba(124,58,237,0.3)" }}
-        />
-        <div className="container-xl" style={{ position: "relative", zIndex: 1 }}>
-          <span className="badge badge-dark" style={{ marginBottom: 16, display: "inline-block" }}>
-            Get in Touch
-          </span>
-          <h1
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(2rem, 5vw, 3.4rem)",
-              color: "white",
-              marginBottom: 16,
-            }}
-          >
-            We're Here to <span className="gradient-text-warm">Guide Your Journey</span>
-          </h1>
-          <p
-            style={{
-              fontSize: "clamp(14px, 1.8vw, 17px)",
-              color: "rgba(255,255,255,0.75)",
-              maxWidth: 600,
-              margin: "0 auto",
-              lineHeight: 1.7,
-            }}
-          >
-            Have questions regarding our 1:1 live training, course roadmaps, timings, or mentors? Reach out anytime!
-          </p>
-        </div>
-      </section>
+      <main className="min-h-screen bg-[#070913] text-slate-100 pt-[90px] relative overflow-hidden">
+        {/* Ambient Glow Orbs */}
+        <div className="absolute top-10 left-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-80 right-10 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Main Content */}
-      <section style={{ padding: "60px 0 80px" }}>
-        <div className="container-xl">
-          {/* 4 Info Cards */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: 20,
-              marginBottom: 50,
-            }}
-          >
-            {contactCards.map((c, i) => (
-              <div
-                key={i}
-                className="card"
-                style={{
-                  padding: 24,
-                  background: "white",
-                  borderRadius: 20,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      width: 46,
-                      height: 46,
-                      borderRadius: 14,
-                      background: c.bg,
-                      color: c.color,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 16,
-                    }}
-                  >
-                    {c.icon}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "Poppins, sans-serif",
-                      fontWeight: 700,
-                      fontSize: 15,
-                      color: "#0F0A1E",
-                      marginBottom: 4,
-                    }}
-                  >
-                    {c.title}
-                  </div>
-                  <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 8 }}>{c.subtitle}</div>
-                  <div style={{ fontFamily: "Poppins, sans-serif", fontWeight: 700, fontSize: 14, color: c.color }}>
-                    {c.contact}
-                  </div>
-                </div>
-                {c.href !== "#" && (
-                  <a
-                    href={c.href}
-                    style={{
-                      marginTop: 18,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: c.color,
-                      textDecoration: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
-                  >
-                    {c.action} <I.ChevronRight />
-                  </a>
-                )}
-              </div>
-            ))}
+        {/* HERO SECTION */}
+        <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 text-center max-w-5xl mx-auto">
+          {/* Glassmorphism contact banner */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-purple-500/40 text-purple-300 text-xs font-semibold mb-6 backdrop-blur-xl shadow-lg">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            24×7 Student Helpdesk & Customer Support Directory
           </div>
 
-          {/* Form & Location Grid */}
-          <div className="two-col items-start">
-            {/* Contact Form */}
-            <div
-              style={{
-                background: "white",
-                borderRadius: 24,
-                padding: "36px",
-                border: "1px solid #E5E7EB",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
-              }}
-            >
-              <h2 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 22, color: "#0F0A1E", marginBottom: 6 }}>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 font-['Poppins']">
+            Need Learning Guidance? <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">We're Available 24×7.</span>
+          </h1>
+
+          <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            Reach out directly to our 24×7 student support team for course enrollment, One-on-One learning consultations, payment assistance, and live technical support.
+          </p>
+        </section>
+
+        {/* CONTACT CARDS GRID — SECTIONS 1, 2, 8, 9, 11 SPECIFICATION */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            {/* Card 1 — Customer Support (24×7 Available) */}
+            <div className="group relative rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-purple-500/30 p-6 flex flex-col justify-between hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+                    <I.Headset />
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-bold border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    24×7 Available
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-white font-['Poppins'] mb-1">
+                  Customer Support
+                </h3>
+                <p className="text-xs text-slate-400 mb-3">
+                  (24×7 Available Helpline)
+                </p>
+                <div className="text-lg font-extrabold text-purple-300 mb-3 tracking-wide">
+                  +91 9311073936
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                  Instant guidance for course admissions, One-on-One consultations, and technical help.
+                </p>
+              </div>
+
+              {/* WhatsApp + Call Button */}
+              <div className="flex flex-col gap-2 pt-3 border-t border-slate-800">
+                <a
+                  href="https://wa.me/919311073936?text=Hello%20KR%20Global%20Learning,%20I%20would%20like%20to%20inquire%20about%20your%20courses%20and%20One-on-One%20learning%20consultation."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-md shadow-emerald-900/30 no-underline"
+                >
+                  <I.MessageCircle /> Chat on WhatsApp
+                </a>
+                <a
+                  href="tel:+919311073936"
+                  className="w-full py-2.5 px-4 rounded-xl bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/40 font-semibold text-xs flex items-center justify-center gap-2 transition-colors no-underline"
+                >
+                  <I.Phone /> Call +91 9311073936
+                </a>
+              </div>
+            </div>
+
+            {/* Card 2 — Business Email */}
+            <div className="group relative rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-amber-500/30 p-6 flex flex-col justify-between hover:border-amber-400/60 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                    <I.Mail />
+                  </div>
+                  <span className="text-[11px] font-semibold text-amber-300 px-2.5 py-1 rounded-full bg-amber-950/60 border border-amber-800/60">
+                    Business Email
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-white font-['Poppins'] mb-1">
+                  Business Email
+                </h3>
+                <p className="text-xs text-amber-300/80 mb-3">
+                  Admissions, Billing & Inquiries
+                </p>
+                <div className="text-sm sm:text-base font-extrabold text-amber-300 mb-3 tracking-wide break-all">
+                  krglobal0713@gmail.com
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                  Expect a prompt response within 2 hours from our dedicated academic coordination team.
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-800">
+                <a
+                  href="mailto:krglobal0713@gmail.com?subject=Learning%20Inquiry%20-%20KR%20Global%20Learning"
+                  className="w-full py-2.5 px-4 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 font-semibold text-xs flex items-center justify-center gap-2 transition-colors no-underline"
+                >
+                  <I.Mail /> Send Email
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3 — Corporate Office */}
+            <div className="group relative rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-cyan-500/30 p-6 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
+                    <I.MapPin />
+                  </div>
+                  <span className="text-[11px] font-semibold text-cyan-300 px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60">
+                    Corporate Office
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-white font-['Poppins'] mb-1">
+                  Corporate Office
+                </h3>
+                <div className="text-xs font-bold text-purple-300 mb-2">
+                  KR GLOBAL LEARNING PRIVATE LIMITED
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                  Unit No. 615, Artha Mart,<br />
+                  Tech Zone IV, Greater Noida West,<br />
+                  Uttar Pradesh – 201318
+                </p>
+              </div>
+
+              {/* Get Directions Button */}
+              <div className="pt-3 border-t border-slate-800">
+                <a
+                  href="https://maps.google.com/?q=Artha+Mart+Tech+Zone+IV+Greater+Noida+West+Uttar+Pradesh+201318"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 font-semibold text-xs flex items-center justify-center gap-2 transition-colors no-underline shadow-md shadow-cyan-950/40"
+                >
+                  <I.MapPin /> Get Directions
+                </a>
+              </div>
+            </div>
+
+            {/* Card 4 — Support Notice Card: Customer Support Availability (SECTION 9 & 11) */}
+            <div className="group relative rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-emerald-500/30 p-6 flex flex-col justify-between hover:border-emerald-400/60 transition-all duration-300">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                    <I.Clock />
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-bold border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    24×7 Available
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-white font-['Poppins'] mb-1">
+                  We're Available 24×7
+                </h3>
+                <div className="text-xs font-bold text-emerald-300 mb-2 flex items-center gap-1.5">
+                  <span>🟢 Available 24 Hours × 7 Days</span>
+                </div>
+                <div className="text-xs text-slate-300 space-y-1 border-t border-slate-800/80 pt-2.5">
+                  <div className="text-[11px] font-bold uppercase text-slate-400 mb-1">
+                    Get instant support for:
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                    <span className="text-emerald-400">✓</span> Course Guidance & Enrollment
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                    <span className="text-emerald-400">✓</span> One-on-One Learning Consultation
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                    <span className="text-emerald-400">✓</span> Payment & Invoice Issues
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                    <span className="text-emerald-400">✓</span> Dashboard & Live Classes Help
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-300">
+                    <span className="text-emerald-400">✓</span> Technical Queries
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-800 flex gap-2">
+                <a
+                  href="https://wa.me/919311073936?text=Hello%20KR%20Global%20Learning,%20I%20need%20assistance."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-semibold text-[11px] flex items-center justify-center gap-1 transition-colors no-underline"
+                >
+                  <I.MessageCircle /> WhatsApp
+                </a>
+                <a
+                  href="tel:+919311073936"
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 font-semibold text-[11px] flex items-center justify-center gap-1 transition-colors no-underline"
+                >
+                  <I.Phone /> Call 24×7
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* GOOGLE MAPS EMBED & FORM SECTION */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Form Column */}
+            <div className="lg:col-span-6 bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl">
+              <h2 className="text-xl sm:text-2xl font-bold text-white font-['Poppins'] mb-2">
                 Send Us a Message
               </h2>
-              <p style={{ fontSize: 14, color: "#6B7280", marginBottom: 24 }}>
-                Fill out the form below and an academic counselor will get in touch with you shortly.
+              <p className="text-xs sm:text-sm text-slate-400 mb-6">
+                Fill out the form below. An academic counselor will contact you within 2 hours.
               </p>
 
               {submitted ? (
-                <div
-                  style={{
-                    padding: "32px 24px",
-                    textAlign: "center",
-                    background: "#F0FDF4",
-                    borderRadius: 16,
-                    border: "1px solid #BBF7D0",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: "50%",
-                      background: "#DCFCE7",
-                      color: "#16A34A",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      margin: "0 auto 16px",
-                    }}
-                  >
+                <div className="p-8 text-center bg-emerald-950/40 rounded-2xl border border-emerald-500/40">
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
                     <I.Check />
                   </div>
-                  <h4 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 700, fontSize: 18, color: "#166534" }}>
-                    Message Sent Successfully!
+                  <h4 className="text-lg font-bold text-emerald-300 font-['Poppins'] mb-2">
+                    Inquiry Received Successfully!
                   </h4>
-                  <p style={{ fontSize: 14, color: "#15803D", marginTop: 8 }}>
-                    Thank you, <strong>{name}</strong>. We have received your message regarding <strong>{subject}</strong>.
-                    Our team will contact you at <strong>{email}</strong> or <strong>{phone}</strong> within 2 hours.
+                  <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto mb-6">
+                    Thank you, <strong className="text-white">{name}</strong>. We have registered your request for <strong className="text-purple-300">{subject}</strong>. Our student counseling desk (+91 9311073936) will contact you shortly.
                   </p>
                   <button
                     onClick={() => {
                       setSubmitted(false);
                       setMessage("");
                     }}
-                    className="btn-primary"
-                    style={{ marginTop: 20 }}
+                    className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-colors cursor-pointer"
                   >
-                    Send Another Message
+                    Submit Another Inquiry
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                       Your Full Name *
                     </label>
                     <input
@@ -260,21 +272,13 @@ export default function ContactPage() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Priya Sharma"
-                      style={{
-                        width: "100%",
-                        padding: "11px 16px",
-                        borderRadius: 12,
-                        border: "1.5px solid #E5E7EB",
-                        fontSize: 14,
-                        outline: "none",
-                        fontFamily: "Inter, sans-serif",
-                      }}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950/70 border border-slate-700/80 focus:border-purple-500 focus:outline-none text-sm text-white placeholder-slate-500"
                     />
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Email Address *
                       </label>
                       <input
@@ -283,19 +287,11 @@ export default function ContactPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="priya@example.com"
-                        style={{
-                          width: "100%",
-                          padding: "11px 16px",
-                          borderRadius: 12,
-                          border: "1.5px solid #E5E7EB",
-                          fontSize: 14,
-                          outline: "none",
-                          fontFamily: "Inter, sans-serif",
-                        }}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950/70 border border-slate-700/80 focus:border-purple-500 focus:outline-none text-sm text-white placeholder-slate-500"
                       />
                     </div>
                     <div>
-                      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Phone Number *
                       </label>
                       <input
@@ -304,200 +300,136 @@ export default function ContactPage() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+91 98765 43210"
-                        style={{
-                          width: "100%",
-                          padding: "11px 16px",
-                          borderRadius: 12,
-                          border: "1.5px solid #E5E7EB",
-                          fontSize: 14,
-                          outline: "none",
-                          fontFamily: "Inter, sans-serif",
-                        }}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950/70 border border-slate-700/80 focus:border-purple-500 focus:outline-none text-sm text-white placeholder-slate-500"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                       Subject / Course of Interest
                     </label>
                     <select
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "11px 16px",
-                        borderRadius: 12,
-                        border: "1.5px solid #E5E7EB",
-                        fontSize: 14,
-                        outline: "none",
-                        fontFamily: "Inter, sans-serif",
-                        background: "white",
-                      }}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950/70 border border-slate-700/80 focus:border-purple-500 focus:outline-none text-sm text-white"
                     >
                       <option value="General Inquiry / Academic Counseling">General Inquiry / Academic Counseling</option>
-                      <option value="Cloud Computing Certification Tracks">Cloud Computing (AWS / Azure / GCP)</option>
+                      <option value="MERN Stack Development">MERN Stack Development</option>
+                      <option value="Java Full Stack & Spring Boot">Java Full Stack & Spring Boot</option>
+                      <option value="AWS Cloud Computing">AWS Cloud Computing</option>
+                      <option value="Microsoft Azure Solutions">Microsoft Azure Solutions</option>
                       <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
-                      <option value="Cisco & Enterprise Networking">Cisco & Enterprise Networking</option>
-                      <option value="Microsoft 365 & IT Administration">Microsoft 365 & IT Administration</option>
-                      <option value="Data & Analytics / Power BI">Data & Analytics (Power BI / Tableau / Splunk)</option>
-                      <option value="Project Management & Agile / PMP">Project Management & Agile (PMP / CSM / SAFe)</option>
-                      <option value="Enterprise Tech (Salesforce / SAP)">Enterprise Tech (Salesforce / SAP)</option>
-                      <option value="Java Backend 1:1 Live Training">Java Backend 1:1 Live Training</option>
-                      <option value="MERN Stack Full Stack Bootcamp">MERN Stack Full Stack Bootcamp</option>
-                      <option value="AI & Machine Learning with Python">AI & Machine Learning with Python</option>
-                      <option value="DSA & Problem Solving Mastery">DSA & Problem Solving Mastery</option>
-                      <option value="Custom 1:1 Mentorship / Doubt Clearing">Custom 1:1 Mentorship / Doubt Clearing</option>
+                      <option value="DevOps & Docker / Kubernetes">DevOps & Docker / Kubernetes</option>
+                      <option value="SAP Training & ERP Solutions">SAP Training & ERP Solutions</option>
+                      <option value="Data Analytics & Power BI">Data Analytics & Power BI</option>
+                      <option value="Corporate / Enterprise Training">Corporate / Enterprise Training</option>
+                      <option value="Institutional & University Tie-ups">Institutional & University Tie-ups</option>
                     </select>
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                      Your Message or Questions *
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Your Message or Inquiry Details *
                     </label>
                     <textarea
                       required
                       rows={4}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Tell us about your learning goals, current background, or any specific questions…"
-                      style={{
-                        width: "100%",
-                        padding: "12px 16px",
-                        borderRadius: 12,
-                        border: "1.5px solid #E5E7EB",
-                        fontSize: 14,
-                        outline: "none",
-                        fontFamily: "Inter, sans-serif",
-                        resize: "vertical",
-                      }}
+                      placeholder="Tell us about your learning goals, background, or corporate requirements…"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950/70 border border-slate-700/80 focus:border-purple-500 focus:outline-none text-sm text-white placeholder-slate-500 resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="btn-primary"
-                    style={{
-                      padding: "14px 24px",
-                      borderRadius: 14,
-                      fontSize: 15,
-                      justifyContent: "center",
-                      marginTop: 6,
-                    }}
+                    className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold text-sm shadow-lg shadow-purple-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    Send Message <I.Send />
+                    <I.Send /> Submit Inquiry
                   </button>
                 </form>
               )}
             </div>
 
-            {/* Location & Academy Details */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-              <div
-                style={{
-                  background: "white",
-                  borderRadius: 24,
-                  padding: "32px",
-                  border: "1px solid #E5E7EB",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 14,
-                      background: "#EDE9FE",
-                      color: "#7C3AED",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <I.MapPin />
+            {/* Google Maps Section — SECTION B SPECIFICATION */}
+            <div className="lg:col-span-6 flex flex-col gap-6">
+              <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
+                      <I.MapPin />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white font-['Poppins']">
+                        Artha Mart Office Location
+                      </h3>
+                      <p className="text-xs text-slate-400">Greater Noida West, Uttar Pradesh – 201318</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 style={{ fontFamily: "Poppins, sans-serif", fontWeight: 700, fontSize: 16, color: "#0F0A1E" }}>
-                      KR Tech Headquarters
-                    </h3>
-                    <p style={{ fontSize: 12, color: "#6B7280" }}>Learning Center & Tech Hub</p>
+                  <a
+                    href="https://maps.google.com/?q=Artha+Mart+Tech+Zone+IV+Greater+Noida+West+Uttar+Pradesh+201318"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold no-underline transition"
+                  >
+                    Open Full Map
+                  </a>
+                </div>
+
+                {/* Google Maps Embed Section */}
+                <div className="rounded-xl overflow-hidden border border-slate-800 shadow-inner h-[280px] bg-slate-950 relative">
+                  <iframe
+                    title="KR GLOBAL LEARNING PRIVATE LIMITED Corporate Office"
+                    src="https://maps.google.com/maps?q=Artha+Mart+Tech+Zone+IV+Greater+Noida+West+Uttar+Pradesh+201318&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)" }}
+                    allowFullScreen={false}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  <div className="absolute bottom-2 left-2 right-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between pointer-events-none">
+                    <span>📍 Unit No. 615, Artha Mart</span>
+                    <span className="text-cyan-400 font-semibold">Tech Zone IV, Greater Noida West</span>
                   </div>
                 </div>
-                <p style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.7, marginBottom: 16 }}>
-                  KR Tech Academy Tower, Tech Hub Corridor, Bengaluru, Karnataka 560103, India.
-                </p>
-                <div
-                  style={{
-                    height: 180,
-                    borderRadius: 16,
-                    background: "linear-gradient(135deg,#0F0A1E,#20103A)",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    position: "relative",
-                    overflow: "hidden",
-                    border: "1px solid #DDD6FE",
-                  }}
-                >
-                  <div className="orb" style={{ width: 140, height: 140, top: -20, right: -20, background: "rgba(124,58,237,0.4)" }} />
-                  <I.MapPin />
-                  <div style={{ fontFamily: "Poppins, sans-serif", fontWeight: 700, fontSize: 14, marginTop: 8 }}>
-                    Bengaluru Tech Hub & Global Remote
-                  </div>
-                  <div style={{ fontSize: 12, color: "#A78BFA", marginTop: 4 }}>
-                    100% Online 1:1 Live Globally
-                  </div>
+
+                <div className="mt-4 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+                  <span>Fast Metro & Noida Expressway Connectivity</span>
+                  <a
+                    href="https://maps.google.com/?q=Artha+Mart+Tech+Zone+IV+Greater+Noida+West+Uttar+Pradesh+201318"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 no-underline"
+                  >
+                    Get Driving Directions <I.ChevronRight />
+                  </a>
                 </div>
               </div>
 
-              {/* Student Trust Box */}
-              <div
-                style={{
-                  background: "linear-gradient(135deg,#7C3AED 0%,#5B21B6 100%)",
-                  borderRadius: 24,
-                  padding: "28px 32px",
-                  color: "white",
-                }}
-              >
-                <div style={{ fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>
-                  Prefer a Free Live Demo Class?
+              {/* Free Consultation Banner */}
+              <div className="rounded-2xl bg-gradient-to-r from-purple-900/60 via-indigo-900/60 to-slate-900/80 border border-purple-500/30 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h4 className="text-base font-bold text-white font-['Poppins'] mb-1">
+                    Book a Free One-on-One Learning Consultation
+                  </h4>
+                  <p className="text-xs text-slate-300">
+                    Interact directly with an industry mentor before enrolling in any technical track.
+                  </p>
                 </div>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, marginBottom: 18 }}>
-                  Meet directly with a mentor before committing. We will show you our live coding environment and plan
-                  your custom syllabus.
-                </p>
                 <a
                   href="/free-demo"
-                  className="btn-ghost-white"
-                  style={{ display: "inline-flex", textDecoration: "none", fontSize: 13, borderRadius: 12 }}
+                  className="whitespace-nowrap px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md transition-colors no-underline"
                 >
-                  Book 1:1 Live Demo Session
+                  Book Free Consultation
                 </a>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Google Maps Interactive Embed */}
-      <section className="container-xl" style={{ paddingBottom: 60 }}>
-        <div style={{ borderRadius: 24, overflow: "hidden", border: "1px solid #E5E7EB", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
-          <iframe
-            title="KR Tech Global Learning Centre"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248849.886539092!2d77.49085449779313!3d12.953959988188047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-            width="100%"
-            height="320"
-            style={{ border: 0, display: "block" }}
-            allowFullScreen={false}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-      </section>
-    </main>
+          </div>
+        </section>
+      </main>
     </SEO>
   );
 }

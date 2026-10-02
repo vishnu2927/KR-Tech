@@ -24,7 +24,7 @@ const CERT_CATEGORIES: CertCategory[] = [
     badge: "Cloud Certified",
     badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
     description: "AWS, Azure & Google Cloud official architecture and dev credentials with live labs.",
-    popularCerts: ["AWS Solutions Architect", "Azure Administrator (AZ-104)", "GCP Cloud Engineer"],
+    popularCerts: ["AWS Solutions Architect", "Azure Administrator (AZ-104)", "Google Associate Cloud Engineer"],
     gradient: "from-sky-500/10 via-blue-500/5 to-transparent",
     shadowColor: "hover:shadow-sky-500/15",
   },
@@ -35,7 +35,7 @@ const CERT_CATEGORIES: CertCategory[] = [
     badge: "Security Expert",
     badgeColor: "bg-red-50 text-red-700 border-red-200",
     description: "Ethical hacking, CISSP, CEH, SOC analysis & threat defense certifications.",
-    popularCerts: ["CompTIA Security+", "Certified Ethical Hacker (CEH)", "CISSP", "SOC Analyst"],
+    popularCerts: ["CompTIA Security+", "Certified Ethical Hacker (CEH)", "CISSP", "CISM"],
     gradient: "from-rose-500/10 via-red-500/5 to-transparent",
     shadowColor: "hover:shadow-red-500/15",
   },
@@ -46,7 +46,7 @@ const CERT_CATEGORIES: CertCategory[] = [
     badge: "Router & Network",
     badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
     description: "Cisco CCNA/CCNP, Fortinet NSE & enterprise routing/switching infrastructure.",
-    popularCerts: ["Cisco CCNA 200-301", "Cisco CCNP Enterprise", "Fortinet NSE Security"],
+    popularCerts: ["Cisco CCNA", "Cisco CCNP Enterprise", "Fortinet NSE / FCP"],
     gradient: "from-emerald-500/10 via-teal-500/5 to-transparent",
     shadowColor: "hover:shadow-emerald-500/15",
   },
@@ -104,7 +104,15 @@ export default function ProfessionalCertifications() {
   }, []);
 
   const getCourseCount = (catGroup: string) => {
-    return courses.filter((c) => c.categoryGroup === catGroup).length;
+    return courses.filter((c) => {
+      const g = (c.categoryGroup || "").toLowerCase();
+      const q = catGroup.toLowerCase();
+      if (q.includes("cloud")) return g.includes("cloud");
+      if (q.includes("cyber") || q.includes("security")) return g.includes("cyber") || g.includes("security");
+      if (q.includes("network")) return g.includes("network");
+      if (q.includes("ai") || q.includes("machine learning")) return g.includes("ai") || g.includes("machine learning");
+      return g === q || g.includes(q);
+    }).length;
   };
 
   return (
@@ -121,7 +129,7 @@ export default function ProfessionalCertifications() {
             badgeClass="badge-purple"
             title="Explore Professional"
             accent="Certifications"
-            desc="Achieve globally recognized certifications with personalized 1:1 live mentor support and real exam simulation labs."
+            desc="Achieve globally recognized certifications with personalized One-on-One live mentor support and real exam simulation labs."
             center={false}
           />
           <Link
@@ -205,13 +213,13 @@ export default function ProfessionalCertifications() {
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-white backdrop-blur-md mb-4">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                100% Guaranteed 1:1 Live
+                100% Live One-on-One Sessions
               </div>
               <h3 className="font-sans font-extrabold text-xl mb-2 text-white">
                 Need a Custom Roadmap?
               </h3>
               <p className="text-xs text-purple-200 leading-relaxed mb-4">
-                Our senior mentors with 10+ years of enterprise experience will assess your background and craft a personalized certification path.
+                Our experienced senior mentors will assess your background and craft a personalized certification path.
               </p>
               <ul className="text-xs space-y-2 text-purple-100 mb-4">
                 <li className="flex items-center gap-2">
@@ -245,7 +253,7 @@ export default function ProfessionalCertifications() {
               <I.Sparkles /> Career Acceleration Program
             </span>
             <h2 className="font-sans font-extrabold text-2xl md:text-3xl lg:text-4xl text-white leading-tight mb-4">
-              Become Industry Ready with KR Tech Professional Certification Programs.
+              Become Industry Ready with KR Global Learning Professional Certification Programs.
             </h2>
             <p className="text-sm md:text-base text-gray-300 mb-8 max-w-2xl leading-relaxed">
               Master the cloud, security, networking, and enterprise domains with personal guidance from seasoned architects. Learn at your own pace, on your own schedule.

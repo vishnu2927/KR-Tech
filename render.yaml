@@ -1,9 +1,9 @@
 services:
-  # KR Tech Backend REST API Web Service on Render
+  # KR GLOBAL LEARNING PRIVATE LIMITED Backend API Web Service on Render
   - type: web
-    name: krtech-backend-api
+    name: kr-global-learning-api
     env: node
-    plan: free
+    plan: standard
     rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
@@ -18,4 +18,22 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CLIENT_URL
-        value: https://krtech.vercel.app
+        value: https://krgloballearning.com
+      - key: CORS_ORIGINS
+        value: https://krgloballearning.com,https://www.krgloballearning.com
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false

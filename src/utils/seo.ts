@@ -15,7 +15,7 @@ export interface SEOMetadata {
 export function updateSEOTags({
   title,
   description,
-  keywords = "1:1 coding classes, personalized tech training, java backend, spring boot, mern stack, react 19, aws certification, devops, cyber security, data analytics, sap fico, live tech mentorship",
+  keywords = "Technology Training Institute, Certification Learning Platform, AI Learning Platform, Cloud Computing Training, Cyber Security Training, One-on-One Technology Learning, Professional Technology Courses, Practical Learning Platform, AWS Training, Azure Training, SAP Training, DevOps Training, Data Analytics Training",
   canonical,
   ogTitle,
   ogDescription,
@@ -25,7 +25,7 @@ export function updateSEOTags({
   twitterCard = "summary_large_image",
   structuredData,
 }: SEOMetadata) {
-  const fullTitle = title.includes("KR Tech") ? title : `${title} | KR Tech`;
+  const fullTitle = title.includes("KR Global") || title.includes("KR GLOBAL") ? title : `${title} | KR Global Learning`;
   document.title = fullTitle;
 
   const currentUrl = ogUrl || canonical || window.location.href;
@@ -44,11 +44,11 @@ export function updateSEOTags({
   // 1. Primary Meta Tags
   setMeta("name", "description", description);
   setMeta("name", "keywords", keywords);
-  setMeta("name", "author", "KR Tech Academic Council");
+  setMeta("name", "author", "KR GLOBAL LEARNING PRIVATE LIMITED");
   setMeta("name", "robots", "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1");
 
   // 2. Open Graph Tags
-  setMeta("property", "og:site_name", "KR Tech");
+  setMeta("property", "og:site_name", "KR GLOBAL LEARNING PRIVATE LIMITED");
   setMeta("property", "og:title", ogTitle || fullTitle);
   setMeta("property", "og:description", ogDescription || description);
   setMeta("property", "og:image", ogImage);
@@ -59,8 +59,8 @@ export function updateSEOTags({
 
   // 3. Twitter Card Tags
   setMeta("name", "twitter:card", twitterCard);
-  setMeta("name", "twitter:site", "@krtech_academy");
-  setMeta("name", "twitter:creator", "@krtech_academy");
+  setMeta("name", "twitter:site", "@krglobal_learning");
+  setMeta("name", "twitter:creator", "@krglobal_learning");
   setMeta("name", "twitter:title", ogTitle || fullTitle);
   setMeta("name", "twitter:description", ogDescription || description);
   setMeta("name", "twitter:image", ogImage);
@@ -93,33 +93,46 @@ export const SchemaBuilder = {
   getOrganizationSchema: () => ({
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
-    "name": "KR Tech",
-    "alternateName": "KR Tech Academy",
-    "url": "https://krtech.in",
-    "logo": "https://krtech.in/favicon.svg",
-    "description": "Premium 1:1 Live Coding Academy & Mentorship Portal.",
+    "name": "KR GLOBAL LEARNING PRIVATE LIMITED",
+    "alternateName": "KR Global Learning",
+    "url": "https://krgloballearning.com",
+    "logo": "https://krgloballearning.com/favicon.svg",
+    "industry": "Technology Training & Certification Company",
+    "description": "KR GLOBAL LEARNING PRIVATE LIMITED is a technology-first education company that provides industry-focused training, certification programs, live One-on-One mentorship, project-based learning, and practical skill development in AI, Cloud Computing, Cyber Security, Full Stack Development, DevOps, SAP, Data Analytics, Microsoft Technologies, Cisco Networking, and other emerging technologies. The company focuses entirely on learning, practical implementation, certification preparation, and continuous student growth.",
+    "telephone": "+91 9311073936",
+    "email": "krglobal0713@gmail.com",
     "sameAs": [
-      "https://www.linkedin.com/company/krtech",
+      "https://www.linkedin.com/company/kr-global-learning",
       "https://github.com/krtech",
-      "https://twitter.com/krtech_academy",
-      "https://www.youtube.com/@krtech"
+      "https://twitter.com/krglobal_learn",
+      "https://www.youtube.com/@krgloballearning"
     ],
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "Bengaluru",
-      "addressRegion": "Karnataka",
+      "streetAddress": "Unit No. 615, Artha Mart, Tech Zone IV",
+      "addressLocality": "Greater Noida West",
+      "addressRegion": "Uttar Pradesh",
+      "postalCode": "201318",
       "addressCountry": "IN"
-    }
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "opens": "00:00",
+        "closes": "23:59"
+      }
+    ]
   }),
 
   getWebSiteSchema: () => ({
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "KR Tech",
-    "url": "https://krtech.in",
+    "name": "KR GLOBAL LEARNING PRIVATE LIMITED",
+    "url": "https://krgloballearning.com",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://krtech.in/courses?search={search_term_string}",
+      "target": "https://krgloballearning.com/courses?search={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   }),
@@ -137,19 +150,19 @@ export const SchemaBuilder = {
     "description": course.description,
     "provider": {
       "@type": "Organization",
-      "name": "KR Tech",
-      "sameAs": "https://krtech.in"
+      "name": "KR GLOBAL LEARNING PRIVATE LIMITED",
+      "sameAs": "https://krgloballearning.com"
     },
     "courseCode": course.slug || course.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-    "educationalCredentialAwarded": "Official KR Tech Certificate of Professional Mastery",
+    "educationalCredentialAwarded": "Official KR GLOBAL LEARNING Certificate of Professional Mastery",
     "timeRequired": course.duration || "P12W",
     "offers": {
       "@type": "Offer",
-      "category": "1:1 Live Training with Senior Industry Architects",
+      "category": "One-on-One Live Training with Senior Industry Architects",
       "price": "0",
       "priceCurrency": "INR",
       "availability": "https://schema.org/InStock",
-      "url": `https://krtech.in/courses/${course.slug || ""}`
+      "url": `https://krgloballearning.com/courses/${course.slug || ""}`
     }
   }),
 

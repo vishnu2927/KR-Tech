@@ -1,75 +1,97 @@
 /**
- * KR Tech Enterprise Analytics Engine (GA4 & Custom Event Tracker)
+ * KR GLOBAL LEARNING PRIVATE LIMITED
+ * Privacy-Conscious Learning Analytics Helper (GA4 / GSC)
+ * 
+ * Strict Company Policy Enforced:
+ * Certified technology training, skill benchmarking, and learning analytics only.
  */
 
 declare global {
   interface Window {
-    dataLayer: any[];
     gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
   }
 }
 
+export type LearningAnalyticsEvent =
+  | 'page_view'
+  | 'course_view'
+  | 'course_search'
+  | 'course_enrollment'
+  | 'lesson_open'
+  | 'lesson_completion'
+  | 'quiz_start'
+  | 'quiz_completion'
+  | 'certificate_view'
+  | 'certificate_verification'
+  | 'consultation_click'
+  | 'contact_submission'
+  | 'demo_booking'
+  | 'resource_download';
+
+export interface EventProperties {
+  courseId?: string;
+  courseTitle?: string;
+  category?: string;
+  lessonId?: string;
+  credentialId?: string;
+  path?: string;
+  searchTerm?: string;
+  [key: string]: any;
+}
+
+/**
+ * Track an approved privacy-conscious learning event
+ */
+export function trackLearningEvent(event: LearningAnalyticsEvent, properties?: EventProperties): void {
+  // Never track sensitive PII (passwords, tokens, phone numbers in event payloads)
+  const safeProperties = { ...properties };
+  delete safeProperties.password;
+  delete safeProperties.token;
+  delete safeProperties.jwt;
+
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', event, safeProperties);
+  } else if (import.meta.env.DEV) {
+    console.debug(`[Learning Analytics - Dev] ${event}:`, safeProperties);
+  }
+}
+
+/**
+ * Check if GA4 is active
+ */
+export function getAnalyticsStatus(): 'PASS' | 'NEEDS VERIFICATION' | 'NOT CONFIGURED' {
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  if (!measurementId) {
+    return 'NOT CONFIGURED';
+  }
+  return typeof window !== 'undefined' && typeof window.gtag === 'function'
+    ? 'PASS'
+    : 'NEEDS VERIFICATION';
+}
+
+/**
+ * Unified Analytics Object for existing page components
+ */
 export const analytics = {
-  /**
-   * Track virtual page view
-   */
-  trackPageView(path: string, title?: string): void {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "page_view", {
-        page_path: path,
-        page_title: title || document.title,
-      });
-    }
-    // Development event log
-    if (import.meta.env.DEV) {
-      console.log(`📊 [Analytics] Page View: ${path} — ${title || document.title}`);
-    }
+  trackPageView(path: string, title?: string) {
+    trackLearningEvent('page_view', { path, page_title: title });
   },
-
-  /**
-   * Track course card interactions and syllabus clicks
-   */
-  trackCourseClick(courseTitle: string, category: string): void {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "select_course", {
-        course_title: courseTitle,
-        category: category,
-      });
-    }
-    if (import.meta.env.DEV) {
-      console.log(`📊 [Analytics] Course Click: "${courseTitle}" (${category})`);
-    }
+  trackDemoBooking(course: string, timeSlot?: string) {
+    trackLearningEvent('consultation_click', { courseTitle: course, timeSlot });
   },
-
-  /**
-   * Track 1:1 Live Demo scheduling conversion
-   */
-  trackDemoBooking(courseName: string, timeSlot?: string): void {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "generate_lead", {
-        currency: "INR",
-        value: 19999,
-        course_name: courseName,
-        time_slot: timeSlot,
-      });
-    }
-    if (import.meta.env.DEV) {
-      console.log(`🎯 [Analytics Conversion] Demo Booked for "${courseName}" - Slot: ${timeSlot}`);
-    }
+  trackResourceDownload(title: string, format?: string) {
+    trackLearningEvent('resource_download', { resourceTitle: title, format });
   },
-
-  /**
-   * Track study material & cheat sheet downloads
-   */
-  trackResourceDownload(resourceTitle: string, format: string): void {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "file_download", {
-        file_name: resourceTitle,
-        file_extension: format,
-      });
-    }
-    if (import.meta.env.DEV) {
-      console.log(`📥 [Analytics] Resource Downloaded: "${resourceTitle}" (${format})`);
-    }
+  trackCourseView(courseId: string, courseTitle?: string) {
+    trackLearningEvent('course_view', { courseId, courseTitle });
+  },
+  trackCourseEnrollment(courseId: string, courseTitle?: string) {
+    trackLearningEvent('course_enrollment', { courseId, courseTitle });
+  },
+  trackEvent(eventName: string, data?: Record<string, any>) {
+    trackLearningEvent(eventName as LearningAnalyticsEvent, data);
   },
 };
+
+export default analytics;

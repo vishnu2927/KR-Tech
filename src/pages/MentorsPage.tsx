@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { mentorService, Mentor } from "../services/mentorService";
 import MentorCard from "../components/MentorCard";
+import SectionHeading from "../components/SectionHeading";
 import { I } from "../components/Icons";
 import SEO from "../components/common/SEO";
 import { SchemaBuilder } from "../utils/seo";
@@ -60,13 +61,13 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
 
   return (
     <SEO
-      title="Meet Expert Industry Mentors — Ex-Amazon, Razorpay & Google"
-      description="Connect 1-on-1 with senior tech mentors with 10+ years experience. Get personalized code reviews, system design coaching, and live project mentorship."
-      canonical="https://krtech.in/mentors"
-      keywords="tech mentors, 1:1 mentorship, coding mentor, code review, mock interviews, system design mentor, amazon engineer mentor"
+      title="Meet Expert Industry Mentors — One-on-One Practical Mentorship"
+      description="Connect One-on-One with senior tech mentors with 10+ years experience. Get personalized code reviews, system architecture coaching, and live project mentorship."
+      canonical="https://krgloballearning.com/mentors"
+      keywords="tech mentors, One-on-One mentorship, coding mentor, code review, system design mentor, technology specialists"
       structuredData={SchemaBuilder.getBreadcrumbSchema([
-        { name: "Home", url: "https://krtech.in/" },
-        { name: "Mentors", url: "https://krtech.in/mentors" },
+        { name: "Home", url: "https://krgloballearning.com/" },
+        { name: "Mentors", url: "https://krgloballearning.com/mentors" },
       ])}
     >
       <main className="pt-20 min-h-screen bg-gradient-to-b from-gray-50 via-white to-purple-50/20">
@@ -108,7 +109,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
             </div>
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
               <div className="text-2xl sm:text-3xl font-extrabold text-emerald-300 font-sans">15,000+</div>
-              <div className="text-xs text-purple-200 mt-1">1:1 Sessions Conducted</div>
+              <div className="text-xs text-purple-200 mt-1">One-on-One Learning Sessions Conducted</div>
             </div>
           </div>
         </div>
@@ -261,8 +262,8 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
       <section className="py-20 bg-purple-50/50 border-t border-purple-100/60">
         <div className="container-xl">
           <SectionHeading
-            badge="The KR Tech Advantage"
-            title="How 1:1 Live Mentorship"
+            badge="The KR Global Learning Advantage"
+            title="How One-on-One Live Mentorship"
             accent="Transforms Careers"
             desc="Unlike pre-recorded MOOCs, you get dedicated private access to an enterprise architect."
             center={true}
@@ -301,7 +302,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
                 ATS Resume & Portfolio Polish
               </h3>
               <p className="text-xs text-gray-600 leading-relaxed">
-                Receive senior-level guidance on highlighting your live projects and certification credentials to stand out to global tech recruiters.
+                Receive senior-level guidance on highlighting your live projects and certification credentials to demonstrate practical industry mastery.
               </p>
             </div>
           </div>
@@ -315,7 +316,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
         <div className="container-xl">
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-8 md:p-12 shadow-2xl border border-purple-500/20 text-center">
             <h2 className="font-sans font-extrabold text-2xl md:text-3xl lg:text-4xl mb-4">
-              Ready to Book Your Free 1:1 Evaluation Session?
+              Ready to Book Your Free One-on-One Evaluation Session?
             </h2>
             <p className="text-sm md:text-base text-purple-200 max-w-2xl mx-auto mb-8 leading-relaxed">
               Meet your dedicated mentor, discuss your target career path, and receive a customized learning roadmap with zero upfront cost.

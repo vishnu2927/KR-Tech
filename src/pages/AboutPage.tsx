@@ -1,270 +1,546 @@
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { I } from "../components/Icons";
-import StatsBar from "../components/StatsBar";
 import Mentors from "../components/Mentors";
 import SEO from "../components/common/SEO";
 
-export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal: () => void }) {
-  const values = [
+// Animated counter hook for numbers counter animation
+function useCounter(target: number, duration: number = 1800) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const stepTime = Math.max(Math.floor(duration / target), 15);
+    const increment = Math.max(1, Math.floor(target / (duration / stepTime)));
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(start);
+      }
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [target, duration]);
+
+  return count;
+}
+
+export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () => void }) {
+  // Counters for Highlights
+  const studentsCount = useCounter(1000, 1600);
+  const coursesCount = useCounter(55, 1400);
+  const mentorsCount = useCounter(10, 1200);
+  const domainsCount = useCounter(25, 1400);
+  const satisfactionCount = useCounter(95, 1500);
+
+  const offerings = [
     {
-      title: "1:1 Live Personalization",
-      desc: "We believe true mastery doesn't come from passive 500-person video lectures. Every student learns directly from an expert mentor with personal feedback on every line of code.",
+      title: "Live One-on-One Expert Mentorship",
+      desc: "Direct pair-programming and real-time guidance from experienced technology architects. No passive 500-person webinars.",
       icon: <I.Users />,
-      color: "#7C3AED",
-      bg: "#EDE9FE",
+      accent: "from-purple-500 to-indigo-500",
     },
     {
-      title: "10+ Years Industry Mentors",
-      desc: "Our mentors are not junior teaching assistants. They are principal engineers and architects from Amazon, Google, Razorpay, and Paytm who bring authentic architectural wisdom.",
-      icon: <I.Award />,
-      color: "#0891B2",
-      bg: "#CFFAFE",
-    },
-    {
-      title: "Real-World Project Mastery",
-      desc: "We don't teach toy todo-apps. You build enterprise-grade microservices, end-to-end full stack platforms, and real machine learning pipelines ready for production.",
+      title: "Practical Project-Based Learning",
+      desc: "Build real enterprise microservices, cloud deployments, and full-stack platforms that demonstrate practical engineering ability.",
       icon: <I.Code />,
-      color: "#7C3AED",
-      bg: "#EDE9FE",
+      accent: "from-cyan-500 to-blue-500",
     },
     {
-      title: "Total Flexibility & Support",
-      desc: "Learn according to your timezone and personal schedule. Lifetime access to recorded sessions, class notes, and 1:1 doubt-clearing ensures you never fall behind.",
-      icon: <I.Clock />,
-      color: "#0891B2",
-      bg: "#CFFAFE",
+      title: "Industry Certification Preparation",
+      desc: "Tailored preparation and exam blueprints aligned with official credentials from AWS, Microsoft Azure, Cisco, and SAP.",
+      icon: <I.Award />,
+      accent: "from-emerald-500 to-teal-500",
     },
+    {
+      title: "AI Learning Assistant",
+      desc: "24×7 intelligent study companion for instant concept explanations, code debugging, smart notes, and personalized quizzes.",
+      icon: <I.Bot />,
+      accent: "from-rose-500 to-pink-500",
+    },
+    {
+      title: "Recorded + Live Classes",
+      desc: "Participate in interactive live coding sessions and access lifetime HD recordings archived directly in your student portal.",
+      icon: <I.Video />,
+      accent: "from-amber-500 to-orange-500",
+    },
+    {
+      title: "Study Resources & Notes",
+      desc: "Comprehensive cheat sheets, system design architectural diagrams, starter repositories, and curated PDF guides.",
+      icon: <I.FileText />,
+      accent: "from-indigo-500 to-purple-500",
+    },
+    {
+      title: "Quizzes & Assignments",
+      desc: "Weekly practical problem sets, code challenges, and thorough mentor reviews to measure and reinforce your mastery.",
+      icon: <I.Check />,
+      accent: "from-blue-500 to-cyan-500",
+    },
+    {
+      title: "24×7 Student Support",
+      desc: "Continuous technical doubt clearing, active student community circles, and a dedicated student success desk.",
+      icon: <I.Headset />,
+      accent: "from-teal-500 to-emerald-500",
+    },
+  ];
+
+  const highlights = [
+    { value: `${studentsCount}+`, label: "Students Trained", desc: "Across India & Global Remote" },
+    { value: `${coursesCount}+`, label: "Courses", desc: "Production-grade tracks" },
+    { value: `${mentorsCount}+`, label: "Industry Mentors", desc: "From Tier-1 Tech Giants" },
+    { value: `${domainsCount}+`, label: "Technology Domains", desc: "AI, Cloud, Full Stack, SAP" },
+    { value: `${satisfactionCount}%`, label: "Student Satisfaction", desc: "Based on One-on-One post-course reviews" },
   ];
 
   return (
     <SEO
-      title="About KR Tech — India's Premium 1:1 Live Coding Academy"
-      description="Learn about KR Tech's mission to revolutionize tech education through 1:1 live pairing, real-world microservices architectures, and 10+ year industry mentors."
-      canonical="https://krtech.in/about"
+      title="About KR GLOBAL LEARNING PRIVATE LIMITED — Live Mentorship & Tech Certifications"
+      description="KR GLOBAL LEARNING PRIVATE LIMITED is empowering India's next generation of tech professionals through live One-on-One mentorship, industry certifications, and project-based learning."
+      canonical="https://krgloballearning.com/about"
     >
-      <main style={{ paddingTop: 90, minHeight: "100vh" }}>
-      {/* Hero */}
-      <section
-        style={{
-          background: "linear-gradient(135deg,#0F0A1E 0%,#1B0E33 100%)",
-          padding: "70px 0 80px",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          className="orb"
-          style={{ width: 480, height: 480, top: -180, left: -100, background: "rgba(124,58,237,0.3)" }}
-        />
-        <div
-          className="orb"
-          style={{ width: 360, height: 360, bottom: -100, right: -50, background: "rgba(6,182,212,0.2)" }}
-        />
+      <main className="min-h-screen bg-[#070913] text-slate-100 pt-[90px] relative overflow-hidden">
+        
+        {/* Animated Background Glow (SECTION A) */}
+        <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+        <div className="absolute top-96 right-10 w-[450px] h-[450px] bg-cyan-600/15 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="container-xl" style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
-          <span className="badge badge-dark" style={{ marginBottom: 16, display: "inline-block" }}>
-            About KR Tech
-          </span>
-          <h1
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(2.2rem, 5vw, 3.8rem)",
-              color: "white",
-              marginBottom: 20,
-              lineHeight: 1.15,
-            }}
-          >
-            Redefining Tech Education with <br />
-            <span className="gradient-text-warm">1-on-1 Personalized Mentorship</span>
+        {/* HERO SECTION */}
+        <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 text-center max-w-5xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-6 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+            Empowering Future Tech Professionals
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 font-['Poppins']">
+            KR GLOBAL LEARNING <br className="hidden sm:inline" />
+            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+              PRIVATE LIMITED
+            </span>
           </h1>
-          <p
-            style={{
-              fontSize: "clamp(15px, 2vw, 18px)",
-              color: "rgba(255,255,255,0.75)",
-              maxWidth: 720,
-              margin: "0 auto 36px",
-              lineHeight: 1.75,
-            }}
-          >
-            KR Tech was founded on a simple premise: mass recorded video courses fail learners. By pairing passionate
-            students and working professionals with industry veterans for 1:1 live sessions, we deliver lasting mastery.
+
+          <p className="text-slate-300 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed mb-10">
+            Empowering India's Next Generation of Tech Professionals Through Live Mentorship & Industry Certifications.
           </p>
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <button
-              onClick={onOpenDemoModal}
-              className="btn-primary"
-              style={{ padding: "14px 32px", borderRadius: 16 }}
-            >
-              <I.Sparkles /> Book Free Live Demo
-            </button>
+
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/courses"
-              className="btn-ghost-white"
-              style={{ padding: "14px 32px", borderRadius: 16, textDecoration: "none" }}
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold text-sm shadow-xl shadow-purple-900/40 transition-all no-underline"
             >
               Explore Courses
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <StatsBar />
-
-      {/* Mission & Vision Section */}
-      <section style={{ padding: "80px 0", background: "white" }}>
-        <div className="container-xl">
-          <div className="two-col items-center">
-            <div>
-              <span className="badge badge-purple" style={{ marginBottom: 16, display: "inline-block" }}>
-                Our Mission
-              </span>
-              <h2 className="section-title">
-                Democratizing <span className="gradient-text">Elite Mentorship</span> for Every Aspirant
-              </h2>
-              <p className="section-desc" style={{ marginTop: 16 }}>
-                We believe anyone with dedication can build world-class software when guided by experienced engineers.
-                Our tailored 1:1 curriculum bridges the gap between traditional college academics and real-world high-scale
-                software architecture.
-              </p>
-              <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 14 }}>
-                {[
-                  "Zero generic batch teaching — 100% personalized live sessions",
-                  "Direct code reviews and project architecture guidance",
-                  "ATS-friendly resume overhaul and portfolio development",
-                  "Dedicated doubt-clearing sessions whenever you need help",
-                ].map((item, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "#374151" }}>
-                    <span
-                      style={{
-                        width: 22,
-                        height: 22,
-                        borderRadius: "50%",
-                        background: "#EDE9FE",
-                        color: "#7C3AED",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <I.Check />
-                    </span>
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div
-              style={{
-                borderRadius: 28,
-                overflow: "hidden",
-                border: "1px solid #EDE9FE",
-                boxShadow: "0 24px 60px rgba(124,58,237,0.12)",
-                position: "relative",
-              }}
+            <button
+              type="button"
+              onClick={onOpenDemoModal || (() => window.location.assign("/free-demo"))}
+              className="px-8 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white border border-purple-500/40 font-bold text-sm backdrop-blur-md transition-all cursor-pointer flex items-center gap-2 header-glow-btn"
             >
-              <img
-                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=700&h=480&fit=crop&auto=format"
-                alt="Mentorship session"
-                style={{ width: "100%", height: 380, objectFit: "cover", display: "block" }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 20,
-                  left: 20,
-                  right: 20,
-                  background: "rgba(15,10,30,0.85)",
-                  backdropFilter: "blur(14px)",
-                  borderRadius: 18,
-                  padding: "16px 20px",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  color: "white",
-                }}
-              >
-                <div style={{ fontFamily: "Poppins, sans-serif", fontWeight: 700, fontSize: 15 }}>
-                  The KR Tech Difference
+              <I.Sparkles /> Book Free Consultation
+            </button>
+          </div>
+        </section>
+
+        {/* SECTION A — COMPANY HIGHLIGHTS (NUMBERS COUNTER ANIMATION) */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="rounded-3xl bg-slate-900/70 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 shadow-2xl">
+            <div className="text-center mb-8">
+              <span className="text-xs uppercase font-bold text-cyan-400 tracking-wider">
+                Impact & Milestones
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-white font-['Poppins'] mt-1">
+                Company Highlights at a Glance
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
+              {highlights.map((h, i) => (
+                <div
+                  key={i}
+                  className={`p-4 rounded-2xl bg-slate-950/50 border border-slate-800/80 ${
+                    i === 4 ? "col-span-2 md:col-span-1" : ""
+                  }`}
+                >
+                  <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent font-['Poppins']">
+                    {h.value}
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-200 mt-1">
+                    {h.label}
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1 hidden sm:block">
+                    {h.desc}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: "#A5F3FC", marginTop: 2 }}>
-                  Dedicated 1:1 Live Coding · 10+ Yrs Mentors · 50,000+ Alumni
-                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 1 — OUR STORY */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl p-8 sm:p-12 shadow-2xl">
+            <div className="max-w-4xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-4">
+                <span>📖</span> Our Origin & Purpose
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Poppins'] mb-6">
+                Our Story
+              </h2>
+              <div className="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+                <p>
+                  KR GLOBAL LEARNING PRIVATE LIMITED was founded with a singular conviction: traditional computer science education and mass webinar courses fail students when it comes to true engineering depth. Real programming is not passive observation — it is active, hands-on architectural problem-solving.
+                </p>
+                <p>
+                  We built KR Global Learning to pioneer personalized, live One-on-One pair programming and technology certification training. By matching learners directly with senior architects and engineering leads, we provide an immersive apprenticeship experience where students build distributed systems, deploy cloud-native infrastructure, and write production-grade code.
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Core Values */}
-      <section className="bg-lavender" style={{ padding: "80px 0" }}>
-        <div className="container-xl">
-          <div style={{ textAlign: "center", marginBottom: 50 }}>
-            <span className="badge badge-purple">Core Pillars</span>
-            <h2 className="section-title" style={{ marginTop: 12 }}>
-              What Makes <span className="gradient-text">KR Tech</span> Unique
+        {/* SECTION 2 & 3 — OUR MISSION & OUR VISION */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Our Mission */}
+            <div className="rounded-3xl bg-gradient-to-br from-purple-950/40 via-slate-900/70 to-slate-950/80 border border-purple-500/30 p-8 sm:p-10 backdrop-blur-xl flex flex-col justify-between shadow-xl">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30 mb-6">
+                  <I.Sparkles />
+                </div>
+                <span className="text-xs uppercase font-extrabold text-purple-400 tracking-wider">
+                  Core Purpose
+                </span>
+                <h3 className="text-2xl font-bold text-white font-['Poppins'] mt-1 mb-4">
+                  Our Mission
+                </h3>
+                <blockquote className="text-base sm:text-lg text-slate-200 leading-relaxed font-normal italic border-l-2 border-purple-400 pl-4 py-1">
+                  "Our mission is to bridge the gap between academic education and industry expectations by providing practical, mentor-led, project-based learning experiences."
+                </blockquote>
+              </div>
+              <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-800">
+                Aligning curriculums with modern cloud, AI, and enterprise tech stacks to ensure 100% technical mastery and engineering competence.
+              </p>
+            </div>
+
+            {/* Our Vision */}
+            <div className="rounded-3xl bg-gradient-to-br from-cyan-950/40 via-slate-900/70 to-slate-950/80 border border-cyan-500/30 p-8 sm:p-10 backdrop-blur-xl flex flex-col justify-between shadow-xl">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30 mb-6">
+                  <I.Award />
+                </div>
+                <span className="text-xs uppercase font-extrabold text-cyan-400 tracking-wider">
+                  Strategic Horizon
+                </span>
+                <h3 className="text-2xl font-bold text-white font-['Poppins'] mt-1 mb-4">
+                  Our Vision
+                </h3>
+                <blockquote className="text-base sm:text-lg text-slate-200 leading-relaxed font-normal italic border-l-2 border-cyan-400 pl-4 py-1">
+                  "To become the world's most trusted technology training and certification platform for students, graduates, and working professionals."
+                </blockquote>
+              </div>
+              <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-800">
+                Pioneering live One-on-One mentor pairing across colleges, technology teams, and global engineering hubs.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* SECTION 4 — OUR LEARNING PHILOSOPHY */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="rounded-3xl bg-slate-900/70 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 shadow-2xl">
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <span className="text-xs uppercase font-bold text-cyan-400 tracking-wider">
+                Pedagogical Foundations
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Poppins'] mt-1">
+                Our Learning Philosophy
+              </h2>
+              <p className="text-slate-400 text-sm mt-2">
+                Structured around deliberate practice, active code collaboration, and real-time mentor critique.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+                <div className="text-2xl mb-3">🛠️</div>
+                <h3 className="text-base font-bold text-white mb-2">Learn by Building</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Every concept is cemented through functional code. Students build production microservices, data pipelines, and full-stack platforms rather than passive toy examples.
+                </p>
+              </div>
+              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+                <div className="text-2xl mb-3">🎯</div>
+                <h3 className="text-base font-bold text-white mb-2">One-on-One Pair Coding</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Direct screen-sharing with experienced engineers ensures immediate doubt elimination, architectural reviews, and best-practice linting from day one.
+                </p>
+              </div>
+              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+                <div className="text-2xl mb-3">📜</div>
+                <h3 className="text-base font-bold text-white mb-2">Vendor Certification Rigor</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Our curricula directly map to globally recognized credentials from AWS, Microsoft, Cisco, and SAP, instilling rigorous industry standards.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 11 — PREMIUM COMPANY TIMELINE (Phase 13 Section 11) */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-8 sm:p-12 backdrop-blur-xl shadow-2xl">
+            <div className="text-center max-w-3xl mx-auto mb-14">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-3">
+                <I.Sparkles /> COMPANY TIMELINE & VALUES
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Poppins'] tracking-tight">
+                Our Evolution & Strategic Pillars
+              </h2>
+              <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
+                Dedicated exclusively to high-standard technology training, verified certifications, live mentorship, and student experience.
+              </p>
+            </div>
+
+            <div className="relative border-l-2 border-purple-500/30 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-10">
+              {/* 1. 2026 Company Founded */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-purple-600 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono">
+                  2026 Milestone
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  Company Founded
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  KR GLOBAL LEARNING PRIVATE LIMITED was officially established to revolutionize technology education through personalized One-on-One live mentorship, production capstones, and rigorous vendor certification training.
+                </p>
+              </div>
+
+              {/* 2. Vision */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-cyan-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">
+                  Strategic Horizon
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  Vision
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  To become the world's most trusted technology training and certification platform, empowering students, graduates, and working professionals with verifiable real-world engineering excellence.
+                </p>
+              </div>
+
+              {/* 3. Mission */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-emerald-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
+                  Core Purpose
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  Mission
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  To bridge the gap between academic theory and industry reality by providing practical, mentor-led, project-based learning experiences with line-by-line code reviews.
+                </p>
+              </div>
+
+              {/* 4. Learning Philosophy */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-amber-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+                  Pedagogical Standard
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  Learning Philosophy
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  Deliberate practice, direct 1-on-1 screen sharing with senior engineering architects, enterprise code defenses, and vendor exam preparation rigor.
+                </p>
+              </div>
+
+              {/* 5. Future Goals */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-rose-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
+                  Looking Ahead
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  Future Goals
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  Expanding specialized cloud sandboxes, generative AI agent research labs, automated interactive coding playgrounds, and global university partnerships.
+                </p>
+              </div>
+
+              {/* 6. Corporate Office */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-blue-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono">
+                  Headquarters
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  Corporate Office
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  Unit No. 615, Artha Mart, Tech Zone IV, Greater Noida West, Uttar Pradesh – 201318, India.
+                </p>
+              </div>
+
+              {/* 7. Support */}
+              <div className="relative group">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-teal-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 font-mono">
+                  Always Active
+                </span>
+                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                  24×7 Student Support
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                  Round-the-clock student assistance, dedicated helpline (+91 9311073936), active doubt clearing circles, and verified email support (krglobal0713@gmail.com).
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 5 — WHAT WE OFFER (8 PILLARS) */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+              Comprehensive Technology Education
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Poppins'] mt-2">
+              What We Offer
             </h2>
-            <p className="section-desc" style={{ margin: "12px auto 0" }}>
-              Our pedagogical philosophy is engineered specifically around individual learner success.
+            <p className="text-slate-400 text-sm mt-3 leading-relaxed">
+              Designed from the ground up for practical technical mastery, live feedback, and real skill transformation.
             </p>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 22,
-            }}
-          >
-            {values.map((v, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {offerings.map((c, i) => (
               <div
                 key={i}
-                className="card"
-                style={{
-                  padding: 30,
-                  background: "white",
-                  borderRadius: 20,
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+                className="group rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-6 hover:border-purple-500/50 hover:bg-slate-900/90 transition-all duration-300 flex flex-col justify-between"
               >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: 16,
-                    background: v.bg,
-                    color: v.color,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 18,
-                  }}
-                >
-                  {v.icon}
+                <div>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.accent} p-0.5 mb-5 shadow-lg group-hover:scale-105 transition-transform`}>
+                    <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-white">
+                      {c.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-base font-bold text-white font-['Poppins'] mb-2 group-hover:text-purple-300 transition-colors">
+                    {c.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {c.desc}
+                  </p>
                 </div>
-                <h3
-                  style={{
-                    fontFamily: "Poppins, sans-serif",
-                    fontWeight: 700,
-                    fontSize: 17,
-                    color: "#0F0A1E",
-                    marginBottom: 10,
-                  }}
-                >
-                  {v.title}
-                </h3>
-                <p style={{ fontSize: 13, lineHeight: 1.7, color: "#6B7280" }}>{v.desc}</p>
+
+                <div className="mt-5 pt-3 border-t border-slate-800/60 flex items-center text-[11px] font-semibold text-purple-400">
+                  <span>Included in All Tracks ✓</span>
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Mentors on about page */}
-      <Mentors />
-    </main>
+        {/* SECTION 6 — TECHNOLOGY DOMAINS WE TEACH */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+          <div className="rounded-3xl bg-slate-900/70 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 shadow-2xl">
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+                Full Tech Spectrum
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Poppins'] mt-1">
+                Technology Domains We Teach
+              </h2>
+              <p className="text-slate-400 text-sm mt-2">
+                Industry-focused programs spanning emerging cloud architectures, security, and enterprise stacks.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-center">
+              {[
+                { name: "Artificial Intelligence & LLMs", icon: "🤖" },
+                { name: "Cloud Computing (AWS / Azure)", icon: "☁️" },
+                { name: "Cyber Security & Ethical Hacking", icon: "🛡️" },
+                { name: "Full Stack MERN Development", icon: "💻" },
+                { name: "Java Backend & Spring Boot 3", icon: "☕" },
+                { name: "DevOps, Docker & Kubernetes", icon: "🚀" },
+                { name: "SAP (FICO, MM, SD, ABAP)", icon: "📊" },
+                { name: "Data Analytics & Power BI", icon: "📈" },
+                { name: "Cisco Networking (CCNA/CCNP)", icon: "🌐" },
+                { name: "Microsoft Technologies & .NET", icon: "🪟" },
+                { name: "Salesforce Admin & Dev", icon: "⚡" },
+                { name: "Data Structures & System Design", icon: "🧠" },
+              ].map((domain, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/80 hover:border-cyan-500/40 transition">
+                  <div className="text-2xl mb-1">{domain.icon}</div>
+                  <div className="text-xs font-semibold text-slate-200">{domain.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* MENTORS SPOTLIGHT */}
+        <Mentors />
+
+        {/* CORPORATE HEADQUARTERS & CONTACT DIRECTORY */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-16 border-t border-slate-800">
+          <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-8 sm:p-10 backdrop-blur-xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              <div className="lg:col-span-7">
+                <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+                  Corporate Headquarters
+                </span>
+                <h3 className="text-2xl font-bold text-white font-['Poppins'] mt-1 mb-3">
+                  KR GLOBAL LEARNING PRIVATE LIMITED
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+                  Unit No. 615, Artha Mart, Tech Zone IV, Greater Noida West, Uttar Pradesh – 201318, India.
+                </p>
+                <div className="text-xs text-slate-300 space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Customer Support Availability: 🟢 Available 24 Hours × 7 Days</span>
+                  </div>
+                  <div className="text-xs text-slate-300 flex items-center gap-2">
+                    <span>Student Helpdesk:</span>
+                    <a href="tel:+919311073936" className="text-cyan-300 font-bold hover:underline no-underline">
+                      📞 +91 9311073936 (24×7 Available)
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 flex flex-col sm:flex-row gap-3">
+                <Link
+                  to="/contact"
+                  className="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md transition-colors no-underline"
+                >
+                  Contact Helpdesk
+                </Link>
+                <a
+                  href="https://maps.google.com/?q=Artha+Mart+Tech+Zone+IV+Greater+Noida+West+Uttar+Pradesh+201318"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs transition-colors no-underline"
+                >
+                  Get Directions
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </main>
     </SEO>
   );
 }

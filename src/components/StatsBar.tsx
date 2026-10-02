@@ -2,7 +2,7 @@ export default function StatsBar() {
   const stats = [
     { n: "50,000+", l: "Students Trained" },
     { n: "10+", l: "Years Expert Mentors" },
-    { n: "1:1", l: "Live Training" },
+    { n: "One-on-One", l: "Live Training" },
     { n: "500+", l: "Projects Delivered" },
     { n: "4.9 / 5", l: "Average Rating" },
   ];

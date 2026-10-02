@@ -235,7 +235,7 @@ export default function PdfViewerModal({
                 <I.Logo />
                 <div>
                   <span className="font-extrabold text-sm text-purple-950 tracking-wider uppercase block">
-                    KR TECH ACADEMY
+                    KR GLOBAL LEARNING ACADEMY
                   </span>
                   <span className="text-[11px] text-gray-500 font-mono">
                     Free Student Resource Division · Verified Atlas Artifact
@@ -264,8 +264,8 @@ export default function PdfViewerModal({
 
             {/* Document Footer */}
             <div className="mt-12 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-              <span>Verified by: {resource.author || "KR Tech Technical Council"}</span>
-              <span>KR Tech Learning Portal · Page 1 of 1</span>
+              <span>Verified by: {resource.author || "KR Global Learning Technical Council"}</span>
+              <span>KR Global Learning Portal · Page 1 of 1</span>
             </div>
           </article>
         </div>

@@ -27,40 +27,45 @@ export function CourseCard({
 
   return (
     <div
-      className="group relative flex flex-col bg-white rounded-3xl border border-gray-100 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgba(124,58,237,0.18)] hover:border-purple-200 overflow-hidden"
-      style={{ height: "100%" }}
+      className="glass-card-dark group relative flex flex-col overflow-hidden text-left"
+      style={{
+        height: "100%",
+        background: "rgba(18, 12, 36, 0.8)",
+        border: "1px solid rgba(167, 139, 250, 0.2)",
+        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)",
+      }}
     >
       {/* Thumbnail */}
-      <Link to={`/courses/${course.id || course._id}`} className="block relative h-44 w-full overflow-hidden bg-gray-100">
+      <Link to={`/courses/${course.id || course._id}`} className="block relative h-48 w-full overflow-hidden bg-gray-900">
         <img
           src={course.image}
           alt={course.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0A1E] via-[#0F0A1E]/30 to-transparent" />
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-purple-600/90 text-white backdrop-blur-md shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            1:1 Live Training
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-purple-600/90 text-white backdrop-blur-md shadow-lg border border-purple-400/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse" />
+            One-on-One Live Training
           </span>
 
           {course.badge && (
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-400 text-amber-950 shadow-sm">
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-400 text-black shadow-md">
               {course.badge}
             </span>
           )}
         </div>
 
         {/* Level badge */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-          <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-white/90 text-gray-800 backdrop-blur-md">
+        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-white/15 text-gray-200 backdrop-blur-md border border-white/20">
             {course.level}
           </span>
-          <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-cyan-900/80 text-cyan-200 backdrop-blur-md">
-            Recorded Included
+          <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-cyan-500/20 text-cyan-200 backdrop-blur-md border border-cyan-400/30">
+            Recorded LMS
           </span>
         </div>
       </Link>
@@ -70,44 +75,44 @@ export function CourseCard({
         <div>
           {/* Category & Mentorship Badges */}
           <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-100">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
               {course.category}
             </span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-              One-on-One Mentorship
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+              Dedicated Mentor
             </span>
           </div>
 
           {/* Course Title */}
           <Link to={`/courses/${course.id || course._id}`} className="no-underline block">
-            <h3 className="font-sans font-bold text-[15px] text-gray-900 leading-snug mb-2 line-clamp-2 min-h-[42px] group-hover:text-purple-700 transition-colors">
+            <h3 className="font-display font-bold text-base text-white leading-snug mb-2 line-clamp-2 min-h-[44px] group-hover:text-cyan-300 transition-colors">
               {course.title}
             </h3>
           </Link>
 
           {/* Mentor Experience */}
-          <div className="flex items-center justify-between text-xs text-gray-600 mb-3 pb-2.5 border-b border-gray-100">
-            <span className="font-medium text-gray-700">
-              Mentor: <strong className="text-purple-700 font-semibold">{course.mentor}</strong>{" "}
+          <div className="flex items-center justify-between text-xs text-gray-400 mb-3 pb-2.5 border-b border-white/10">
+            <span className="font-medium text-gray-300 truncate mr-2">
+              Mentor: <strong className="text-purple-300 font-semibold">{course.mentor}</strong>{" "}
               <span className="text-gray-400 text-[11px]">({course.mentorCompany})</span>
             </span>
-            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+            <span className="text-[11px] font-bold text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-2 py-0.5 rounded shrink-0">
               {course.mentorExp || "10+ Years"} Exp
             </span>
           </div>
 
           {/* Meta Info: Duration, Rating, Language */}
-          <div className="grid grid-cols-3 gap-2 py-2 px-2.5 rounded-xl bg-gray-50 text-xs text-gray-600 mb-3.5">
+          <div className="grid grid-cols-3 gap-2 py-2 px-2.5 rounded-xl bg-white/5 text-xs text-gray-300 mb-3.5 border border-white/5">
             <div className="flex items-center gap-1">
-              <span className="text-purple-600"><I.Clock /></span>
+              <span className="text-purple-400"><I.Clock /></span>
               <span className="font-medium">{course.duration}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-amber-500"><I.Star /></span>
-              <span className="font-bold text-gray-800">{course.rating}</span>
+              <span className="text-amber-400"><I.Star /></span>
+              <span className="font-bold text-white">{course.rating}</span>
             </div>
             <div className="flex items-center gap-1 truncate" title={course.language}>
-              <span className="text-cyan-600 text-[11px]">🌐</span>
+              <span className="text-cyan-400 text-[11px]">🌐</span>
               <span className="truncate text-[11px] font-medium">{course.language}</span>
             </div>
           </div>
@@ -115,8 +120,8 @@ export function CourseCard({
           {/* Features bullet preview */}
           <ul className="space-y-1.5 mb-4">
             {course.features.slice(0, 2).map((feat, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-xs text-gray-600">
-                <span className="text-emerald-500 mt-0.5"><I.Check /></span>
+              <li key={idx} className="flex items-start gap-2 text-xs text-gray-300">
+                <span className="text-emerald-400 mt-0.5"><I.Check /></span>
                 <span className="line-clamp-1">{feat}</span>
               </li>
             ))}
@@ -124,13 +129,15 @@ export function CourseCard({
         </div>
 
         {/* Pricing & Dual Action Buttons */}
-        <div className="pt-3 border-t border-gray-100">
+        <div className="pt-3 border-t border-white/10">
           <div className="flex items-baseline justify-between mb-3">
             <div>
-              <span className="text-lg font-extrabold text-purple-700 font-sans">{course.price}</span>
-              <span className="text-xs text-gray-400 line-through ml-2">{course.originalPrice}</span>
+              <span className="text-lg font-extrabold text-cyan-300 font-display">{course.price}</span>
+              {course.originalPrice && !course.price.startsWith("$") ? (
+                <span className="text-xs text-gray-500 line-through ml-2">{course.originalPrice}</span>
+              ) : null}
             </div>
-            <span className="text-[11px] font-semibold text-emerald-600">Live 1:1 Slots</span>
+            <span className="text-[11px] font-semibold text-emerald-400">One-on-One Live Slots Available</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -143,16 +150,16 @@ export function CourseCard({
                   navigate(`/courses/${course.id || course._id}`);
                 }
               }}
-              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-all text-center cursor-pointer"
+              className="px-3 py-2 text-xs font-semibold text-gray-300 bg-white/10 hover:bg-purple-600/30 hover:text-white rounded-xl transition-all text-center cursor-pointer border border-white/10"
             >
-              View Curriculum
+              Curriculum
             </button>
             <button
               type="button"
               onClick={handleBookDemo}
-              className="px-3 py-2 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-sm transition-all text-center hover:shadow-md"
+              className="px-3 py-2 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl shadow-lg transition-all text-center cursor-pointer"
             >
-              Book Free Demo
+              Book Your Free Consultation
             </button>
           </div>
         </div>
@@ -234,21 +241,28 @@ export default function Courses({
   const displayCourses = limit ? popularSorted.slice(0, limit) : filtered;
 
   return (
-    <section id="courses" className="py-20 bg-white">
-      <div className="container-xl">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-9 gap-4">
-          <SectionHeading
-            badge="Featured Programs"
-            badgeClass="badge-cyan"
-            title="Explore One-on-One"
-            accent="Live Courses"
-            desc="Hands-on, project-based 1:1 curricula taught by industry mentors with 10+ years of experience from MongoDB Atlas."
-            center={false}
-          />
+    <section id="courses" className="py-24 bg-dark-purple relative overflow-hidden text-white border-t border-purple-500/15">
+      {/* Background radial glows */}
+      <div className="orb" style={{ width: 600, height: 600, top: -150, left: -100, background: "rgba(124,58,237,0.22)" }} />
+      <div className="orb" style={{ width: 450, height: 450, bottom: -100, right: -50, background: "rgba(6,182,212,0.18)" }} />
+
+      <div className="container-xl relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 backdrop-blur-md mb-3">
+              <I.Sparkles /> 55+ INDUSTRY-ALIGNED COURSES
+            </span>
+            <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+              Explore One-on-One <span className="gradient-text-warm">Live Courses</span>
+            </h2>
+            <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-xl">
+              Hands-on, project-based One-on-One curricula taught by industry mentors with 10+ years of experience from MongoDB Atlas.
+            </p>
+          </div>
           {limit && (
             <Link
               to="/courses"
-              className="btn-ghost flex items-center gap-1.5 self-start md:self-auto text-purple-700 font-semibold no-underline text-sm"
+              className="btn-ghost-white flex items-center gap-2 self-start md:self-auto text-cyan-300 font-semibold no-underline text-sm hover:text-white px-5 py-2.5 rounded-xl"
             >
               View All {courses.length > 0 ? courses.length : "55"} Courses <I.ChevronRight />
             </Link>
@@ -264,8 +278,8 @@ export default function Courses({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? "bg-purple-600 text-white shadow-md shadow-purple-200 border border-purple-600"
-                    : "bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 hover:text-gray-900"
+                    ? "bg-purple-600 text-white shadow-lg shadow-purple-900/50 border border-purple-400"
+                    : "bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {cat}
@@ -280,21 +294,22 @@ export default function Courses({
             {Array.from({ length: limit || 8 }).map((_, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm animate-pulse space-y-4"
+                className="glass-card-dark p-4 shadow-sm animate-pulse space-y-4"
+                style={{ minHeight: 380 }}
               >
-                <div className="h-44 bg-gray-200 rounded-2xl w-full" />
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-100 rounded w-1/2" />
-                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                  <div className="h-5 bg-purple-100 rounded w-16" />
-                  <div className="h-8 bg-gray-200 rounded-xl w-24" />
+                <div className="h-44 bg-white/5 rounded-2xl w-full" />
+                <div className="h-4 bg-white/10 rounded w-3/4" />
+                <div className="h-3 bg-white/5 rounded w-1/2" />
+                <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                  <div className="h-5 bg-purple-500/20 rounded w-16" />
+                  <div className="h-8 bg-white/10 rounded-xl w-24" />
                 </div>
               </div>
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-12 p-6 bg-rose-50 rounded-3xl border border-rose-200 max-w-lg mx-auto">
-            <p className="text-rose-700 font-semibold text-sm mb-3">⚠️ {error}</p>
+          <div className="text-center py-12 p-6 bg-rose-950/40 rounded-3xl border border-rose-500/30 max-w-lg mx-auto">
+            <p className="text-rose-300 font-semibold text-sm mb-3">⚠️ {error}</p>
             <button
               type="button"
               onClick={() => window.location.reload()}
@@ -304,7 +319,7 @@ export default function Courses({
             </button>
           </div>
         ) : displayCourses.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 text-sm">
+          <div className="text-center py-12 text-gray-400 text-sm">
             No courses found matching "{selectedCategory}".
           </div>
         ) : (
@@ -324,21 +339,24 @@ export default function Courses({
       {/* Curriculum / Details Modal */}
       {activeDetailsCourse && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/75 backdrop-blur-sm animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
           onClick={(e) => {
             if (e.target === e.currentTarget) setActiveDetailsCourse(null);
           }}
         >
-          <div className="w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] animate-scaleIn">
-            <div className="p-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-between">
+          <div
+            className="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border border-purple-500/30 text-left animate-scaleIn"
+            style={{ background: "#0F0A1E" }}
+          >
+            <div className="p-6 bg-gradient-to-r from-purple-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between border-b border-white/10">
               <div>
-                <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full mb-2">
-                  1:1 Live Curriculum & Syllabus
+                <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-2.5 py-0.5 rounded-full mb-2">
+                  One-on-One Live Curriculum & Syllabus
                 </span>
-                <h3 className="font-sans font-extrabold text-xl leading-tight">
+                <h3 className="font-display font-extrabold text-xl leading-tight text-white">
                   {activeDetailsCourse.title}
                 </h3>
-                <p className="text-xs text-purple-100 mt-1">
+                <p className="text-xs text-gray-300 mt-1">
                   Mentor: {activeDetailsCourse.mentor} ({activeDetailsCourse.mentorCompany}) · {activeDetailsCourse.duration} · {activeDetailsCourse.language}
                 </p>
               </div>
@@ -353,28 +371,28 @@ export default function Courses({
 
             <div className="p-6 overflow-y-auto flex-1 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-gray-900 font-sans">
+                <span className="text-sm font-bold text-white font-display">
                   Structured Weekly Milestones
                 </span>
-                <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">
-                  {activeDetailsCourse.roadmap.length} Modules
+                <span className="text-xs font-semibold text-purple-300 bg-purple-500/20 px-2.5 py-1 rounded-full border border-purple-500/30">
+                  {activeDetailsCourse.roadmap?.length || 0} Modules
                 </span>
               </div>
 
               <div className="space-y-3">
-                {activeDetailsCourse.roadmap.map((r, idx) => (
-                  <div key={idx} className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                {activeDetailsCourse.roadmap?.map((r, idx) => (
+                  <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold text-purple-700">
+                      <span className="text-xs font-bold text-cyan-300">
                         {r.week} — {r.title}
                       </span>
                     </div>
-                    <ul className="pl-4 list-disc text-xs text-gray-600 space-y-1 mb-2.5">
+                    <ul className="pl-4 list-disc text-xs text-gray-300 space-y-1 mb-2.5">
                       {r.topics.map((top, tIdx) => (
                         <li key={tIdx}>{top}</li>
                       ))}
                     </ul>
-                    <div className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5">
+                    <div className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/50 border border-emerald-500/30 px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5">
                       <span>🎯 Milestone:</span>
                       <span>{r.milestone}</span>
                     </div>
@@ -383,17 +401,17 @@ export default function Courses({
               </div>
             </div>
 
-            <div className="p-5 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+            <div className="p-5 border-t border-white/10 bg-black/40 flex items-center justify-between">
               <div>
-                <span className="text-[11px] text-gray-500 block">Course Tuition</span>
-                <span className="text-xl font-extrabold text-purple-700 font-sans">{activeDetailsCourse.price}</span>
+                <span className="text-[11px] text-gray-400 block">Course Tuition</span>
+                <span className="text-xl font-extrabold text-cyan-300 font-display">{activeDetailsCourse.price}</span>
               </div>
               <Link
                 to={`/free-demo?course=${encodeURIComponent(activeDetailsCourse.title)}`}
                 onClick={() => setActiveDetailsCourse(null)}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md transition-all flex items-center gap-1.5 no-underline"
+                className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 shadow-lg transition-all flex items-center gap-1.5 no-underline"
               >
-                <I.Sparkles /> Book Free 1:1 Live Demo
+                <I.Sparkles /> Book Free Free One-on-One Learning Consultation
               </Link>
             </div>
           </div>

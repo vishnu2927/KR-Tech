@@ -1,10 +1,10 @@
 {
-  "name": "KR Tech — One-on-One Live Tech Mentorship",
-  "short_name": "KR Tech",
-  "description": "India's premium coding academy with personalized 1:1 live training, project support, and placement mentoring.",
+  "name": "KR GLOBAL LEARNING PRIVATE LIMITED",
+  "short_name": "KR Global Learning",
+  "description": "Learn. Build. Grow. Globally. Empowering India's Next Generation of Tech Professionals Through Live Mentorship & Industry Certifications.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F0A1E",
+  "background_color": "#070913",
   "theme_color": "#7C3AED",
   "orientation": "portrait-primary",
   "icons": [

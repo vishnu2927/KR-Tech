@@ -62,7 +62,7 @@ export default function PopularCoursesChart({
             width={110}
           />
           <Tooltip
-            formatter={(val: number) => [`${val.toLocaleString()} Enrolled`, "Students"]}
+            formatter={(val: any) => [`${val?.toLocaleString()} Enrolled`, "Students"]}
             contentStyle={{
               backgroundColor: isDark ? "#0f172a" : "#ffffff",
               borderColor: isDark ? "#334155" : "#cbd5e1",
