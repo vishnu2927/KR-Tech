@@ -178,9 +178,9 @@ export default function CourseDetailPage({ onOpenDemoModal }: CourseDetailPagePr
   // Helper to extract clean numeric amount
   const parsePrice = (priceVal?: string | number): number => {
     if (typeof priceVal === "number") return priceVal;
-    if (!priceVal) return 12999;
+    if (!priceVal) return 499;
     const clean = String(priceVal).replace(/[^0-9]/g, "");
-    return clean ? parseInt(clean, 10) : 12999;
+    return clean ? parseInt(clean, 10) : 499;
   };
 
   const handleBuyNow = () => {
@@ -555,14 +555,6 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                   <div>
                     <div className="flex items-baseline gap-3">
                       <span className="text-3xl font-extrabold text-white font-sans">{course.price}</span>
-                      {course.originalPrice && !course.price.startsWith("$") ? (
-                        <span className="text-sm text-slate-500 line-through">{course.originalPrice}</span>
-                      ) : null}
-                      {course.originalPrice && !course.price.startsWith("$") ? (
-                        <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          Limited Time Offer
-                        </span>
-                      ) : null}
                     </div>
                     <p className="text-xs text-slate-400 mt-1">Includes One-on-One Live Mentorship, HD Recordings & Verified Certification</p>
                   </div>

@@ -17,7 +17,7 @@ export default function OrderSummary({
   courseTitle,
   courseCategory = "Engineering & Architecture",
   mentorName = "Principal Tech Lead",
-  originalPrice = 24999,
+  originalPrice,
   baseAmount,
   discountAmount,
   appliedCouponCode,
@@ -25,11 +25,6 @@ export default function OrderSummary({
   isProcessing = false,
   onPayNow,
 }: OrderSummaryProps) {
-  // 18% GST calculation
-  const gstRate = 0.18;
-  const taxableAmount = Math.round(finalAmount / (1 + gstRate));
-  const gstAmount = finalAmount - taxableAmount;
-
   return (
     <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl space-y-6 sticky top-24">
       {/* Header */}
@@ -47,14 +42,9 @@ export default function OrderSummary({
 
       {/* Pricing Breakdown */}
       <div className="space-y-3 text-xs">
-        <div className="flex justify-between items-center text-slate-400">
-          <span>Standard Tuition Fee</span>
-          <span className="line-through font-mono">₹{originalPrice.toLocaleString("en-IN")}</span>
-        </div>
-
         <div className="flex justify-between items-center text-slate-300">
-          <span>Cohort Admission Rate</span>
-          <span className="font-mono text-white font-semibold">₹{baseAmount.toLocaleString("en-IN")}</span>
+          <span>Tuition Fee</span>
+          <span className="font-mono text-white font-semibold">${baseAmount.toLocaleString()}</span>
         </div>
 
         {discountAmount > 0 && (
@@ -62,33 +52,23 @@ export default function OrderSummary({
             <span className="flex items-center gap-1">
               <span>🏷️</span> Coupon ({appliedCouponCode})
             </span>
-            <span className="font-mono font-bold">- ₹{discountAmount.toLocaleString("en-IN")}</span>
+            <span className="font-mono font-bold">- ${discountAmount.toLocaleString()}</span>
           </div>
         )}
-
-        <div className="flex justify-between items-center text-slate-400 text-[11px] pt-1">
-          <span>Taxable Tuition</span>
-          <span className="font-mono">₹{taxableAmount.toLocaleString("en-IN")}</span>
-        </div>
-
-        <div className="flex justify-between items-center text-slate-400 text-[11px]">
-          <span>GST (18% Integrated Tax)</span>
-          <span className="font-mono">₹{gstAmount.toLocaleString("en-IN")}</span>
-        </div>
 
         {/* Total Row */}
         <div className="pt-4 border-t border-slate-800/80 flex justify-between items-baseline">
           <div>
             <span className="text-xs uppercase font-bold text-slate-400 tracking-wider block">
-              Total Payable (INR)
+              Total Payable (USD)
             </span>
             <span className="text-[10px] text-emerald-400 font-medium">
-              Inclusive of all taxes & LMS access
+              Inclusive of live mentorship, capstones & certification
             </span>
           </div>
           <div className="text-right">
             <span className="text-2xl md:text-3xl font-black text-white font-mono bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
-              ₹{finalAmount.toLocaleString("en-IN")}
+              ${finalAmount.toLocaleString()}
             </span>
           </div>
         </div>

@@ -29,37 +29,27 @@ export default function Footer() {
     { label: "Power BI", href: "/courses" },
   ];
 
-  // Configurable social media channels
+  // Official company social media channels
   const socialChannels = [
-    {
-      icon: <I.Instagram />,
-      label: "Instagram",
-      href: (import.meta as any).env?.VITE_INSTAGRAM_URL || "https://instagram.com/krgloballearning",
-    },
-    {
-      icon: <I.Linkedin />,
-      label: "LinkedIn",
-      href: (import.meta as any).env?.VITE_LINKEDIN_URL || "https://linkedin.com/company/kr-global-learning",
-    },
     {
       icon: <I.Youtube />,
       label: "YouTube",
-      href: (import.meta as any).env?.VITE_YOUTUBE_URL || "https://youtube.com/@krgloballearning",
-    },
-    {
-      icon: <I.Github />,
-      label: "GitHub",
-      href: (import.meta as any).env?.VITE_GITHUB_URL || "https://github.com/krtech",
-    },
-    {
-      icon: <I.Twitter />,
-      label: "Twitter/X",
-      href: (import.meta as any).env?.VITE_TWITTER_URL || "https://twitter.com/krglobal_learn",
+      href: "https://youtube.com/@krgloballeaning?si=ZuFhhdkJl0HR9zQ5",
     },
     {
       icon: <I.Telegram />,
       label: "Telegram",
-      href: (import.meta as any).env?.VITE_TELEGRAM_URL || "https://t.me/krgloballearning",
+      href: "https://t.me/krglobal0713",
+    },
+    {
+      icon: <I.Instagram />,
+      label: "Instagram",
+      href: "https://www.instagram.com/krglobal0713?utm_source=qr&stkn=bzJhYWIzemRnZ212",
+    },
+    {
+      icon: <I.Twitter />,
+      label: "X (Twitter)",
+      href: "https://x.com/KRGlobal1307",
     },
   ];
 
@@ -114,23 +104,24 @@ export default function Footer() {
                 </div>
               </div>
 
-              {/* Social Channels (SECTION E / 14) */}
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">
-                  Connect on Social Media
+              {/* Social Channels: Follow Us / Connect With Us */}
+              <div className="mt-2">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                  Follow Us / Connect With Us
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {socialChannels.map((s) => (
                     <a
                       key={s.label}
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="footer-social"
+                      className="footer-social flex items-center justify-center p-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-slate-300 hover:text-white hover:border-cyan-400/70 hover:bg-slate-800 transition-all shadow-md group"
                       aria-label={s.label}
                       title={s.label}
                     >
-                      {s.icon}
+                      <span className="transition-transform group-hover:scale-110">{s.icon}</span>
                     </a>
                   ))}
                 </div>

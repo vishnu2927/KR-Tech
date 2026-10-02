@@ -227,7 +227,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
     },
     {
       q: "Is there any financial assistance or EMI option available?",
-      a: "Yes, we offer zero-cost monthly EMI options starting at ₹1,200/month as well as merit-based fee concessions for students.",
+      a: "Yes, we offer flexible installment payment options starting at $99/month as well as merit-based fee concessions for learners.",
     },
     {
       q: "How does the Free One-on-One Learning Consultation class work?",
@@ -1104,7 +1104,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
                 className="btn-primary"
                 style={{ padding: "10px 20px" }}
               >
-                <I.Sparkles /> Book Free Free One-on-One Learning Consultation
+                <I.Sparkles /> Book Free One-on-One Learning Consultation
               </button>
             </div>
           </div>

@@ -329,6 +329,51 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
               </>
             )}
           </div>
+
+          {/* Official Social Links in Mobile Drawer */}
+          <div className="pt-4 mt-4 border-t border-slate-200/80">
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center mb-2.5">
+              Connect With Us
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <a
+                href="https://youtube.com/@krgloballeaning?si=ZuFhhdkJl0HR9zQ5"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-red-600 hover:bg-slate-200 transition"
+              >
+                <I.Youtube />
+              </a>
+              <a
+                href="https://t.me/krglobal0713"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Telegram"
+                className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-cyan-600 hover:bg-slate-200 transition"
+              >
+                <I.Telegram />
+              </a>
+              <a
+                href="https://www.instagram.com/krglobal0713?utm_source=qr&stkn=bzJhYWIzemRnZ212"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-pink-600 hover:bg-slate-200 transition"
+              >
+                <I.Instagram />
+              </a>
+              <a
+                href="https://x.com/KRGlobal1307"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X (Twitter)"
+                className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:text-black hover:bg-slate-200 transition"
+              >
+                <I.Twitter />
+              </a>
+            </div>
+          </div>
         </div>
       )}
     </header>

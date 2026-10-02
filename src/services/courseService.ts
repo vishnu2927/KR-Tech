@@ -8,6 +8,7 @@ export interface Course {
   category: string;
   categoryGroup: string;
   duration: string;
+  durationHours?: number;
   students: string;
   rating: string;
   level: "Beginner" | "Intermediate" | "Advanced" | "All Levels";
@@ -35,6 +36,7 @@ export interface CoursePayload {
   category: string;
   categoryGroup?: string;
   duration?: string;
+  durationHours?: number;
   level?: Course["level"];
   mentor?: string;
   mentorCompany?: string;
@@ -68,25 +70,40 @@ function mapCategoryToGroup(cat: string = ""): string {
 function normalizeCourse(raw: any): Course {
   let priceStr = "";
   if (typeof raw.price === "string") {
-    priceStr = raw.price.startsWith("$") || raw.price.startsWith("₹") ? raw.price : `$${raw.price}`;
-  } else if (typeof raw.price === "number") {
-    if (raw.currency === "USD" || raw.price <= 1500) {
-      priceStr = `$${raw.price}`;
+    if (raw.price.startsWith("$")) {
+      priceStr = raw.price;
     } else {
-      priceStr = `₹${raw.price.toLocaleString("en-IN")}`;
+      const num = parseInt(raw.price.replace(/[^0-9]/g, "")) || 499;
+      priceStr = num > 1000 ? (num >= 16000 ? "$599" : num >= 14000 ? "$549" : num >= 12000 ? "$499" : num >= 9000 ? "$399" : num >= 6000 ? "$299" : "$199") : `$${num}`;
     }
+  } else if (typeof raw.price === "number") {
+    priceStr = raw.price > 1000 ? (raw.price >= 16000 ? "$599" : raw.price >= 14000 ? "$549" : raw.price >= 12000 ? "$499" : raw.price >= 9000 ? "$399" : raw.price >= 6000 ? "$299" : "$199") : `$${raw.price}`;
   } else {
     priceStr = "$599";
   }
 
-  let origPriceStr = "";
-  if (priceStr.startsWith("$")) {
-    // For USD catalog items, do NOT invent fake original prices or discounts
-    origPriceStr = "";
-  } else if (typeof raw.originalPrice === "string") {
-    origPriceStr = raw.originalPrice;
-  } else if (typeof raw.originalPrice === "number") {
-    origPriceStr = `₹${raw.originalPrice.toLocaleString("en-IN")}`;
+  // All courses strictly use actual USD pricing without fake crossed-out original prices
+  const origPriceStr = "";
+
+  // Duration in Hours
+  let durationHours = typeof raw.durationHours === "number" ? raw.durationHours : undefined;
+  let durationStr = raw.duration || "80 Hours";
+
+  if (durationHours) {
+    durationStr = `${durationHours} Hours`;
+  } else if (durationStr.toLowerCase().includes("week")) {
+    const num = parseInt(durationStr.replace(/[^0-9]/g, "")) || 8;
+    durationHours = num <= 6 ? 40 : num <= 8 ? 80 : num <= 10 ? 100 : 120;
+    durationStr = `${durationHours} Hours`;
+  } else if (durationStr.toLowerCase().includes("month")) {
+    const num = parseFloat(durationStr.replace(/[^0-9.]/g, "")) || 3;
+    durationHours = Math.round(num * 30);
+    durationStr = `${durationHours} Hours`;
+  } else if (!durationStr.toLowerCase().includes("hour")) {
+    durationHours = 80;
+    durationStr = "80 Hours";
+  } else {
+    durationHours = parseInt(durationStr.replace(/[^0-9]/g, "")) || 80;
   }
 
   const ratingStr = typeof raw.rating === "number"
@@ -107,7 +124,8 @@ function normalizeCourse(raw: any): Course {
     title: raw.title,
     category: raw.category,
     categoryGroup: raw.categoryGroup || mapCategoryToGroup(raw.category),
-    duration: raw.duration || "8-10 Weeks",
+    duration: durationStr,
+    durationHours,
     students: studentsStr,
     rating: ratingStr,
     level: raw.level || "Intermediate",
@@ -125,8 +143,8 @@ function normalizeCourse(raw: any): Course {
     roadmap: Array.isArray(raw.roadmap) && raw.roadmap.length > 0
       ? raw.roadmap
       : [
-          { week: "Week 1-2", title: "Core Fundamentals & Architecture", topics: ["Syntax & Structure", "Design Patterns"], milestone: "Foundation Build" },
-          { week: "Week 3-4", title: "Hands-on Implementation & Deployment", topics: ["APIs & Microservices", "Cloud Integration"], milestone: "Production Capstone" },
+          { week: "Phase 1", title: "Core Fundamentals & Architecture", topics: ["Syntax & Structure", "Design Patterns"], milestone: "Foundation Build" },
+          { week: "Phase 2", title: "Hands-on Implementation & Deployment", topics: ["APIs & Microservices", "Cloud Integration"], milestone: "Production Capstone" },
         ],
   };
 }

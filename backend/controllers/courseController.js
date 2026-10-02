@@ -7,13 +7,15 @@ const FALLBACK_COURSES = [
     id: "java-backend",
     title: "Complete Java Backend Development with Spring Boot & Microservices",
     category: "Java Backend",
+    categoryGroup: "Software Development",
     description: "Master Java 21, Spring Boot 3.x, Microservices, Kafka, Docker & One-on-One Capstone Architecture.",
-    duration: "6 Months",
+    duration: "180 Hours",
+    durationHours: 180,
     level: "Intermediate",
     rating: 4.95,
     studentsCount: 18200,
-    price: 14999,
-    originalPrice: 26999,
+    price: "$499",
+    originalPrice: "",
     isPopular: true,
   },
   {
@@ -21,13 +23,15 @@ const FALLBACK_COURSES = [
     id: "mern-stack",
     title: "MERN Stack Full Stack Web Development Mastery Bootcamp",
     category: "MERN Stack",
+    categoryGroup: "Software Development",
     description: "React 19, Next.js 15, Node.js, Express, MongoDB & real-time SaaS production capstone.",
-    duration: "5 Months",
+    duration: "150 Hours",
+    durationHours: 150,
     level: "Beginner",
     rating: 4.92,
     studentsCount: 22100,
-    price: 14999,
-    originalPrice: 26999,
+    price: "$499",
+    originalPrice: "",
     isPopular: true,
   },
   {
@@ -37,7 +41,8 @@ const FALLBACK_COURSES = [
     category: "Cloud & Cloud Architecture",
     categoryGroup: "Cloud & Cloud Architecture",
     description: "EC2, S3, VPC, ECS Fargate, IAM, CloudFormation & official exam readiness simulator.",
-    duration: "8 Weeks",
+    duration: "80 Hours",
+    durationHours: 80,
     level: "Intermediate",
     rating: 4.95,
     studentsCount: 19800,
@@ -154,23 +159,27 @@ const getCourseById = async (req, res) => {
 // @access  Private/Admin
 const createCourse = async (req, res) => {
   try {
-    const { title, category, description, duration, level, rating, studentsCount, price, originalPrice, isPopular } = req.body;
+    const { title, category, description, duration, durationHours, level, rating, studentsCount, price, originalPrice, isPopular } = req.body;
 
     if (!title || !category) {
       return res.status(400).json({ success: false, message: 'Title and category are required' });
     }
 
+    const resolvedDurationHours = durationHours || (duration ? parseInt(duration.replace(/[^0-9]/g, '')) || 80 : 80);
+    const resolvedDuration = duration ? (duration.toLowerCase().includes('hour') ? duration : `${resolvedDurationHours} Hours`) : `${resolvedDurationHours} Hours`;
+
     if (mongoose.connection.readyState === 1) {
       const course = await Course.create({
         title,
         category,
-        description: description || '1:1 Live Coding Mastery Syllabus',
-        duration: duration || '8-10 Weeks',
+        description: description || 'One-on-One Live Industry Certification Curriculum',
+        duration: resolvedDuration,
+        durationHours: resolvedDurationHours,
         level: level || 'Intermediate',
         rating: rating || 4.9,
         studentsCount: studentsCount || 100,
-        price: price || 19999,
-        originalPrice: originalPrice || 34999,
+        price: price || '$499',
+        originalPrice: originalPrice || '',
         isPopular: !!isPopular,
       });
       return res.status(201).json({ success: true, message: 'Course created successfully', course });
@@ -180,8 +189,11 @@ const createCourse = async (req, res) => {
       _id: `c-${Date.now()}`,
       title,
       category,
-      description: description || '1:1 Live Coding Mastery Syllabus',
-      price: price || 19999,
+      description: description || 'One-on-One Live Industry Certification Curriculum',
+      duration: resolvedDuration,
+      durationHours: resolvedDurationHours,
+      price: price || '$499',
+      originalPrice: originalPrice || '',
     };
     return res.status(201).json({ success: true, message: 'Course created (Local Mode)', course: mockCreated });
   } catch (error) {

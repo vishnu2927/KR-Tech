@@ -72,7 +72,7 @@ export default function PaymentSuccessPage() {
           <div className="mt-6 inline-block py-3 px-6 rounded-2xl bg-[#090D16] border border-white/10">
             <span className="text-xs uppercase text-gray-400 tracking-wider block">Total Amount Paid</span>
             <span className="text-3xl font-black text-white bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent font-mono">
-              ₹{typeof amount === "number" ? amount.toLocaleString("en-IN") : amount}
+              ${typeof amount === "number" ? amount.toLocaleString() : String(amount).replace(/^[₹Rs\$\s]+/, "")}
             </span>
           </div>
         </div>

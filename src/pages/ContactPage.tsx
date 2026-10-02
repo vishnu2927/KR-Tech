@@ -429,6 +429,129 @@ export default function ContactPage() {
 
           </div>
         </section>
+
+        {/* CONNECT WITH US — OFFICIAL SOCIAL CHANNELS */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="rounded-3xl bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-8 sm:p-10 shadow-2xl">
+            <div className="text-center max-w-2xl mx-auto mb-8">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 text-purple-300 text-xs font-semibold mb-3 border border-purple-500/30">
+                Official Channels
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Poppins'] mb-2">
+                Connect With Us
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300">
+                Join our learning network, stream tech masterclasses, participate in technical discussions, and stay updated with official announcements.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {/* YouTube */}
+              <a
+                href="https://youtube.com/@krgloballeaning?si=ZuFhhdkJl0HR9zQ5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-red-500/50 hover:bg-slate-900/90 transition-all flex flex-col justify-between no-underline"
+              >
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-red-500/15 text-red-500 flex items-center justify-center border border-red-500/30 mb-4 group-hover:scale-105 transition-transform">
+                    <I.Youtube />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-['Poppins'] mb-1 group-hover:text-red-400 transition-colors">
+                    YouTube
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-3">
+                    @krgloballeaning
+                  </p>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    Watch in-depth technical masterclasses, architecture reviews, and certification preparation playlists.
+                  </p>
+                </div>
+                <div className="text-xs font-bold text-red-400 flex items-center gap-1.5 pt-3 border-t border-slate-800/80">
+                  <span>Visit Channel</span> <I.ArrowRight />
+                </div>
+              </a>
+
+              {/* Telegram */}
+              <a
+                href="https://t.me/krglobal0713"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900/90 transition-all flex flex-col justify-between no-underline"
+              >
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center border border-cyan-500/30 mb-4 group-hover:scale-105 transition-transform">
+                    <I.Telegram />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-['Poppins'] mb-1 group-hover:text-cyan-300 transition-colors">
+                    Telegram
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-3">
+                    @krglobal0713
+                  </p>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    Daily technical case studies, interview prep notes, live session notifications, and learning resources.
+                  </p>
+                </div>
+                <div className="text-xs font-bold text-cyan-400 flex items-center gap-1.5 pt-3 border-t border-slate-800/80">
+                  <span>Join Community</span> <I.ArrowRight />
+                </div>
+              </a>
+
+              {/* X / Twitter */}
+              <a
+                href="https://x.com/KRGlobal1307"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-slate-500/50 hover:bg-slate-900/90 transition-all flex flex-col justify-between no-underline"
+              >
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center border border-slate-700 mb-4 group-hover:scale-105 transition-transform">
+                    <I.Twitter />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-['Poppins'] mb-1 group-hover:text-cyan-300 transition-colors">
+                    X (Twitter)
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-3">
+                    @KRGlobal1307
+                  </p>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    Follow real-time technology insights, cloud and AI trends, and updates directly from our mentors.
+                  </p>
+                </div>
+                <div className="text-xs font-bold text-slate-300 flex items-center gap-1.5 pt-3 border-t border-slate-800/80">
+                  <span>Follow @KRGlobal1307</span> <I.ArrowRight />
+                </div>
+              </a>
+
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/krglobal0713?utm_source=qr&stkn=bzJhYWIzemRnZ212"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-pink-500/50 hover:bg-slate-900/90 transition-all flex flex-col justify-between no-underline"
+              >
+                <div>
+                  <div className="w-12 h-12 rounded-xl bg-pink-500/15 text-pink-400 flex items-center justify-center border border-pink-500/30 mb-4 group-hover:scale-105 transition-transform">
+                    <I.Instagram />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-['Poppins'] mb-1 group-hover:text-pink-300 transition-colors">
+                    Instagram
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-3">
+                    @krglobal0713
+                  </p>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    Student highlights, mentorship sessions, certificate achievements, and behind-the-scenes glimpses.
+                  </p>
+                </div>
+                <div className="text-xs font-bold text-pink-400 flex items-center gap-1.5 pt-3 border-t border-slate-800/80">
+                  <span>Follow on Instagram</span> <I.ArrowRight />
+                </div>
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
     </SEO>
   );

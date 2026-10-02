@@ -24,13 +24,13 @@ interface CourseFormData {
 const INITIAL_FORM_STATE: CourseFormData = {
   title: "",
   category: "Java Backend",
-  duration: "6 Months",
+  duration: "80 Hours",
   level: "Intermediate",
-  price: "₹14,999",
-  originalPrice: "₹26,999",
+  price: "$499",
+  originalPrice: "",
   description: "Comprehensive One-on-One mentorship covering enterprise system design, real-world capstone projects, and official certification preparation.",
   highlights: "One-on-One Live Mentorship, Real-world Capstones, Code Review, Certification Prep",
-  roadmap: "Week 1-2: Core Architecture & Fundamentals\nWeek 3-4: Frameworks & APIs\nWeek 5-6: Microservices & Cloud Deployment",
+  roadmap: "Phase 1: Core Architecture & Fundamentals\nPhase 2: Frameworks & APIs\nPhase 3: Microservices & Cloud Deployment",
   image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
   mentor: "Rajesh Kumar",
   mentorCompany: "Principal Technical Architect",
@@ -140,18 +140,24 @@ export default function CourseManagementPage() {
 
     const highlightsArray = formData.highlights.split(",").map((h) => h.trim()).filter(Boolean);
     const roadmapItems = formData.roadmap.split("\n").filter(Boolean).map((line, idx) => ({
-      week: `Week ${idx * 2 + 1}-${idx * 2 + 2}`,
+      week: `Phase ${idx + 1}`,
       title: line,
-      topics: ["Architecture Review", "One-on-One Live Coding"],
+      topics: ["Architecture Review", "One-on-One Live Sessions"],
       milestone: "Capstone Delivery",
     }));
+
+    const matchHours = formData.duration.match(/(\d+)/);
+    const durationHours = matchHours ? parseInt(matchHours[1], 10) : 80;
+    const cleanDuration = `${durationHours} Hours`;
+    const cleanPrice = formData.price.trim().startsWith("$") ? formData.price.trim() : `$${formData.price.trim().replace(/^[^0-9]*/, "")}`;
 
     const newCoursePayload = {
       title: formData.title,
       category: formData.category,
-      duration: formData.duration,
+      duration: cleanDuration,
+      durationHours,
       level: formData.level,
-      price: formData.price,
+      price: cleanPrice,
       originalPrice: formData.originalPrice,
       description: formData.description,
       features: highlightsArray,
@@ -180,7 +186,7 @@ export default function CourseManagementPage() {
       duration: course.duration,
       level: (course.level as any) || "Intermediate",
       price: course.price,
-      originalPrice: course.originalPrice || "₹24,999",
+      originalPrice: course.originalPrice || "",
       description: (course as any).description || "Comprehensive One-on-One tech mentorship with real-world capstone architecture.",
       highlights: (course.features || []).join(", "),
       roadmap: (course.roadmap || []).map((r) => r.title).join("\n"),
@@ -198,12 +204,18 @@ export default function CourseManagementPage() {
     if (!formData.id || !formData.title.trim()) return;
 
     const highlightsArray = formData.highlights.split(",").map((h) => h.trim()).filter(Boolean);
+    const matchHours = formData.duration.match(/(\d+)/);
+    const durationHours = matchHours ? parseInt(matchHours[1], 10) : 80;
+    const cleanDuration = `${durationHours} Hours`;
+    const cleanPrice = formData.price.trim().startsWith("$") ? formData.price.trim() : `$${formData.price.trim().replace(/^[^0-9]*/, "")}`;
+
     const updated = await courseService.updateCourse(formData.id, {
       title: formData.title,
       category: formData.category,
-      duration: formData.duration,
+      duration: cleanDuration,
+      durationHours,
       level: formData.level,
-      price: formData.price,
+      price: cleanPrice,
       features: highlightsArray,
       image: formData.image,
       mentor: formData.mentor,
@@ -214,7 +226,7 @@ export default function CourseManagementPage() {
     if (updated) {
       const { roadmap: _rm, ...cleanFormData } = formData;
       setCourses((prev) =>
-        prev.map((c) => (c.id === formData.id ? { ...c, ...cleanFormData, highlights: highlightsArray, features: highlightsArray } : c))
+        prev.map((c) => (c.id === formData.id ? { ...c, ...cleanFormData, duration: cleanDuration, durationHours, price: cleanPrice, highlights: highlightsArray, features: highlightsArray } : c))
       );
       showToast(`✓ Updated course: "${formData.title}" in MongoDB`);
     }
@@ -557,36 +569,36 @@ export default function CourseManagementPage() {
               {/* Duration & Price */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Duration *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Duration (Hours) *</label>
                   <input
                     type="text"
                     required
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    placeholder="e.g. 6 Months"
+                    placeholder="e.g. 80 Hours"
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Price *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Price ($ USD) *</label>
                   <input
                     type="text"
                     required
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    placeholder="e.g. ₹14,999"
+                    placeholder="e.g. $499"
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Original Price</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Original Price (Optional)</label>
                   <input
                     type="text"
                     value={formData.originalPrice}
                     onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
-                    placeholder="e.g. ₹26,999"
+                    placeholder="e.g. $699"
                     className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>

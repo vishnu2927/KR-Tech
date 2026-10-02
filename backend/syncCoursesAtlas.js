@@ -48,13 +48,17 @@ async function syncCourses() {
         .map(f => f.trim().replace(/^["']|["']$/g, ''))
         .filter(Boolean);
     }
+    const durHoursMatch = block.match(/durationHours:\s*([0-9]+)/);
+    const resolvedHours = durHoursMatch ? parseInt(durHoursMatch[1]) : (durMatch ? parseInt(durMatch[1].replace(/[^0-9]/g, '')) || 80 : 80);
+    const resolvedDuration = durMatch ? (durMatch[1].includes('Hours') ? durMatch[1] : `${resolvedHours} Hours`) : `${resolvedHours} Hours`;
 
     courses.push({
       id,
       title: titleMatch ? titleMatch[1] : id,
       category: catMatch ? catMatch[1] : 'Technology',
       categoryGroup: groupMatch ? groupMatch[1] : '',
-      duration: durMatch ? durMatch[1] : '8-10 Weeks',
+      duration: resolvedDuration,
+      durationHours: resolvedHours,
       level: levelMatch ? levelMatch[1] : 'Intermediate',
       rating: ratingMatch ? parseFloat(ratingMatch[1]) : 4.9,
       studentsCount: studentsMatch ? parseInt(studentsMatch[1].replace(/[^0-9]/g, '')) * 100 : 1200,
@@ -87,6 +91,7 @@ async function syncCourses() {
       existing.category = c.category;
       existing.categoryGroup = c.categoryGroup;
       existing.duration = c.duration;
+      existing.durationHours = c.durationHours;
       existing.level = c.level;
       existing.rating = c.rating;
       existing.price = c.price;
@@ -102,6 +107,7 @@ async function syncCourses() {
         category: c.category,
         categoryGroup: c.categoryGroup,
         duration: c.duration,
+        durationHours: c.durationHours,
         level: c.level,
         rating: c.rating,
         studentsCount: c.studentsCount,

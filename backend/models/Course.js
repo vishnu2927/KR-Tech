@@ -26,7 +26,11 @@ const courseSchema = new mongoose.Schema(
     },
     duration: {
       type: String,
-      default: '8-10 Weeks',
+      default: '80 Hours',
+    },
+    durationHours: {
+      type: Number,
+      default: 80,
     },
     level: {
       type: String,

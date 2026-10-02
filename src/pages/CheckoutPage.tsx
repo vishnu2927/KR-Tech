@@ -84,9 +84,9 @@ export default function CheckoutPage() {
           setCourse({
             id: courseId || "course-java-backend",
             title: "Java Full Stack Masterclass (Spring Boot & Microservices)",
-            price: "₹12,999",
-            originalPrice: "₹24,999",
-            duration: "6 Months",
+            price: "$499",
+            originalPrice: "",
+            duration: "80 Hours",
             level: "Intermediate",
             category: "Full Stack",
             description: "End-to-end industrial software engineering with live project architecture.",
@@ -107,13 +107,13 @@ export default function CheckoutPage() {
   // Clean numeric price calculation
   const parsePrice = (priceVal?: string | number): number => {
     if (typeof priceVal === "number") return priceVal;
-    if (!priceVal) return 12999;
+    if (!priceVal) return 499;
     const clean = String(priceVal).replace(/[^0-9]/g, "");
-    return clean ? parseInt(clean, 10) : 12999;
+    return clean ? parseInt(clean, 10) : 499;
   };
 
-  const baseAmount = course ? parsePrice(course.price) : 12999;
-  const originalPrice = course ? parsePrice(course.originalPrice || 24999) : 24999;
+  const baseAmount = course ? parsePrice(course.price) : 499;
+  const originalPrice = course && course.originalPrice ? parsePrice(course.originalPrice) : baseAmount;
   const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
   const finalAmount = Math.max(0, baseAmount - discountAmount);
 

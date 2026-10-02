@@ -133,9 +133,6 @@ export function CourseCard({
           <div className="flex items-baseline justify-between mb-3">
             <div>
               <span className="text-lg font-extrabold text-cyan-300 font-display">{course.price}</span>
-              {course.originalPrice && !course.price.startsWith("$") ? (
-                <span className="text-xs text-gray-500 line-through ml-2">{course.originalPrice}</span>
-              ) : null}
             </div>
             <span className="text-[11px] font-semibold text-emerald-400">One-on-One Live Slots Available</span>
           </div>
