@@ -108,7 +108,7 @@ export default function UpcomingLiveSessions({
             to="/courses"
             className="btn-ghost-white flex items-center gap-2 self-start md:self-auto text-cyan-300 font-semibold no-underline text-sm hover:text-white px-5 py-2.5 rounded-xl"
           >
-            Explore All 55+ Programs <I.ChevronRight />
+            Explore All Programs <I.ChevronRight />
           </Link>
         </div>
 

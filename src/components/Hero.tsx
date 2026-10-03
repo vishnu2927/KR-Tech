@@ -34,7 +34,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
         >
           <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
           <span style={{ fontFamily: "Poppins,sans-serif", fontSize: 13, fontWeight: 700, color: "#67E8F9" }}>
-            ONE-ON-ONE LIVE TRAINING · 55+ COURSES · 10+ MENTORS
+            ONE-ON-ONE LIVE TRAINING · TECHNOLOGY COURSES · PERSONALIZED MENTORSHIP
           </span>
         </div>
 
@@ -136,7 +136,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
 
         {/* Software Learning Pair-Programming Hero Stage (IDE Mockup + Live Screen Share) */}
         <div className="relative w-full max-w-5xl fade-up-5">
-          {/* Floating Glass Stat 1 - Top Left: 10+ Expert Mentors */}
+          {/* Floating Glass Stat 1 - Top Left: Expert Mentors */}
           <div
             className="floating-card hidden lg:flex items-center gap-3.5 px-4 py-3 rounded-2xl"
             style={{
@@ -167,7 +167,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             </div>
             <div style={{ textAlign: "left" }}>
               <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
-                10+ Senior Mentors
+                Senior Tech Mentors
               </div>
               <div style={{ fontSize: 11, color: "#A5F3FC", fontWeight: 500 }}>
                 Enterprise Architects & Technical Mentors
@@ -214,7 +214,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             </div>
           </div>
 
-          {/* Floating Glass Stat 3 - Bottom Left: 55+ Courses */}
+          {/* Floating Glass Stat 3 - Bottom Left: Courses */}
           <div
             className="floating-card hidden lg:flex items-center gap-3.5 px-4 py-3 rounded-2xl"
             style={{
@@ -245,15 +245,15 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             </div>
             <div style={{ textAlign: "left" }}>
               <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
-                55+ Certified Courses
+                Comprehensive Course Catalog
               </div>
               <div style={{ fontSize: 11, color: "#A7F3D0", fontWeight: 500 }}>
-                MongoDB Atlas Synced Catalog
+                Industry-Aligned Syllabus
               </div>
             </div>
           </div>
 
-          {/* Floating Glass Stat 4 - Bottom Right: 100+ Certifications */}
+          {/* Floating Glass Stat 4 - Bottom Right: Certifications */}
           <div
             className="floating-card hidden lg:flex items-center gap-3.5 px-4 py-3 rounded-2xl"
             style={{
@@ -284,10 +284,10 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             </div>
             <div style={{ textAlign: "left" }}>
               <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
-                100+ Certifications
+                Verified Certifications
               </div>
               <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 500 }}>
-                98% Practical Mastery
+                Practical Project Mastery
               </div>
             </div>
           </div>

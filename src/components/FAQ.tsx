@@ -8,7 +8,7 @@ export default function FAQ() {
     {
       category: "One-on-One Learning",
       q: "How does One-on-One learning work?",
-      a: "Unlike crowded batch classes, you get a dedicated expert mentor with 10+ years of enterprise experience. Every session is conducted via private One-on-One live screen-sharing where you write production code together, architect systems, and receive immediate real-time feedback.",
+      a: "Unlike crowded batch classes, you get a dedicated expert mentor with deep enterprise experience. Every session is conducted via private One-on-One live screen-sharing where you write production code together, architect systems, and receive immediate real-time feedback.",
     },
     {
       category: "Certifications",

@@ -165,10 +165,10 @@ export default function Testimonials() {
         {/* Learning Achievement Badges Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto">
           {[
-            { label: "Hands-on Projects Built", value: "500+", sub: "Production microservices" },
-            { label: "Industry Mentors", value: "10+", sub: "Staff & Principal Engineers" },
-            { label: "Verified Credentials", value: "100+", sub: "Verifiable with QR & Registry" },
-            { label: "Curriculum Domains", value: "12+", sub: "Engineering tracks" },
+            { label: "Hands-on Projects Built", value: "Practical", sub: "Production microservices" },
+            { label: "Industry Mentors", value: "Dedicated", sub: "Experienced Engineers" },
+            { label: "Verified Credentials", value: "Official", sub: "Verifiable with QR & Registry" },
+            { label: "Curriculum Domains", value: "12", sub: "Engineering tracks" },
           ].map((stat, i) => (
             <div
               key={i}

@@ -237,8 +237,8 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
 
   return (
     <SEO
-      title="55+ One-on-One Live Tech Courses & Vendor Certifications"
-      description="Explore 55+ technical courses in Java Backend, MERN Stack, AI, AWS, Azure, Cyber Security, SAP, and Salesforce. One-on-One Live mentorship with industry projects."
+      title="One-on-One Live Tech Courses & Vendor Certifications"
+      description="Explore technical courses in Java Backend, MERN Stack, AI, AWS, Azure, Cyber Security, SAP, and Salesforce. One-on-One Live mentorship with industry projects."
       canonical="https://krtech.in/courses"
       keywords="tech courses, One-on-One live training, java backend, spring boot, mern stack, aws certification, data engineering, cyber security"
       structuredData={SchemaBuilder.getBreadcrumbSchema([
@@ -291,7 +291,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
             }}
           >
             Choose personalized one-on-one training designed around your schedule and learning goals. Learn directly
-            from mentors with 10+ years of real industry experience.
+            from mentors with deep real industry experience.
           </p>
 
           {/* Action CTAs */}
@@ -324,8 +324,8 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
             }}
           >
             {[
-              { n: "20+ Live Courses", icon: <I.Code /> },
-              { n: "10+ Expert Mentors", icon: <I.Award /> },
+              { n: "Industry Courses", icon: <I.Code /> },
+              { n: "Expert Tech Mentors", icon: <I.Award /> },
               { n: "One-on-One Live Sessions", icon: <I.Users /> },
               { n: "Recorded Lectures Included", icon: <I.Play /> },
             ].map((s, idx) => (

@@ -33,7 +33,7 @@ export default function Home({ onOpenDemoModal }: { onOpenDemoModal: (courseOrMe
         {/* 1. Software Learning Pair-Programming Hero */}
         <Hero onOpenDemoModal={() => onOpenDemoModal()} />
 
-        {/* 2. Animated Stats Bar (55+ Courses, 10+ Mentors, One-on-One Ratio, 100+ Certifications) */}
+        {/* 2. Animated Stats Bar (Courses, Mentorship Ratio, Certifications) */}
         <StudentSuccessMetrics />
 
         {/* 3. Premium Course Category Grid (8 Specialization Domains) */}

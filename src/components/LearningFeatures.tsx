@@ -16,7 +16,7 @@ export default function LearningFeatures() {
       badge: "One-on-One Live",
       badgeAccent: "#06B6D4",
       title: "One-on-One Live Training",
-      desc: "Learn directly from mentors with 10+ years of enterprise experience. 100% individual focus, live screen shares, and instant feedback.",
+      desc: "Learn directly from mentors with deep enterprise experience. 100% individual focus, live screen shares, and instant feedback.",
       bullets: ["Private One-on-One coding sessions", "Direct line-by-line code review", "Customized pacing for your level"],
     },
     {

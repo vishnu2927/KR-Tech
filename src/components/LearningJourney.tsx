@@ -15,7 +15,7 @@ export default function LearningJourney({ onOpenDemo }: { onOpenDemo?: () => voi
       num: "02",
       phase: "Phase 2",
       title: "Dedicated Senior Technical Mentor Pairing",
-      desc: "Get matched One-on-One with an active staff engineer (10+ years at Amazon, Google, Razorpay). They design a customized syllabus aligned with your career goals.",
+      desc: "Get matched One-on-One with an experienced technical mentor. They design a customized syllabus aligned with your learning goals and skill level.",
       icon: <I.Users />,
       accent: "#A78BFA",
       bg: "rgba(167,139,250,0.15)",
@@ -73,7 +73,7 @@ export default function LearningJourney({ onOpenDemo }: { onOpenDemo?: () => voi
             Your Accelerated <span className="gradient-text-warm">Learning Journey</span>
           </h2>
           <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-2xl mx-auto">
-            From your very first diagnostic demo class to building high-concurrency enterprise applications with 10+ years mentors.
+            From your very first diagnostic demo class to building high-concurrency enterprise applications with dedicated mentors.
           </p>
         </div>
 

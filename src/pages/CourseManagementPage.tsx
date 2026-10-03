@@ -295,7 +295,7 @@ export default function CourseManagementPage() {
                 Curriculum & Course CMS
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
-                Manage all 55+ certification tracks, edit tuition pricing, upload thumbnails, update milestone roadmaps, and publish new One-on-One industry syllabi.
+                Manage all active certification tracks, edit tuition pricing, upload thumbnails, update milestone roadmaps, and publish new One-on-One industry syllabi.
               </p>
             </div>
 

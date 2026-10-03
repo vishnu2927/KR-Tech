@@ -5,7 +5,7 @@ export default function TrustSection() {
   const trustCards = [
     {
       title: "Expert Mentors",
-      desc: "Learn directly from senior architects and engineering leads with 10+ years of hands-on production experience.",
+      desc: "Learn directly from senior architects and engineering leads with deep hands-on production experience.",
       icon: <I.Users />,
       accent: "from-purple-500 to-indigo-500",
       pill: "1-on-1 Guidance",

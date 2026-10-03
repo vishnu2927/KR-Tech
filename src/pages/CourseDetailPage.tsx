@@ -315,7 +315,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
               to="/courses"
               className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition-all no-underline"
             >
-              Browse 55+ Courses
+              Browse All Courses
             </Link>
             <Link
               to="/"
@@ -1273,7 +1273,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                   <h2 className="font-sans font-extrabold text-2xl text-white mt-1">Related Courses in {course.category}</h2>
                 </div>
                 <Link to="/courses" className="text-xs font-bold text-purple-400 hover:text-purple-300 no-underline">
-                  View All 55+ Courses →
+                  View All Courses →
                 </Link>
               </div>
 

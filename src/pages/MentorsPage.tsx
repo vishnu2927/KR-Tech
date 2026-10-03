@@ -62,7 +62,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
   return (
     <SEO
       title="Meet Expert Industry Mentors — One-on-One Practical Mentorship"
-      description="Connect One-on-One with senior tech mentors with 10+ years experience. Get personalized code reviews, system architecture coaching, and live project mentorship."
+      description="Connect One-on-One with senior tech mentors with deep industry experience. Get personalized code reviews, system architecture coaching, and live project mentorship."
       canonical="https://krgloballearning.com/mentors"
       keywords="tech mentors, One-on-One mentorship, coding mentor, code review, system design mentor, technology specialists"
       structuredData={SchemaBuilder.getBreadcrumbSchema([
@@ -90,7 +90,7 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
           </h1>
 
           <p className="text-base sm:text-lg text-purple-100/80 max-w-2xl mx-auto leading-relaxed mb-8">
-            Learn directly from leaders with <strong className="text-white font-semibold">10+ years of real industry experience</strong>. Get personalized one-on-one sessions tailored to your goals.
+            Learn directly from leaders with <strong className="text-white font-semibold">proven enterprise experience</strong>. Get personalized one-on-one sessions tailored to your goals.
           </p>
 
           {/* Quick Metrics Bar */}
@@ -100,8 +100,8 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
               <div className="text-xs text-purple-200 mt-1">Available Tech Courses</div>
             </div>
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-sans">10+ Years</div>
-              <div className="text-xs text-purple-200 mt-1">Average Industry Exp</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-sans">Senior Level</div>
+              <div className="text-xs text-purple-200 mt-1">Industry Experience</div>
             </div>
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
               <div className="text-2xl sm:text-3xl font-extrabold text-amber-300 font-sans">1-on-1</div>

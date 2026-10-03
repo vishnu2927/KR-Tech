@@ -63,7 +63,7 @@ export default function FreeDemoSection({ onOpenModal }: { onOpenModal?: () => v
               to="/courses"
               className="btn-ghost-white py-3.5 px-8 rounded-2xl text-sm font-semibold text-white no-underline border border-white/20 hover:border-cyan-400/60"
             >
-              Explore 55+ Courses
+              Explore Courses
             </Link>
           </div>
         </div>

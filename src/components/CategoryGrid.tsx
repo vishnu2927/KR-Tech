@@ -163,7 +163,7 @@ export default function CategoryGrid() {
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4 font-sans">
-            Explore 55+ Live Programs Across{" "}
+            Explore Live Programs Across{" "}
             <span className="bg-gradient-to-r from-cyan-400 via-purple-300 to-indigo-300 bg-clip-text text-transparent">
               12 Technology Domains
             </span>
@@ -239,7 +239,7 @@ export default function CategoryGrid() {
             to="/courses"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600/30 to-cyan-600/30 hover:from-purple-600/50 hover:to-cyan-600/50 border border-purple-500/40 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all hover:scale-105 no-underline shadow-lg shadow-purple-950/40"
           >
-            <span>Explore Complete 55+ Courses & Roadmaps</span>
+            <span>Explore Complete Courses & Roadmaps</span>
             <I.ArrowRight />
           </Link>
         </div>

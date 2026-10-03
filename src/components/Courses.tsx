@@ -247,13 +247,13 @@ export default function Courses({
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 backdrop-blur-md mb-3">
-              <I.Sparkles /> 55+ INDUSTRY-ALIGNED COURSES
+              <I.Sparkles /> INDUSTRY-ALIGNED COURSES
             </span>
             <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
               Explore One-on-One <span className="gradient-text-warm">Live Courses</span>
             </h2>
             <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-xl">
-              Hands-on, project-based One-on-One curricula taught by industry mentors with 10+ years of experience from MongoDB Atlas.
+              Hands-on, project-based One-on-One curricula taught by experienced industry mentors.
             </p>
           </div>
           {limit && (
@@ -261,7 +261,7 @@ export default function Courses({
               to="/courses"
               className="btn-ghost-white flex items-center gap-2 self-start md:self-auto text-cyan-300 font-semibold no-underline text-sm hover:text-white px-5 py-2.5 rounded-xl"
             >
-              View All {courses.length > 0 ? courses.length : "55"} Courses <I.ChevronRight />
+              View All Courses <I.ChevronRight />
             </Link>
           )}
         </div>

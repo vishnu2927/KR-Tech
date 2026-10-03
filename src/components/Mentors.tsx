@@ -33,13 +33,13 @@ export default function Mentors({ onOpenDemo }: { onOpenDemo?: (mentorName?: str
       <div className="container-xl relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-3">
-            <I.Sparkles /> 10+ TIER-1 TECH ARCHITECTS
+            <I.Sparkles /> TECH ARCHITECTS & PRACTITIONERS
           </span>
           <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
-            Learn Directly From <span className="gradient-text-warm">10+ Yrs Mentors</span>
+            Learn Directly From <span className="gradient-text-warm">Experienced Mentors</span>
           </h2>
           <p className="text-sm sm:text-base text-gray-400 mt-2 max-w-2xl mx-auto">
-            Zero teaching assistants. Our trainers are active senior engineers and staff architects from tier-1 MNCs who guide you One-on-One on live code.
+            Our trainers are experienced engineers and software architects who guide you One-on-One through hands-on technical sessions.
           </p>
         </div>
 

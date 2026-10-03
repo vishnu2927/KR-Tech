@@ -48,7 +48,7 @@ export default function StickyDemoBanner({ onOpenDemo }: { onOpenDemo: () => voi
             <div className="font-display font-bold text-xs sm:text-sm text-white flex items-center gap-2 flex-wrap">
               <span>Free One-on-One Learning Consultation</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 font-semibold">
-                10+ Years Experience
+                Experienced Mentors
               </span>
             </div>
             <div className="text-[11px] text-gray-300 mt-1 leading-relaxed">

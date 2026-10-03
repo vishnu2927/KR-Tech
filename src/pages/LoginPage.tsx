@@ -139,7 +139,7 @@ export default function LoginPage() {
                 domain: <span className="text-emerald-300">"Cloud & AI Systems"</span>,
               </p>
               <p className="pl-4 text-slate-400">
-                practicalLabs: <span className="text-cyan-300">"10+ Production Deployments"</span>,
+                practicalLabs: <span className="text-cyan-300">"Production-Grade Deployments"</span>,
               </p>
               <p className="pl-4 text-slate-400">
                 systemDesign: <span className="text-cyan-300">"Microservices & Kafka"</span>,
