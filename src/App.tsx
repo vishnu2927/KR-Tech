@@ -598,14 +598,14 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
+    <BrowserRouter>
+      <ErrorBoundary>
+        <AuthProvider>
           <OfflineBanner />
           <ScrollToTop />
           <AppContent />
-        </BrowserRouter>
-      </AuthProvider>
-    </ErrorBoundary>
+        </AuthProvider>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 }
