@@ -6,7 +6,7 @@
 const CLIENT_URL =
   process.env.CLIENT_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://krgloballearning.com'
+    ? 'https://www.krgloballearning.org'
     : 'http://localhost:5173');
 
 const renderBaseLayout = ({ title, preheader, content, ctaText, ctaUrl }) => {

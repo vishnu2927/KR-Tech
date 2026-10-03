@@ -355,32 +355,77 @@ const getPaymentStats = async (req, res) => {
 const handleWebhook = async (req, res) => {
   try {
     const signature = req.headers['x-razorpay-signature'];
+    const rawBody = req.rawBody || req.body;
+
+    if (!signature) {
+      return res.status(400).json({ success: false, message: 'Missing Razorpay signature header' });
+    }
+
     const isValid = razorpayService.verifyWebhookSignature({
-      rawBody: req.body,
+      rawBody,
       signature,
     });
 
-    if (process.env.RAZORPAY_WEBHOOK_SECRET && !isValid) {
+    if (!isValid) {
       return res.status(400).json({ success: false, message: 'Invalid webhook signature' });
     }
 
-    const event = req.body.event;
-    const payload = req.body.payload;
+    const event = req.body?.event;
+    const payload = req.body?.payload;
 
     if (event === 'payment.captured' && payload && payload.payment) {
       const rzpPayment = payload.payment.entity;
-      await Payment.findOneAndUpdate(
+      const paymentAmount = (rzpPayment.amount || 0) / 100;
+      const studentEmail = (rzpPayment.email || '').toLowerCase().trim();
+
+      // 1. Idempotently record or update Payment
+      const paymentDoc = await Payment.findOneAndUpdate(
         { paymentId: rzpPayment.id },
         {
-          paymentId: rzpPayment.id,
-          orderId: rzpPayment.order_id,
-          amount: rzpPayment.amount / 100,
-          currency: rzpPayment.currency,
-          userEmail: rzpPayment.email,
-          status: 'captured',
+          $set: {
+            paymentId: rzpPayment.id,
+            orderId: rzpPayment.order_id,
+            amount: paymentAmount,
+            currency: rzpPayment.currency || 'INR',
+            userEmail: studentEmail || 'student@krgloballearning.org',
+            status: 'captured',
+            method: rzpPayment.method || 'Razorpay',
+          },
         },
         { upsert: true, new: true }
       );
+
+      // 2. Idempotently mark Order as paid
+      let orderDoc = null;
+      if (rzpPayment.order_id) {
+        orderDoc = await Order.findOneAndUpdate(
+          { orderId: rzpPayment.order_id },
+          { $set: { status: 'paid' } },
+          { new: true }
+        );
+      }
+
+      // 3. Idempotently enroll student if course details are available
+      const courseId = rzpPayment.notes?.courseId || orderDoc?.courseId;
+      const courseTitle = rzpPayment.notes?.courseTitle || orderDoc?.courseTitle;
+      const studentName = orderDoc?.userName || 'KR Global Learning Student';
+
+      if (studentEmail && courseId) {
+        await Enrollment.findOneAndUpdate(
+          { userEmail: studentEmail, courseId: String(courseId) },
+          {
+            $set: {
+              userEmail: studentEmail,
+              userName: studentName,
+              courseId: String(courseId),
+              courseTitle: String(courseTitle || 'Live Tech Mentorship Program'),
+              status: 'active',
+              enrolledAt: new Date(),
+            },
+          },
+          { upsert: true, new: true }
+        );
+      }
     }
 
     res.json({ status: 'ok', received: true });

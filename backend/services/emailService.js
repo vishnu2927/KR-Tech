@@ -26,7 +26,7 @@ let smtpStatus = {
 const CLIENT_URL =
   process.env.CLIENT_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://krgloballearning.com'
+    ? 'https://www.krgloballearning.org'
     : 'http://localhost:5173');
 
 /**
@@ -53,6 +53,9 @@ const initTransporter = async () => {
               pass: pass.replace(/\s+/g, ''), // Strip spaces in 16-character Google App Passwords
             },
             tls: { rejectUnauthorized: false },
+            connectionTimeout: 8000,
+            greetingTimeout: 8000,
+            socketTimeout: 10000,
           }
         : {
             host,
@@ -60,6 +63,9 @@ const initTransporter = async () => {
             secure: port === 465,
             auth: { user, pass },
             tls: { rejectUnauthorized: false },
+            connectionTimeout: 8000,
+            greetingTimeout: 8000,
+            socketTimeout: 10000,
           };
 
       const candidateTransporter = nodemailer.createTransport(transportConfig);
@@ -134,9 +140,118 @@ const initTransporter = async () => {
 initTransporter();
 
 /**
- * Verify Current SMTP Configuration
+ * Send Transactional Email via Resend HTTP REST API
+ * Uses native Node.js fetch() with timeout protection and base64 attachment support.
+ *
+ * @param {Object} params
+ * @param {string} [params.from] - Sender address
+ * @param {string|string[]} params.to - Recipient address(es)
+ * @param {string} params.subject - Email subject
+ * @param {string} params.html - Rendered HTML content
+ * @param {Array} [params.attachments] - Array of attachment objects
+ * @param {string} [params.replyTo] - Reply-To address
+ * @returns {Promise<{ id: string, data: Object }>}
+ */
+const sendViaResendHttp = async ({ from, to, subject, html, attachments, replyTo }) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+
+  const payload = {
+    from: from || process.env.RESEND_FROM || process.env.SMTP_FROM || '"KR Global Learning" <admissions@krgloballearning.org>',
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    html,
+  };
+
+  const resolvedReplyTo = replyTo || process.env.RESEND_REPLY_TO;
+  if (resolvedReplyTo) {
+    payload.reply_to = resolvedReplyTo;
+  }
+
+  if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+    payload.attachments = attachments.map((att) => {
+      let content = att.content;
+      if (Buffer.isBuffer(content)) {
+        content = content.toString('base64');
+      }
+      const item = {
+        filename: att.filename,
+        content,
+      };
+      if (att.contentType || att.content_type) {
+        item.content_type = att.contentType || att.content_type;
+      }
+      return item;
+    });
+  }
+
+  const controller = new AbortController();
+  const timeoutMs = 12000;
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  let response;
+  try {
+    response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`Resend HTTP request timed out after ${timeoutMs}ms`);
+    }
+    throw new Error(`Resend network failure: ${err.message}`);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  let rawText = '';
+  try {
+    rawText = await response.text();
+  } catch (readErr) {
+    throw new Error(`Resend response read failure: ${readErr.message}`);
+  }
+
+  let resData;
+  try {
+    resData = rawText ? JSON.parse(rawText) : {};
+  } catch (jsonErr) {
+    throw new Error(`Resend returned invalid JSON (HTTP ${response.status}): ${rawText.slice(0, 200)}`);
+  }
+
+  if (!response.ok) {
+    const errMsg = resData?.message || resData?.error || `HTTP ${response.status}`;
+    throw new Error(`Resend API error (${response.status}): ${errMsg}`);
+  }
+
+  return {
+    id: resData.id,
+    data: resData,
+  };
+};
+
+/**
+ * Verify Current Email Transport Configuration (Resend HTTP or Nodemailer SMTP)
  */
 const verifySmtp = async () => {
+  if (process.env.RESEND_API_KEY) {
+    return {
+      verified: true,
+      provider: 'Resend HTTP REST API (Production HTTPS)',
+      host: 'api.resend.com',
+      port: 443,
+      user: process.env.RESEND_FROM || '"KR Global Learning" <admissions@krgloballearning.org>',
+      lastCheck: new Date().toISOString(),
+      error: null,
+    };
+  }
+
   if (!transporter) {
     await initTransporter();
   }
@@ -150,14 +265,14 @@ const verifySmtp = async () => {
     smtpStatus.verified = false;
     smtpStatus.error = err.message;
   }
-  return smtpStatus;
+  return { ...smtpStatus };
 };
 
 /**
  * Direct Email Dispatcher (Underlying worker for queue and instant calls)
  */
 const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachments, existingLogId }) => {
-  if (!transporter) {
+  if (!process.env.RESEND_API_KEY && !transporter) {
     await initTransporter();
   }
 
@@ -239,19 +354,47 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
     }
   }
 
-  const from = process.env.SMTP_FROM || '"KR Global Learning Admissions" <krglobal0713@gmail.com>';
+  const from =
+    process.env.RESEND_FROM ||
+    process.env.SMTP_FROM ||
+    '"KR Global Learning Admissions" <admissions@krgloballearning.org>';
 
-  const mailOptions = {
-    from,
-    to,
-    subject: templateOutput.subject,
-    html: templateOutput.html,
-    ...(finalAttachments && finalAttachments.length > 0 ? { attachments: finalAttachments } : {}),
-  };
+  const replyTo = process.env.RESEND_REPLY_TO || undefined;
+
+  let messageId = null;
+  let previewUrl = null;
+  let providerResponse = null;
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    const previewUrl = isEthereal && nodemailer.getTestMessageUrl ? nodemailer.getTestMessageUrl(info) : null;
+    if (process.env.RESEND_API_KEY) {
+      const resendRes = await sendViaResendHttp({
+        from,
+        to,
+        subject: templateOutput.subject,
+        html: templateOutput.html,
+        attachments: finalAttachments,
+        replyTo,
+      });
+      messageId = resendRes.id || `resend_${Date.now()}`;
+      providerResponse = `200 OK (Resend HTTP: ${messageId})`;
+    } else {
+      if (!transporter) {
+        await initTransporter();
+      }
+      const mailOptions = {
+        from,
+        to,
+        subject: templateOutput.subject,
+        html: templateOutput.html,
+        ...(replyTo ? { replyTo } : {}),
+        ...(finalAttachments && finalAttachments.length > 0 ? { attachments: finalAttachments } : {}),
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      messageId = info.messageId || `msg_${Date.now()}`;
+      previewUrl = isEthereal && nodemailer.getTestMessageUrl ? nodemailer.getTestMessageUrl(info) : null;
+      providerResponse = info.response || '250 OK';
+    }
 
     // Log or update dispatched email in MongoDB Atlas collection: emailLogs
     let emailLogDoc = null;
@@ -260,8 +403,8 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
         emailLogDoc = await EmailLog.findByIdAndUpdate(
           existingLogId,
           {
-            status: isEthereal ? 'simulated' : 'sent',
-            messageId: info.messageId || `msg_${Date.now()}`,
+            status: isEthereal && !process.env.RESEND_API_KEY ? 'simulated' : 'sent',
+            messageId,
             previewUrl: previewUrl || undefined,
             lastAttemptAt: new Date(),
             $inc: { attempts: 1 },
@@ -273,8 +416,8 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
           recipient: to,
           subject: templateOutput.subject,
           template,
-          status: isEthereal ? 'simulated' : 'sent',
-          messageId: info.messageId || `msg_${Date.now()}`,
+          status: isEthereal && !process.env.RESEND_API_KEY ? 'simulated' : 'sent',
+          messageId,
           previewUrl: previewUrl || undefined,
           retryCount: 0,
           attempts: 1,
@@ -282,7 +425,8 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
           metadata: {
             ...metadata,
             hasPdfAttachment: finalAttachments.length > 0,
-            response: info.response,
+            provider: process.env.RESEND_API_KEY ? 'resend_http' : (isEthereal ? 'ethereal' : 'smtp'),
+            response: providerResponse,
           },
         });
       }
@@ -292,20 +436,24 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
 
     return {
       success: true,
-      messageId: info.messageId,
+      messageId,
       previewUrl,
       logId: emailLogDoc ? emailLogDoc._id : null,
       hasAttachment: finalAttachments.length > 0,
     };
   } catch (error) {
-    console.error(`Email dispatch error for [${to}] [${template}]:`, error.message);
+    const sanitizedError = (error.message || 'Email dispatch failed')
+      .replace(/Bearer\s+[A-Za-z0-9_\-\.]+/gi, 'Bearer [REDACTED]')
+      .replace(/re_[A-Za-z0-9_]+/gi, '[REDACTED_API_KEY]');
+
+    console.error(`Email dispatch error for [${to}] [${template}]:`, sanitizedError);
 
     // Save failed attempt in MongoDB Atlas
     try {
       if (existingLogId) {
         await EmailLog.findByIdAndUpdate(existingLogId, {
           status: 'failed',
-          error: error.message,
+          error: sanitizedError,
           lastAttemptAt: new Date(),
           $inc: { attempts: 1 },
         });
@@ -315,11 +463,14 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
           subject: templateOutput?.subject || 'KR Global Learning Notification',
           template,
           status: 'failed',
-          error: error.message,
+          error: sanitizedError,
           retryCount: 0,
           attempts: 1,
           lastAttemptAt: new Date(),
-          metadata,
+          metadata: {
+            ...metadata,
+            provider: process.env.RESEND_API_KEY ? 'resend_http' : (isEthereal ? 'ethereal' : 'smtp'),
+          },
         });
       }
     } catch (dbErr) {
@@ -328,7 +479,7 @@ const sendEmailDirect = async ({ to, template, data = {}, metadata = {}, attachm
 
     return {
       success: false,
-      error: error.message,
+      error: sanitizedError,
     };
   }
 };
@@ -494,6 +645,7 @@ const sendSessionReminderEmail = async ({
 module.exports = {
   sendEmail,
   sendEmailDirect,
+  sendViaResendHttp,
   verifySmtp,
   sendWelcomeEmail,
   sendDemoBookingEmail,

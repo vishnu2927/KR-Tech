@@ -20,7 +20,7 @@ async function testCompleteAuth() {
   const testEmail = `student.audit.${Date.now()}@krtech.edu`;
   const testPassword = 'Password@123';
   const testName = 'Vikramaditya Sen';
-  const testPhone = '+91 99887 76655';
+  const testPhone = `+91 ${Math.floor(6000000000 + Math.random() * 3999999999)}`;
   const testCourse = 'Full Stack Java 21 & High-Scale Microservices';
 
   console.log('\n--- 1. Testing Registration (POST /api/auth/register) ---');
@@ -143,7 +143,7 @@ async function testCompleteAuth() {
 
   console.log('\n--- 5. Testing Student Profile Update (PUT /api/auth/profile) ---');
   const updatedName = 'Vikramaditya Sen (Lead Architect)';
-  const updatedPhone = '+91 99887 00000';
+  const updatedPhone = `+91 ${Math.floor(6000000000 + Math.random() * 3999999999)}`;
   const updateRes = await axios.put(`${API_BASE}/auth/profile`, {
     name: updatedName,
     phone: updatedPhone,

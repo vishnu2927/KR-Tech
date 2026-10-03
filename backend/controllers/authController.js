@@ -546,16 +546,24 @@ const revokeSession = async (req, res) => {
 // @route   GET /api/auth/google
 // @access  Public
 const googleAuthStart = async (req, res) => {
+  const clientUrl =
+    process.env.CLIENT_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://www.krgloballearning.org'
+      : 'http://localhost:5173');
+
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const callbackUrl =
     process.env.GOOGLE_CALLBACK_URL ||
-    `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+    (process.env.NODE_ENV === 'production'
+      ? 'https://kr-tech.onrender.com/api/auth/google/callback'
+      : `${req.protocol}://${req.get('host')}/api/auth/google/callback`);
 
   if (!clientId || !clientSecret) {
     // If OAuth is not configured, inform safely
     if (req.accepts('html')) {
-      return res.redirect('/login?error=google_not_configured');
+      return res.redirect(`${clientUrl}/login?error=google_not_configured`);
     }
     return res.status(503).json({
       success: false,
@@ -591,6 +599,12 @@ const googleAuthStart = async (req, res) => {
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleAuthCallback = async (req, res) => {
+  const clientUrl =
+    process.env.CLIENT_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://www.krgloballearning.org'
+      : 'http://localhost:5173');
+
   try {
     const { code, state, error } = req.query;
 
@@ -601,7 +615,7 @@ const googleAuthCallback = async (req, res) => {
         success: false,
         details: `Google returned error: ${error}`,
       });
-      return res.redirect(`/login?error=${encodeURIComponent(error)}`);
+      return res.redirect(`${clientUrl}/login?error=${encodeURIComponent(error)}`);
     }
 
     if (!state || !oauthStateCache.has(state)) {
@@ -611,22 +625,24 @@ const googleAuthCallback = async (req, res) => {
         success: false,
         details: 'Invalid or expired CSRF state parameter',
       });
-      return res.redirect('/login?error=invalid_csrf_state');
+      return res.redirect(`${clientUrl}/login?error=invalid_csrf_state`);
     }
     oauthStateCache.delete(state);
 
     if (!code) {
-      return res.redirect('/login?error=missing_authorization_code');
+      return res.redirect(`${clientUrl}/login?error=missing_authorization_code`);
     }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const callbackUrl =
       process.env.GOOGLE_CALLBACK_URL ||
-      `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+      (process.env.NODE_ENV === 'production'
+        ? 'https://kr-tech.onrender.com/api/auth/google/callback'
+        : `${req.protocol}://${req.get('host')}/api/auth/google/callback`);
 
     if (!clientId || !clientSecret) {
-      return res.redirect('/login?error=google_not_configured');
+      return res.redirect(`${clientUrl}/login?error=google_not_configured`);
     }
 
     // Exchange authorization code for tokens
@@ -645,7 +661,7 @@ const googleAuthCallback = async (req, res) => {
     const tokenData = await tokenResponse.json();
     if (!tokenResponse.ok || !tokenData.access_token) {
       console.error('Google token exchange failed:', tokenData);
-      return res.redirect('/login?error=token_exchange_failed');
+      return res.redirect(`${clientUrl}/login?error=token_exchange_failed`);
     }
 
     // Retrieve verified profile
@@ -655,11 +671,11 @@ const googleAuthCallback = async (req, res) => {
     const profile = await userinfoResponse.json();
 
     if (!userinfoResponse.ok || !profile.email) {
-      return res.redirect('/login?error=profile_fetch_failed');
+      return res.redirect(`${clientUrl}/login?error=profile_fetch_failed`);
     }
 
     if (!profile.email_verified) {
-      return res.redirect('/login?error=unverified_google_email');
+      return res.redirect(`${clientUrl}/login?error=unverified_google_email`);
     }
 
     const normalizedEmail = profile.email.toLowerCase().trim();
@@ -718,10 +734,10 @@ const googleAuthCallback = async (req, res) => {
     const jwtToken = generateToken(user._id, user.role, user.email, session?._id);
 
     // Redirect to frontend auth callback handler
-    res.redirect(`/auth/callback?token=${encodeURIComponent(jwtToken)}&refreshToken=${encodeURIComponent(refreshToken)}`);
+    res.redirect(`${clientUrl}/auth/callback?token=${encodeURIComponent(jwtToken)}&refreshToken=${encodeURIComponent(refreshToken)}`);
   } catch (err) {
     console.error('Google OAuth callback error:', err);
-    res.redirect('/login?error=oauth_internal_error');
+    res.redirect(`${clientUrl}/login?error=oauth_internal_error`);
   }
 };
 

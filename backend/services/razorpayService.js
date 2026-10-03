@@ -110,18 +110,30 @@ class RazorpayService {
    * signature = HMAC-SHA256(rawBody, webhookSecret)
    */
   verifyWebhookSignature({ rawBody, signature }) {
-    if (!signature) {
+    if (!signature || !this.webhookSecret) {
       return false;
     }
 
     try {
-      const bodyString = typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody);
+      const bodyString = Buffer.isBuffer(rawBody)
+        ? rawBody.toString('utf8')
+        : typeof rawBody === 'string'
+          ? rawBody
+          : JSON.stringify(rawBody);
+
       const expectedSignature = crypto
         .createHmac('sha256', this.webhookSecret)
         .update(bodyString)
         .digest('hex');
 
-      return expectedSignature === signature;
+      if (expectedSignature.length !== signature.length) {
+        return false;
+      }
+
+      return crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, 'utf8'),
+        Buffer.from(signature, 'utf8')
+      );
     } catch (err) {
       console.error('Error verifying webhook signature:', err);
       return false;

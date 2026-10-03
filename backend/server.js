@@ -126,8 +126,15 @@ const authLeadLimiter = rateLimit({
 app.use('/api/auth', authLeadLimiter);
 app.use('/api/leads', authLeadLimiter);
 
-// 5. Body Parsers with payload size limits
-app.use(express.json({ limit: '50kb' }));
+// 5. Body Parsers with payload size limits & raw buffer capture for webhook HMAC verification
+app.use(
+  express.json({
+    limit: '50kb',
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // Sprint 12.8: Comprehensive Health & Uptime Monitoring
