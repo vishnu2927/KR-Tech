@@ -67,7 +67,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                   fontFamily: "Poppins,sans-serif",
                   fontWeight: 800,
                   fontSize: 18,
-                  color: isSolid ? "#0F0A1E" : "white",
+                  color: "#0F172A",
                   lineHeight: 1.1,
                 }}
               >
@@ -76,10 +76,11 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
               <div
                 style={{
                   fontFamily: "Poppins,sans-serif",
-                  fontWeight: 500,
+                  fontWeight: 600,
                   fontSize: 10,
-                  color: isSolid ? "#7C3AED" : "rgba(167,139,250,0.95)",
+                  color: "#2563EB",
                   lineHeight: 1,
+                  marginTop: 2,
                 }}
               >
                 Learn. Build. Grow. Globally.
@@ -95,9 +96,9 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                   <a
                     key={l.label}
                     href={l.to}
-                    className={`nav-link ${!isSolid ? "nav-link-hero" : ""}`}
+                    className="nav-link"
                     style={{
-                      color: isSolid ? "#374151" : "rgba(255,255,255,0.92)",
+                      color: "#334155",
                       textDecoration: "none",
                     }}
                   >
@@ -110,9 +111,9 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                 <Link
                   key={l.label}
                   to={l.to}
-                  className={`nav-link ${!isSolid ? "nav-link-hero" : ""}`}
+                  className="nav-link"
                   style={{
-                    color: isActive ? "#7C3AED" : isSolid ? "#374151" : "rgba(255,255,255,0.92)",
+                    color: isActive ? "#2563EB" : "#334155",
                     fontWeight: isActive ? 700 : 500,
                     textDecoration: "none",
                   }}
@@ -127,11 +128,11 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
           <div className="hidden md:flex items-center gap-2.5">
             <button
               onClick={() => setSearchOpen((v) => !v)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer hover:bg-blue-100"
               style={{
-                background: isSolid ? "#F5F3FF" : "rgba(255,255,255,0.14)",
-                color: isSolid ? "#7C3AED" : "rgba(255,255,255,0.9)",
-                border: "none",
+                background: "#EFF6FF",
+                color: "#2563EB",
+                border: "1px solid #DBEAFE",
               }}
               aria-label="Search"
             >
@@ -139,14 +140,13 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
             </button>
 
             {/* Notification Bell - only visible when authenticated */}
-            {user && <NotificationDropdown isDark={!isSolid} />}
+            {user && <NotificationDropdown isDark={false} />}
 
             {user ? (
               <div className="flex items-center gap-2">
                 <Link
                   to={user.role === "admin" ? "/admin" : "/dashboard"}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-purple-200/40 bg-white/10 hover:bg-white/20 transition-all text-xs font-bold no-underline"
-                  style={{ color: isSolid ? "#7C3AED" : "white" }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 transition-all text-xs font-bold no-underline text-indigo-700"
                 >
                   <img
                     src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&h=160&fit=crop&crop=faces&auto=format"}
@@ -157,7 +157,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                 </Link>
                 <Link
                   to="/security"
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-700/50 bg-slate-900/30 hover:bg-cyan-500/20 hover:text-cyan-300 text-xs font-medium transition-all text-slate-400 no-underline"
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-cyan-50 hover:text-cyan-700 text-xs font-medium transition-all text-slate-600 no-underline"
                   title="Security & Active Devices"
                 >
                   🛡️ Security
@@ -167,7 +167,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                     logout();
                     navigate("/login");
                   }}
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-700/50 bg-slate-900/30 hover:bg-rose-500/20 hover:text-rose-300 text-xs font-medium transition-all text-slate-400 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 text-xs font-medium transition-all text-slate-600 cursor-pointer"
                   title="Sign Out"
                 >
                   Logout
@@ -177,7 +177,7 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
               <div className="flex items-center gap-1.5">
                 <Link
                   to="/login"
-                  className={isSolid ? "btn-ghost" : "btn-ghost-white"}
+                  className="btn-ghost"
                   style={{ padding: "8px 14px", fontSize: 13, textDecoration: "none" }}
                 >
                   Login
@@ -189,7 +189,9 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
                     padding: "8px 14px",
                     fontSize: 13,
                     textDecoration: "none",
-                    color: isSolid ? "#7C3AED" : "rgba(255,255,255,0.9)",
+                    color: "#2563EB",
+                    background: "#EFF6FF",
+                    borderColor: "#BFDBFE",
                   }}
                 >
                   Register
@@ -213,9 +215,9 @@ export default function Navbar({ onOpenDemoModal }: NavbarProps) {
           <button
             className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl"
             style={{
-              background: isSolid ? "#F5F3FF" : "rgba(255,255,255,0.15)",
-              color: isSolid ? "#7C3AED" : "white",
-              border: "none",
+              background: "#EFF6FF",
+              color: "#1E293B",
+              border: "1px solid #E2E8F0",
               cursor: "pointer",
             }}
             onClick={() => setMobileOpen((v) => !v)}

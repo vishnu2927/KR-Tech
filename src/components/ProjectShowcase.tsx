@@ -231,22 +231,18 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
     : projects.filter((p) => p.category === selectedCategory);
 
   return (
-    <section id="projects" className="py-24 bg-[#070913] relative overflow-hidden text-white border-t border-purple-500/15">
-      {/* Ambient background glows */}
-      <div className="absolute top-10 left-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
-
+    <section id="projects" className="py-24 bg-slate-50 relative overflow-hidden text-slate-900 border-t border-slate-200/80">
       <div className="container-xl relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <SectionHeading
-            badge="Verified Student Showcase"
+            badge="Practical Project Showcase"
             badgeClass="badge-cyan"
-            title="Real Production Projects Built by Learners"
-            subtitle="Explore practical capstones and architecture labs engineered during One-on-One live mentorship. Verified student completed work only."
+            title="Real Hands-on Projects Built by Learners"
+            subtitle="Explore practical capstones and architecture labs engineered during One-on-One live mentorship."
           />
         </div>
 
-        {/* 6 Category Filter Tabs (Section 5 Requirement) */}
+        {/* 6 Category Filter Tabs */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
           {categories.map((cat) => (
             <button
@@ -255,8 +251,8 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedCategory === cat
-                  ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-900/40 border border-purple-400/40 scale-105"
-                  : "bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700"
+                  ? "bg-blue-600 text-white shadow-sm border border-blue-600 scale-105"
+                  : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 shadow-xs"
               }`}
             >
               {cat}
@@ -269,45 +265,45 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
           {filteredProjects.map((p) => (
             <div
               key={p.id}
-              className="group relative rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 overflow-hidden flex flex-col justify-between hover:border-cyan-500/40 hover:bg-slate-900/90 transition-all duration-300 shadow-xl"
+              className="group relative rounded-2xl bg-white border border-slate-200 overflow-hidden flex flex-col justify-between hover:border-blue-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 shadow-xs"
             >
               {/* Thumbnail Image */}
-              <div className="relative h-48 w-full overflow-hidden bg-slate-950">
+              <div className="relative h-48 w-full overflow-hidden bg-slate-100">
                 <img
                   src={p.image}
                   alt={p.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
                 
                 {/* Category Pill */}
-                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-900/90 border border-purple-500/30 text-purple-300 backdrop-blur-md">
+                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/95 border border-slate-200 text-indigo-700 backdrop-blur-md shadow-xs">
                   {p.category}
                 </span>
 
                 {/* Stars/Forks count */}
-                <div className="absolute top-3 right-3 flex items-center gap-2 text-xs font-semibold text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/10">
-                  <span className="flex items-center gap-1 text-amber-300">★ {p.stars}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-cyan-300">⑂ {p.forks}</span>
+                <div className="absolute top-3 right-3 flex items-center gap-2 text-xs font-bold text-slate-900 bg-white/95 px-2.5 py-1 rounded-full backdrop-blur-md shadow-xs">
+                  <span className="flex items-center gap-1 text-amber-600">★ {p.stars}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-blue-600">⑂ {p.forks}</span>
                 </div>
               </div>
 
               {/* Card Body */}
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="font-display font-bold text-lg text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                  <h3 className="font-display font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
                     {p.title}
                   </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                  <p className="text-xs text-slate-600 leading-relaxed mb-4">
                     {p.tagline}
                   </p>
 
                   {/* Highlights */}
                   <div className="space-y-1.5 mb-4">
                     {p.highlights.map((h, i) => (
-                      <div key={i} className="text-[11px] text-slate-400 flex items-center gap-2">
-                        <span className="text-emerald-400">✓</span>
+                      <div key={i} className="text-[11px] text-slate-600 flex items-center gap-2">
+                        <span className="text-emerald-600 font-bold">✓</span>
                         <span>{h}</span>
                       </div>
                     ))}
@@ -318,7 +314,7 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
                     {p.tech.map((t) => (
                       <span
                         key={t}
-                        className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-800 text-cyan-300 border border-slate-700"
+                        className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200"
                       >
                         {t}
                       </span>
@@ -327,12 +323,12 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
                 </div>
 
                 {/* Footer Metadata */}
-                <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-semibold text-white text-[11px]">
+                    <div className="font-bold text-slate-900 text-[11px]">
                       Built by {p.builtBy}
                     </div>
-                    <div className="text-[10px] text-slate-400 truncate max-w-[170px]">
+                    <div className="text-[10px] text-slate-500 truncate max-w-[170px]">
                       {p.course}
                     </div>
                   </div>
@@ -340,7 +336,7 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
                   <button
                     type="button"
                     onClick={() => setActiveModalProject(p)}
-                    className="px-3 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 font-semibold text-xs transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs transition cursor-pointer"
                   >
                     View Specs →
                   </button>
@@ -352,36 +348,36 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
 
         {/* Modal for Project Detail */}
         {activeModalProject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <div className="bg-slate-900 border border-slate-700 max-w-xl w-full rounded-2xl p-6 sm:p-8 space-y-5 text-white shadow-2xl relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-white border border-slate-200 max-w-xl w-full rounded-2xl p-6 sm:p-8 space-y-5 text-slate-900 shadow-2xl relative animate-scaleIn">
               <button
                 type="button"
                 onClick={() => setActiveModalProject(null)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center cursor-pointer"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 text-lg font-bold w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center transition-colors cursor-pointer"
               >
                 ✕
               </button>
 
-              <div className="flex items-center gap-2 text-xs text-purple-400 font-bold uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-xs text-indigo-600 font-bold uppercase tracking-wider">
                 <span>{activeModalProject.category}</span>
                 <span>•</span>
                 <span>Completed: {activeModalProject.completionDate}</span>
               </div>
 
-              <h2 className="font-display font-extrabold text-2xl text-white">
+              <h2 className="font-display font-extrabold text-2xl text-slate-900">
                 {activeModalProject.title}
               </h2>
 
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 {activeModalProject.tagline}
               </p>
 
               <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Key Architecture Highlights</h4>
-                <ul className="space-y-1.5 text-xs text-slate-300">
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Key Architecture Highlights</h4>
+                <ul className="space-y-1.5 text-xs text-slate-600">
                   {activeModalProject.highlights.map((h, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="text-emerald-400 font-bold">✓</span>
+                      <span className="text-emerald-600 font-bold">✓</span>
                       <span>{h}</span>
                     </li>
                   ))}
@@ -389,20 +385,20 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
               </div>
 
               <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Technologies Used</h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Technologies Used</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {activeModalProject.tech.map((t) => (
-                    <span key={t} className="px-2.5 py-1 rounded bg-slate-800 text-cyan-300 text-xs border border-slate-700">
+                    <span key={t} className="px-2.5 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200">
                       {t}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+              <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-bold text-white">Author: {activeModalProject.builtBy}</div>
-                  <div className="text-[11px] text-slate-400">{activeModalProject.course}</div>
+                  <div className="text-xs font-bold text-slate-900">Author: {activeModalProject.builtBy}</div>
+                  <div className="text-[11px] text-slate-500">{activeModalProject.course}</div>
                 </div>
 
                 <div className="flex gap-2">
@@ -412,7 +408,7 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
                       setActiveModalProject(null);
                       if (onOpenDemo) onOpenDemo();
                     }}
-                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs transition cursor-pointer shadow-sm"
                   >
                     Build Similar Project
                   </button>
@@ -426,3 +422,4 @@ export default function ProjectShowcase({ onOpenDemo }: { onOpenDemo?: () => voi
     </section>
   );
 }
+

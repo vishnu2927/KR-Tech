@@ -617,7 +617,7 @@ export const lmsService = {
           { key: "quiz_master", title: "Quiz Master", icon: "🎯", description: "Score 90%+ in 5 quizzes", unlocked: true },
         ],
         rewardsShop: [
-          { id: "rew-01", title: "1-on-1 Senior Staff Architect Session (45m)", costXp: 5000, category: "Mentorship" },
+          { id: "rew-01", title: "One-on-One Senior Staff Architect Session (45m)", costXp: 5000, category: "Mentorship" },
           { id: "rew-02", title: "Exclusive System Design Case Studies Book (PDF)", costXp: 1500, category: "Resource" },
         ],
       };

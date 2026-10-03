@@ -29,37 +29,30 @@ function useCounter(target: number, duration: number = 1800) {
 }
 
 export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () => void }) {
-  // Counters for Highlights
-  const studentsCount = useCounter(1000, 1600);
-  const coursesCount = useCounter(55, 1400);
-  const mentorsCount = useCounter(10, 1200);
-  const domainsCount = useCounter(25, 1400);
-  const satisfactionCount = useCounter(95, 1500);
-
   const offerings = [
     {
       title: "Live One-on-One Expert Mentorship",
       desc: "Direct pair-programming and real-time guidance from experienced technology architects. No passive 500-person webinars.",
       icon: <I.Users />,
-      accent: "from-purple-500 to-indigo-500",
+      accent: "from-blue-600 to-indigo-600",
     },
     {
       title: "Practical Project-Based Learning",
       desc: "Build real enterprise microservices, cloud deployments, and full-stack platforms that demonstrate practical engineering ability.",
       icon: <I.Code />,
-      accent: "from-cyan-500 to-blue-500",
+      accent: "from-cyan-600 to-blue-600",
     },
     {
       title: "Industry Certification Preparation",
       desc: "Tailored preparation and exam blueprints aligned with official credentials from AWS, Microsoft Azure, Cisco, and SAP.",
       icon: <I.Award />,
-      accent: "from-emerald-500 to-teal-500",
+      accent: "from-emerald-600 to-teal-600",
     },
     {
       title: "AI Learning Assistant",
       desc: "24×7 intelligent study companion for instant concept explanations, code debugging, smart notes, and personalized quizzes.",
       icon: <I.Bot />,
-      accent: "from-rose-500 to-pink-500",
+      accent: "from-purple-600 to-indigo-600",
     },
     {
       title: "Recorded + Live Classes",
@@ -71,28 +64,28 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
       title: "Study Resources & Notes",
       desc: "Comprehensive cheat sheets, system design architectural diagrams, starter repositories, and curated PDF guides.",
       icon: <I.FileText />,
-      accent: "from-indigo-500 to-purple-500",
+      accent: "from-indigo-600 to-purple-600",
     },
     {
       title: "Quizzes & Assignments",
       desc: "Weekly practical problem sets, code challenges, and thorough mentor reviews to measure and reinforce your mastery.",
       icon: <I.Check />,
-      accent: "from-blue-500 to-cyan-500",
+      accent: "from-blue-600 to-cyan-600",
     },
     {
       title: "24×7 Student Support",
       desc: "Continuous technical doubt clearing, active student community circles, and a dedicated student success desk.",
       icon: <I.Headset />,
-      accent: "from-teal-500 to-emerald-500",
+      accent: "from-teal-600 to-emerald-600",
     },
   ];
 
   const highlights = [
-    { value: `${studentsCount}+`, label: "Students Trained", desc: "Across India & Global Remote" },
-    { value: `${coursesCount}+`, label: "Courses", desc: "Production-grade tracks" },
-    { value: `${mentorsCount}+`, label: "Industry Mentors", desc: "From Tier-1 Tech Giants" },
-    { value: `${domainsCount}+`, label: "Technology Domains", desc: "AI, Cloud, Full Stack, SAP" },
-    { value: `${satisfactionCount}%`, label: "Student Satisfaction", desc: "Based on One-on-One post-course reviews" },
+    { value: "84", label: "Live Tech Courses", desc: "Production-grade tracks in Cloud, AI, Full Stack & Security" },
+    { value: "12", label: "Technology Domains", desc: "Enterprise & Modern Software Stacks" },
+    { value: "One-on-One", label: "Dedicated Mentorship", desc: "Personalized Pair-Programming Sessions" },
+    { value: "100%", label: "Hands-on Practical Labs", desc: "Real Capstones & Architecture Defenses" },
+    { value: "24×7", label: "Student Helpdesk", desc: "Round-the-Clock Support & Doubt Resolution" },
   ];
 
   return (
@@ -101,55 +94,55 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
       description="KR GLOBAL LEARNING PRIVATE LIMITED is empowering India's next generation of tech professionals through live One-on-One mentorship, industry certifications, and project-based learning."
       canonical="https://krgloballearning.com/about"
     >
-      <main className="min-h-screen bg-[#070913] text-slate-100 pt-[90px] relative overflow-hidden">
+      <main className="min-h-screen bg-slate-50 text-slate-900 pt-[90px] relative overflow-hidden">
         
-        {/* Animated Background Glow (SECTION A) */}
-        <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-        <div className="absolute top-96 right-10 w-[450px] h-[450px] bg-cyan-600/15 rounded-full blur-[100px] pointer-events-none" />
+        {/* Ambient Background Glow */}
+        <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-96 right-10 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
 
         {/* HERO SECTION */}
-        <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 text-center max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-6 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+        <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 text-center max-w-5xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-6 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             Empowering Future Tech Professionals
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 font-['Poppins']">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 font-['Poppins']">
             KR GLOBAL LEARNING <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="gradient-text-warm">
               PRIVATE LIMITED
             </span>
           </h1>
 
-          <p className="text-slate-300 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed mb-10">
+          <p className="text-slate-600 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed mb-10">
             Empowering India's Next Generation of Tech Professionals Through Live Mentorship & Industry Certifications.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/courses"
-              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold text-sm shadow-xl shadow-purple-900/40 transition-all no-underline"
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm shadow-xl shadow-blue-500/20 transition-all no-underline"
             >
               Explore Courses
             </Link>
             <button
               type="button"
               onClick={onOpenDemoModal || (() => window.location.assign("/free-demo"))}
-              className="px-8 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white border border-purple-500/40 font-bold text-sm backdrop-blur-md transition-all cursor-pointer flex items-center gap-2 header-glow-btn"
+              className="px-8 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-sm shadow-xs transition-all cursor-pointer flex items-center gap-2"
             >
               <I.Sparkles /> Book Free Consultation
             </button>
           </div>
         </section>
 
-        {/* SECTION A — COMPANY HIGHLIGHTS (NUMBERS COUNTER ANIMATION) */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-          <div className="rounded-3xl bg-slate-900/70 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 shadow-2xl">
+        {/* SECTION A — COMPANY HIGHLIGHTS */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-10 shadow-xl shadow-slate-200/50">
             <div className="text-center mb-8">
-              <span className="text-xs uppercase font-bold text-cyan-400 tracking-wider">
+              <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">
                 Impact & Milestones
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-white font-['Poppins'] mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Poppins'] mt-1">
                 Company Highlights at a Glance
               </h2>
             </div>
@@ -158,17 +151,17 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
               {highlights.map((h, i) => (
                 <div
                   key={i}
-                  className={`p-4 rounded-2xl bg-slate-950/50 border border-slate-800/80 ${
+                  className={`p-4 rounded-2xl bg-slate-50 border border-slate-200/80 ${
                     i === 4 ? "col-span-2 md:col-span-1" : ""
                   }`}
                 >
-                  <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent font-['Poppins']">
+                  <div className="text-3xl sm:text-4xl font-extrabold text-blue-600 font-['Poppins']">
                     {h.value}
                   </div>
-                  <div className="text-xs sm:text-sm font-bold text-slate-200 mt-1">
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 mt-1">
                     {h.label}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1 hidden sm:block">
+                  <div className="text-[11px] text-slate-500 mt-1 hidden sm:block">
                     {h.desc}
                   </div>
                 </div>
@@ -178,16 +171,16 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
         </section>
 
         {/* SECTION 1 — OUR STORY */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-          <div className="rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl p-8 sm:p-12 shadow-2xl">
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-12 shadow-xl shadow-slate-200/50">
             <div className="max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-4">
                 <span>📖</span> Our Origin & Purpose
               </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Poppins'] mb-6">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-['Poppins'] mb-6">
                 Our Story
               </h2>
-              <div className="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+              <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
                 <p>
                   KR GLOBAL LEARNING PRIVATE LIMITED was founded with a singular conviction: traditional computer science education and mass webinar courses fail students when it comes to true engineering depth. Real programming is not passive observation — it is active, hands-on architectural problem-solving.
                 </p>
@@ -200,47 +193,47 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
         </section>
 
         {/* SECTION 2 & 3 — OUR MISSION & OUR VISION */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Our Mission */}
-            <div className="rounded-3xl bg-gradient-to-br from-purple-950/40 via-slate-900/70 to-slate-950/80 border border-purple-500/30 p-8 sm:p-10 backdrop-blur-xl flex flex-col justify-between shadow-xl">
+            <div className="rounded-3xl bg-white border border-blue-200 p-8 sm:p-10 flex flex-col justify-between shadow-xl shadow-slate-200/50">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200 mb-6">
                   <I.Sparkles />
                 </div>
-                <span className="text-xs uppercase font-extrabold text-purple-400 tracking-wider">
+                <span className="text-xs uppercase font-extrabold text-blue-600 tracking-wider">
                   Core Purpose
                 </span>
-                <h3 className="text-2xl font-bold text-white font-['Poppins'] mt-1 mb-4">
+                <h3 className="text-2xl font-bold text-slate-900 font-['Poppins'] mt-1 mb-4">
                   Our Mission
                 </h3>
-                <blockquote className="text-base sm:text-lg text-slate-200 leading-relaxed font-normal italic border-l-2 border-purple-400 pl-4 py-1">
+                <blockquote className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal italic border-l-2 border-blue-600 pl-4 py-1">
                   "Our mission is to bridge the gap between academic education and industry expectations by providing practical, mentor-led, project-based learning experiences."
                 </blockquote>
               </div>
-              <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-500 mt-6 pt-4 border-t border-slate-100">
                 Aligning curriculums with modern cloud, AI, and enterprise tech stacks to ensure 100% technical mastery and engineering competence.
               </p>
             </div>
 
             {/* Our Vision */}
-            <div className="rounded-3xl bg-gradient-to-br from-cyan-950/40 via-slate-900/70 to-slate-950/80 border border-cyan-500/30 p-8 sm:p-10 backdrop-blur-xl flex flex-col justify-between shadow-xl">
+            <div className="rounded-3xl bg-white border border-indigo-200 p-8 sm:p-10 flex flex-col justify-between shadow-xl shadow-slate-200/50">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-200 mb-6">
                   <I.Award />
                 </div>
-                <span className="text-xs uppercase font-extrabold text-cyan-400 tracking-wider">
+                <span className="text-xs uppercase font-extrabold text-indigo-600 tracking-wider">
                   Strategic Horizon
                 </span>
-                <h3 className="text-2xl font-bold text-white font-['Poppins'] mt-1 mb-4">
+                <h3 className="text-2xl font-bold text-slate-900 font-['Poppins'] mt-1 mb-4">
                   Our Vision
                 </h3>
-                <blockquote className="text-base sm:text-lg text-slate-200 leading-relaxed font-normal italic border-l-2 border-cyan-400 pl-4 py-1">
+                <blockquote className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal italic border-l-2 border-indigo-600 pl-4 py-1">
                   "To become the world's most trusted technology training and certification platform for students, graduates, and working professionals."
                 </blockquote>
               </div>
-              <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-500 mt-6 pt-4 border-t border-slate-100">
                 Pioneering live One-on-One mentor pairing across colleges, technology teams, and global engineering hubs.
               </p>
             </div>
@@ -249,39 +242,39 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
         </section>
 
         {/* SECTION 4 — OUR LEARNING PHILOSOPHY */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-          <div className="rounded-3xl bg-slate-900/70 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 shadow-2xl">
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-10 shadow-xl shadow-slate-200/50">
             <div className="text-center max-w-3xl mx-auto mb-10">
-              <span className="text-xs uppercase font-bold text-cyan-400 tracking-wider">
+              <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">
                 Pedagogical Foundations
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Poppins'] mt-1">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Poppins'] mt-1">
                 Our Learning Philosophy
               </h2>
-              <p className="text-slate-400 text-sm mt-2">
+              <p className="text-slate-600 text-sm mt-2">
                 Structured around deliberate practice, active code collaboration, and real-time mentor critique.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200">
                 <div className="text-2xl mb-3">🛠️</div>
-                <h3 className="text-base font-bold text-white mb-2">Learn by Building</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-base font-bold text-slate-900 mb-2">Learn by Building</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Every concept is cemented through functional code. Students build production microservices, data pipelines, and full-stack platforms rather than passive toy examples.
                 </p>
               </div>
-              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200">
                 <div className="text-2xl mb-3">🎯</div>
-                <h3 className="text-base font-bold text-white mb-2">One-on-One Pair Coding</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-base font-bold text-slate-900 mb-2">One-on-One Pair Coding</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Direct screen-sharing with experienced engineers ensures immediate doubt elimination, architectural reviews, and best-practice linting from day one.
                 </p>
               </div>
-              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200">
                 <div className="text-2xl mb-3">📜</div>
-                <h3 className="text-base font-bold text-white mb-2">Vendor Certification Rigor</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h3 className="text-base font-bold text-slate-900 mb-2">Vendor Certification Rigor</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
                   Our curricula directly map to globally recognized credentials from AWS, Microsoft, Cisco, and SAP, instilling rigorous industry standards.
                 </p>
               </div>
@@ -289,116 +282,102 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
           </div>
         </section>
 
-        {/* SECTION 11 — PREMIUM COMPANY TIMELINE (Phase 13 Section 11) */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-          <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-8 sm:p-12 backdrop-blur-xl shadow-2xl">
+        {/* SECTION 11 — COMPANY TIMELINE */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-12 shadow-xl shadow-slate-200/50">
             <div className="text-center max-w-3xl mx-auto mb-14">
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-3">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-3">
                 <I.Sparkles /> COMPANY TIMELINE & VALUES
               </span>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Poppins'] tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-['Poppins'] tracking-tight">
                 Our Evolution & Strategic Pillars
               </h2>
-              <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
+              <p className="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
                 Dedicated exclusively to high-standard technology training, verified certifications, live mentorship, and student experience.
               </p>
             </div>
 
-            <div className="relative border-l-2 border-purple-500/30 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-10">
+            <div className="relative border-l-2 border-blue-200 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-10">
               {/* 1. 2026 Company Founded */}
               <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-purple-600 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-blue-600 border-4 border-white flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 font-mono">
                   2026 Milestone
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                <h3 className="text-lg font-bold text-slate-900 mt-1.5 font-['Poppins']">
                   Company Founded
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
                   KR GLOBAL LEARNING PRIVATE LIMITED was officially established to revolutionize technology education through personalized One-on-One live mentorship, production capstones, and rigorous vendor certification training.
                 </p>
               </div>
 
               {/* 2. Vision */}
               <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-cyan-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-cyan-500 border-4 border-white flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 font-mono">
                   Strategic Horizon
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                <h3 className="text-lg font-bold text-slate-900 mt-1.5 font-['Poppins']">
                   Vision
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
                   To become the world's most trusted technology training and certification platform, empowering students, graduates, and working professionals with verifiable real-world engineering excellence.
                 </p>
               </div>
 
               {/* 3. Mission */}
               <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-emerald-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
                   Core Purpose
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                <h3 className="text-lg font-bold text-slate-900 mt-1.5 font-['Poppins']">
                   Mission
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
                   To bridge the gap between academic theory and industry reality by providing practical, mentor-led, project-based learning experiences with line-by-line code reviews.
                 </p>
               </div>
 
               {/* 4. Learning Philosophy */}
               <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-amber-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-amber-500 border-4 border-white flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 font-mono">
                   Pedagogical Standard
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                <h3 className="text-lg font-bold text-slate-900 mt-1.5 font-['Poppins']">
                   Learning Philosophy
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
-                  Deliberate practice, direct 1-on-1 screen sharing with senior engineering architects, enterprise code defenses, and vendor exam preparation rigor.
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
+                  Deliberate practice, direct One-on-One screen sharing with senior engineering architects, enterprise code defenses, and vendor exam preparation rigor.
                 </p>
               </div>
 
-              {/* 5. Future Goals */}
+              {/* 5. Corporate Office */}
               <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-rose-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
-                  Looking Ahead
-                </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
-                  Future Goals
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
-                  Expanding specialized cloud sandboxes, generative AI agent research labs, automated interactive coding playgrounds, and global university partnerships.
-                </p>
-              </div>
-
-              {/* 6. Corporate Office */}
-              <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-blue-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-blue-600 border-4 border-white flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 font-mono">
                   Headquarters
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                <h3 className="text-lg font-bold text-slate-900 mt-1.5 font-['Poppins']">
                   Corporate Office
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
                   Unit No. 615, Artha Mart, Tech Zone IV, Greater Noida West, Uttar Pradesh – 201318, India.
                 </p>
               </div>
 
-              {/* 7. Support */}
+              {/* 6. Support */}
               <div className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-teal-500 border-4 border-slate-950 flex items-center justify-center text-[10px] text-white font-bold" />
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 font-mono">
+                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 w-6 h-6 rounded-full bg-teal-500 border-4 border-white flex items-center justify-center text-[10px] text-white font-bold" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200 font-mono">
                   Always Active
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1.5 font-['Poppins']">
+                <h3 className="text-lg font-bold text-slate-900 mt-1.5 font-['Poppins']">
                   24×7 Student Support
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
                   Round-the-clock student assistance, dedicated helpline (+91 9311073936), active doubt clearing circles, and verified email support (krglobal0713@gmail.com).
                 </p>
               </div>
@@ -406,16 +385,16 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
           </div>
         </section>
 
-        {/* SECTION 5 — WHAT WE OFFER (8 PILLARS) */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        {/* SECTION 5 — WHAT WE OFFER */}
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+            <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">
               Comprehensive Technology Education
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Poppins'] mt-2">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-['Poppins'] mt-2">
               What We Offer
             </h2>
-            <p className="text-slate-400 text-sm mt-3 leading-relaxed">
+            <p className="text-slate-600 text-sm mt-3 leading-relaxed">
               Designed from the ground up for practical technical mastery, live feedback, and real skill transformation.
             </p>
           </div>
@@ -424,23 +403,23 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
             {offerings.map((c, i) => (
               <div
                 key={i}
-                className="group rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-6 hover:border-purple-500/50 hover:bg-slate-900/90 transition-all duration-300 flex flex-col justify-between"
+                className="group rounded-2xl bg-white border border-slate-200 p-6 hover:border-blue-300 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.accent} p-0.5 mb-5 shadow-lg group-hover:scale-105 transition-transform`}>
-                    <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-white">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.accent} p-0.5 mb-5 shadow-md group-hover:scale-105 transition-transform`}>
+                    <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center text-blue-600">
                       {c.icon}
                     </div>
                   </div>
-                  <h3 className="text-base font-bold text-white font-['Poppins'] mb-2 group-hover:text-purple-300 transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 font-['Poppins'] mb-2 group-hover:text-blue-600 transition-colors">
                     {c.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     {c.desc}
                   </p>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-slate-800/60 flex items-center text-[11px] font-semibold text-purple-400">
+                <div className="mt-5 pt-3 border-t border-slate-100 flex items-center text-[11px] font-semibold text-blue-600">
                   <span>Included in All Tracks ✓</span>
                 </div>
               </div>
@@ -449,16 +428,16 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
         </section>
 
         {/* SECTION 6 — TECHNOLOGY DOMAINS WE TEACH */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-          <div className="rounded-3xl bg-slate-900/70 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 shadow-2xl">
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+          <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-10 shadow-xl shadow-slate-200/50">
             <div className="text-center max-w-3xl mx-auto mb-10">
-              <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+              <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">
                 Full Tech Spectrum
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Poppins'] mt-1">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Poppins'] mt-1">
                 Technology Domains We Teach
               </h2>
-              <p className="text-slate-400 text-sm mt-2">
+              <p className="text-slate-600 text-sm mt-2">
                 Industry-focused programs spanning emerging cloud architectures, security, and enterprise stacks.
               </p>
             </div>
@@ -478,9 +457,9 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
                 { name: "Salesforce Admin & Dev", icon: "⚡" },
                 { name: "Data Structures & System Design", icon: "🧠" },
               ].map((domain, idx) => (
-                <div key={idx} className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/80 hover:border-cyan-500/40 transition">
+                <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 transition">
                   <div className="text-2xl mb-1">{domain.icon}</div>
-                  <div className="text-xs font-semibold text-slate-200">{domain.name}</div>
+                  <div className="text-xs font-semibold text-slate-800">{domain.name}</div>
                 </div>
               ))}
             </div>
@@ -491,28 +470,28 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
         <Mentors />
 
         {/* CORPORATE HEADQUARTERS & CONTACT DIRECTORY */}
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-16 border-t border-slate-800">
-          <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-8 sm:p-10 backdrop-blur-xl">
+        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-16 border-t border-slate-200">
+          <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-10 shadow-xl shadow-slate-200/50">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
               <div className="lg:col-span-7">
-                <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">
                   Corporate Headquarters
                 </span>
-                <h3 className="text-2xl font-bold text-white font-['Poppins'] mt-1 mb-3">
+                <h3 className="text-2xl font-bold text-slate-900 font-['Poppins'] mt-1 mb-3">
                   KR GLOBAL LEARNING PRIVATE LIMITED
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Unit No. 615, Artha Mart, Tech Zone IV, Greater Noida West, Uttar Pradesh – 201318, India.
                 </p>
-                <div className="text-xs text-slate-300 space-y-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="text-xs text-slate-700 space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>Customer Support Availability: 🟢 Available 24 Hours × 7 Days</span>
                   </div>
-                  <div className="text-xs text-slate-300 flex items-center gap-2">
+                  <div className="text-xs text-slate-700 flex items-center gap-2">
                     <span>Student Helpdesk:</span>
-                    <a href="tel:+919311073936" className="text-cyan-300 font-bold hover:underline no-underline">
+                    <a href="tel:+919311073936" className="text-blue-600 font-bold hover:underline no-underline">
                       📞 +91 9311073936 (24×7 Available)
                     </a>
                   </div>
@@ -522,7 +501,7 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
               <div className="lg:col-span-5 flex flex-col sm:flex-row gap-3">
                 <Link
                   to="/contact"
-                  className="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md transition-colors no-underline"
+                  className="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-colors no-underline"
                 >
                   Contact Helpdesk
                 </Link>
@@ -530,7 +509,7 @@ export default function AboutPage({ onOpenDemoModal }: { onOpenDemoModal?: () =>
                   href="https://maps.google.com/?q=Artha+Mart+Tech+Zone+IV+Greater+Noida+West+Uttar+Pradesh+201318"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs transition-colors no-underline"
+                  className="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-bold text-xs transition-colors no-underline"
                 >
                   Get Directions
                 </a>

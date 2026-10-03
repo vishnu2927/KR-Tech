@@ -175,7 +175,7 @@ export default function AchievementsPage() {
       mentor: "Senior Staff Mentor",
       status: "Completed",
       date: "May 10, 2026",
-      desc: "1-on-1 goal setting, coding gap analysis, and tailored curriculum initialization.",
+      desc: "One-on-One goal setting, coding gap analysis, and tailored curriculum initialization.",
     },
     {
       phase: "Milestone 2",
@@ -526,7 +526,7 @@ export default function AchievementsPage() {
               <div className="space-y-6">
                 <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
                   <span className="text-xl">🗺️</span>
-                  <h2 className="text-xl font-bold text-white font-display">1-on-1 Mentorship Milestones</h2>
+                  <h2 className="text-xl font-bold text-white font-display">One-on-One Mentorship Milestones</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

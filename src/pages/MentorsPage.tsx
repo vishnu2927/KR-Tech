@@ -74,42 +74,42 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
       {/* ─────────────────────────────────────────────────────────────────────────────
           1. Hero Section
       ───────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative py-20 bg-gradient-to-br from-slate-950 via-purple-950 to-indigo-950 text-white overflow-hidden text-center">
-        {/* Glowing Orbs */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-purple-600/25 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 -right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative py-16 bg-gradient-to-b from-blue-50/70 via-indigo-50/40 to-white text-slate-900 overflow-hidden text-center border-b border-slate-100">
+        {/* Ambient Glows */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 -right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container-xl relative z-10">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-4">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            100% 1-on-1 Dedicated Guidance
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/80 mb-4 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            100% One-on-One Dedicated Guidance
           </span>
 
-          <h1 className="font-sans font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-tight max-w-4xl mx-auto mb-5">
-            Meet Your Industry <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-cyan-300">Expert Mentors</span>
+          <h1 className="font-sans font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight max-w-4xl mx-auto mb-5">
+            Meet Your Industry <span className="gradient-text-warm">Expert Mentors</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-purple-100/80 max-w-2xl mx-auto leading-relaxed mb-8">
-            Learn directly from leaders with <strong className="text-white font-semibold">proven enterprise experience</strong>. Get personalized one-on-one sessions tailored to your goals.
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
+            Learn directly from leaders with <strong className="text-slate-900 font-semibold">proven enterprise experience</strong>. Get personalized one-on-one sessions tailored to your goals.
           </p>
 
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4 border-t border-purple-500/20">
-            <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-white font-sans">84</div>
-              <div className="text-xs text-purple-200 mt-1">Available Tech Courses</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4 border-t border-slate-200">
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-blue-600 font-sans">84</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Available Tech Courses</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-sans">Senior Level</div>
-              <div className="text-xs text-purple-200 mt-1">Industry Experience</div>
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 font-sans">Senior Level</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Industry Experience</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-300 font-sans">1-on-1</div>
-              <div className="text-xs text-purple-200 mt-1">Dedicated Mentorship</div>
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-purple-600 font-sans">One-on-One</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Dedicated Mentorship</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-300 font-sans">100%</div>
-              <div className="text-xs text-purple-200 mt-1">Practical Projects & Labs</div>
+            <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-sans">100%</div>
+              <div className="text-xs text-slate-600 font-medium mt-1">Practical Projects & Labs</div>
             </div>
           </div>
         </div>

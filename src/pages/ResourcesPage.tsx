@@ -4,7 +4,7 @@ import { I } from "../components/Icons";
 import SEO from "../components/common/SEO";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import PdfViewerModal from "../components/resources/PdfViewerModal";
-import { Resource, resourceService, CreateResourcePayload } from "../services/resourceService";
+import { Resource, resourceService } from "../services/resourceService";
 import { analytics } from "../utils/analytics";
 import { useAuth } from "../context/AuthContext";
 
@@ -38,22 +38,6 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
   const [activeResource, setActiveResource] = useState<Resource | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState<boolean>(false);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-
-  // Admin Upload Modal state
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
-  const [uploadTitle, setUploadTitle] = useState<string>("");
-  const [uploadCategory, setUploadCategory] = useState<string>("PDF Notes");
-  const [uploadFormat, setUploadFormat] = useState<string>("PDF");
-  const [uploadFileSize, setUploadFileSize] = useState<string>("4.2 MB");
-  const [uploadAuthor, setUploadAuthor] = useState<string>("KR Global Learning Senior Architect Council");
-  const [uploadDescription, setUploadDescription] = useState<string>("");
-  const [uploadContent, setUploadContent] = useState<string>("");
-  const [uploadTags, setUploadTags] = useState<string>("");
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-
-  // Delete Confirmation state
-  const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   // Toast State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -261,14 +245,14 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
       description="Access free PDF notes, architecture cheat sheets, course roadmaps, code snippets, practice questions, and AI summaries curated by KR Global Learning senior mentors."
       canonical="https://krgloballearning.com/resources"
     >
-      <main className="pt-24 pb-20 min-h-screen bg-[#070913] text-white relative overflow-hidden">
-        {/* Ambient Glows */}
-        <div className="absolute top-10 left-10 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-60 right-10 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
+      <main className="pt-24 pb-20 min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
+        {/* Soft Ambient Glows */}
+        <div className="absolute top-10 left-10 w-96 h-96 bg-blue-200/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-60 right-10 w-96 h-96 bg-cyan-200/30 rounded-full blur-3xl pointer-events-none" />
 
         {/* Toast Alert */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 bg-purple-600 text-white px-5 py-3 rounded-2xl shadow-2xl border border-purple-400/30 flex items-center gap-3 backdrop-blur-md animate-bounce">
+          <div className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white px-5 py-3 rounded-2xl shadow-2xl border border-blue-400/30 flex items-center gap-3 backdrop-blur-md animate-bounce">
             <span className="text-lg">⚡</span>
             <span className="text-xs font-bold">{toastMessage}</span>
           </div>
@@ -276,26 +260,26 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
 
         {/* Hero Section */}
         <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-400/30 backdrop-blur-md mb-4">
-            <span>📚</span> VERIFIED RESOURCE LIBRARY (PHASE 13)
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-blue-700 border border-blue-200 shadow-sm mb-4">
+            <span>📚</span> VERIFIED RESOURCE LIBRARY
           </div>
 
-          <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-tight mb-4">
+          <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight mb-4 font-['Poppins']">
             Curated Technology{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-cyan-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600">
               Resource Library
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed mb-6">
+          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed mb-6">
             Hand-crafted PDF notes, architecture cheat sheets, learning roadmaps, code snippets, practice questions, and AI summaries curated by senior tech architects.
           </p>
 
-          <div className="flex justify-center items-center gap-4 flex-wrap text-xs text-slate-300">
-            <span className="flex items-center gap-1.5 font-semibold text-emerald-400">✓ 100% Open Access</span>
-            <span className="flex items-center gap-1.5 font-semibold text-cyan-400">✓ Instant Downloads</span>
-            <span className="flex items-center gap-1.5 font-semibold text-purple-300">✓ In-App Document Reader</span>
-            <span className="flex items-center gap-1.5 font-semibold text-amber-300">✓ AI Study Summaries</span>
+          <div className="flex justify-center items-center gap-4 flex-wrap text-xs text-slate-600">
+            <span className="flex items-center gap-1.5 font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">✓ 100% Open Access</span>
+            <span className="flex items-center gap-1.5 font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">✓ Instant Downloads</span>
+            <span className="flex items-center gap-1.5 font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">✓ In-App Document Reader</span>
+            <span className="flex items-center gap-1.5 font-semibold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">✓ AI Study Summaries</span>
           </div>
         </section>
 
@@ -304,20 +288,20 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
             {/* Search Input */}
             <div className="w-full md:max-w-md">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-white focus-within:border-cyan-500 transition-all">
-                <span className="text-cyan-400"><I.Search /></span>
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-900 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 shadow-sm transition-all">
+                <span className="text-blue-600"><I.Search /></span>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search PDF notes, cheat sheets, roadmaps, snippets..."
-                  className="w-full text-xs sm:text-sm bg-transparent outline-none text-white placeholder-slate-500"
+                  className="w-full text-xs sm:text-sm bg-transparent outline-none text-slate-900 placeholder-slate-400"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="text-xs text-slate-400 hover:text-white cursor-pointer"
+                    className="text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
                     Clear
                   </button>
@@ -330,10 +314,10 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
               <button
                 type="button"
                 onClick={() => setOnlyBookmarked(!onlyBookmarked)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
                   onlyBookmarked
-                    ? "bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20"
-                    : "bg-slate-900/80 text-slate-300 border border-slate-800 hover:border-amber-400/50"
+                    ? "bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20"
+                    : "bg-white text-slate-700 border border-slate-200 hover:border-amber-400"
                 }`}
               >
                 <span>★</span>
@@ -354,8 +338,8 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedCategory === cat && !onlyBookmarked
-                    ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40 scale-105"
-                    : "bg-slate-900/80 text-slate-400 border border-slate-800 hover:text-white hover:border-slate-700"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-105"
+                    : "bg-white text-slate-600 border border-slate-200 hover:text-slate-900 hover:border-slate-300 shadow-sm"
                 }`}
               >
                 {cat}
@@ -364,24 +348,24 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
           </div>
 
           {/* Results count info */}
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-6">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-6">
             <div>
-              Showing <strong className="text-white">{filteredResources.length}</strong> resources
+              Showing <strong className="text-slate-900">{filteredResources.length}</strong> resources
               {selectedCategory !== "All" && (
-                <span> in <strong className="text-cyan-300">{selectedCategory}</strong></span>
+                <span> in <strong className="text-blue-600">{selectedCategory}</strong></span>
               )}
               {onlyBookmarked && (
-                <span className="text-amber-400 font-semibold"> (Filtered by Bookmarks)</span>
+                <span className="text-amber-600 font-semibold"> (Filtered by Bookmarks)</span>
               )}
             </div>
           </div>
 
           {/* Resources Grid */}
           {filteredResources.length === 0 ? (
-            <div className="text-center py-20 bg-slate-900/50 rounded-3xl border border-slate-800 p-8 max-w-md mx-auto">
+            <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 p-8 max-w-md mx-auto shadow-sm">
               <div className="text-3xl mb-3">🔍</div>
-              <h3 className="font-bold text-white text-base mb-1">No resources found</h3>
-              <p className="text-xs text-slate-400 mb-4">
+              <h3 className="font-bold text-slate-900 text-base mb-1">No resources found</h3>
+              <p className="text-xs text-slate-500 mb-4">
                 Try adjusting your search query or reset the category filters.
               </p>
               <button
@@ -391,7 +375,7 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                   setSearchQuery("");
                   setOnlyBookmarked(false);
                 }}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition cursor-pointer shadow-sm"
               >
                 Reset Filters
               </button>
@@ -403,17 +387,17 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                 return (
                   <div
                     key={res.id || (res as any)._id}
-                    className="group relative flex flex-col justify-between bg-slate-900/70 backdrop-blur-xl rounded-3xl border border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-900/90 transition-all duration-300 p-6 shadow-xl"
+                    className="group relative flex flex-col justify-between bg-white rounded-3xl border border-slate-200/90 hover:border-blue-300 hover:shadow-xl transition-all duration-300 p-6 shadow-sm"
                   >
                     <div>
                       {/* Top Bar (Category + Format + Bookmark Star) */}
                       <div className="flex items-center justify-between mb-4">
-                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                           {res.category}
                         </span>
 
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-600 border border-slate-200">
                             {res.format} · {res.fileSize}
                           </span>
 
@@ -423,8 +407,8 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                             onClick={(e) => toggleBookmark(res.id || (res as any)._id, e)}
                             className={`p-1.5 rounded-lg border transition cursor-pointer ${
                               isBookmarked
-                                ? "bg-amber-500/20 border-amber-500/40 text-amber-300"
-                                : "bg-slate-800/60 border-slate-700 text-slate-400 hover:text-white"
+                                ? "bg-amber-50 border-amber-300 text-amber-600"
+                                : "bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600"
                             }`}
                             title={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
                           >
@@ -434,12 +418,12 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                       </div>
 
                       {/* Title */}
-                      <h2 className="font-sans font-bold text-base text-white leading-snug mb-2 group-hover:text-cyan-300 transition-colors">
+                      <h2 className="font-sans font-bold text-base text-slate-900 leading-snug mb-2 group-hover:text-blue-600 transition-colors">
                         {res.title}
                       </h2>
 
                       {/* Description */}
-                      <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-3">
+                      <p className="text-xs text-slate-600 leading-relaxed mb-4 line-clamp-3">
                         {res.description}
                       </p>
 
@@ -448,7 +432,7 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                         {res.tags?.map((tag, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800/80 text-cyan-300 border border-slate-700"
+                            className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-blue-700 border border-slate-200"
                           >
                             #{tag}
                           </span>
@@ -458,13 +442,13 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
 
                     {/* Footer Actions */}
                     <div>
-                      <div className="pt-3 pb-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                      <div className="pt-3 pb-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                         <span>🔥 <strong>{res.downloadsCount}</strong> downloads</span>
                         {/* AI Summary Trigger */}
                         <button
                           type="button"
                           onClick={() => setAiSummaryModalResource(res)}
-                          className="font-bold text-cyan-400 hover:text-cyan-300 text-[11px] flex items-center gap-1 cursor-pointer"
+                          className="font-bold text-blue-600 hover:text-blue-800 text-[11px] flex items-center gap-1 cursor-pointer"
                         >
                           <I.Sparkles /> AI Summary →
                         </button>
@@ -475,7 +459,7 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                         <button
                           type="button"
                           onClick={(e) => handleViewPdf(res, e)}
-                          className="flex-1 py-2 rounded-xl text-xs font-bold text-slate-200 bg-slate-800/80 hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-700"
+                          className="flex-1 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
                         >
                           <I.FileText />
                           <span>Preview</span>
@@ -486,7 +470,7 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
                           type="button"
                           onClick={(e) => handleDownload(res, e)}
                           disabled={downloadingId === res.id}
-                          className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+                          className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
                         >
                           <I.Download />
                           <span>{downloadingId === res.id ? "Saving..." : "Download"}</span>
@@ -500,49 +484,49 @@ export default function ResourcesPage({ onOpenDemoModal }: ResourcesPageProps) {
           )}
         </section>
 
-        {/* AI Summary Modal (Phase 13 Section 8) */}
+        {/* AI Summary Modal */}
         {aiSummaryModalResource && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <div className="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-2xl p-6 sm:p-8 space-y-5 text-white shadow-2xl relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div className="bg-white border border-slate-200 max-w-lg w-full rounded-2xl p-6 sm:p-8 space-y-5 text-slate-900 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
               <button
                 type="button"
                 onClick={() => setAiSummaryModalResource(null)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center cursor-pointer"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg font-bold w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"
               >
                 ✕
               </button>
 
-              <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wider">
                 <I.Sparkles /> AI Generated Study Summary
               </div>
 
-              <h2 className="font-display font-bold text-lg text-white">
+              <h2 className="font-display font-bold text-lg text-slate-900">
                 {aiSummaryModalResource.title}
               </h2>
 
-              <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-500/20 space-y-2 text-xs text-slate-300">
-                <div className="font-bold text-purple-300 uppercase tracking-wider text-[10px]">
+              <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-200/80 space-y-2 text-xs text-slate-700">
+                <div className="font-bold text-blue-800 uppercase tracking-wider text-[10px]">
                   Key Concept Takeaways:
                 </div>
                 <p className="leading-relaxed">
                   {aiSummaryModalResource.description}
                 </p>
-                <ul className="space-y-1 list-disc list-inside text-slate-300 pt-1">
+                <ul className="space-y-1 list-disc list-inside text-slate-600 pt-1">
                   <li>Master foundational architecture patterns before writing microservice code.</li>
                   <li>Incorporate automated unit & integration testing in your Git pipeline.</li>
                   <li>Align implementation with official vendor certification blueprints.</li>
                 </ul>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-                <span className="text-[11px] text-slate-400">Format: {aiSummaryModalResource.format}</span>
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <span className="text-[11px] text-slate-500">Format: {aiSummaryModalResource.format}</span>
                 <button
                   type="button"
                   onClick={() => {
                     handleDownload(aiSummaryModalResource);
                     setAiSummaryModalResource(null);
                   }}
-                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer shadow-sm"
                 >
                   Download Full Material
                 </button>

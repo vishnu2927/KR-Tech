@@ -396,107 +396,104 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
     >
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      <main className="min-h-screen bg-slate-950 text-slate-100 selection:bg-purple-600 selection:text-white pt-20">
+      <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white pt-20">
         {/* ─────────────────────────────────────────────────────────────────────────────
             SECTION 1: HERO SECTION
         ───────────────────────────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden pt-8 pb-16 border-b border-slate-800/80">
+        <section className="relative overflow-hidden pt-8 pb-16 bg-gradient-to-b from-blue-50/80 via-indigo-50/40 to-white border-b border-slate-200/80">
           {/* Ambient Glows */}
-          <div className="absolute top-0 right-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-10 w-80 h-80 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-10 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs text-slate-400 mb-6 flex-wrap">
-              <Link to="/" className="text-slate-400 hover:text-purple-300 no-underline transition-colors">
+            <div className="flex items-center gap-2 text-xs text-slate-500 mb-6 flex-wrap font-medium">
+              <Link to="/" className="text-slate-500 hover:text-blue-600 no-underline transition-colors">
                 Home
               </Link>
               <span>/</span>
-              <Link to="/courses" className="text-slate-400 hover:text-purple-300 no-underline transition-colors">
+              <Link to="/courses" className="text-slate-500 hover:text-blue-600 no-underline transition-colors">
                 Courses
               </Link>
               <span>/</span>
-              <span className="text-purple-400 font-semibold">{course.category}</span>
+              <span className="text-blue-600 font-semibold">{course.category}</span>
               <span>/</span>
-              <span className="text-slate-200 truncate max-w-xs">{course.title}</span>
+              <span className="text-slate-800 truncate max-w-xs">{course.title}</span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               {/* Left Details */}
               <div className="lg:col-span-8 space-y-6">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     One-on-One Live Pair-Programming
                   </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-cyan-50 text-cyan-700 border border-cyan-200">
                     {course.category}
                   </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    {course.badge || "Bestseller"}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                    Verified in Atlas Cloud
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200">
+                    {course.badge || "Featured"}
                   </span>
                 </div>
 
-                <h1 className="font-sans font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight leading-tight">
+                <h1 className="font-sans font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 tracking-tight leading-tight">
                   {course.title}
                 </h1>
 
-                <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl">
+                <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-3xl">
                   {course.description ||
                     `Master modern ${course.category} architecture with our One-on-One live senior mentorship program. Build real-world production capstones, debug complex issues live, and earn a verified certificate of completion.`}
                 </p>
 
                 {/* Key Meta Chips Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                  <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <span className="text-purple-400">⏳</span> Duration
+                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                    <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                      <span className="text-blue-600">⏳</span> Duration
                     </div>
-                    <div className="text-sm font-bold text-white mt-1">{course.duration}</div>
+                    <div className="text-sm font-bold text-slate-900 mt-1">{course.duration}</div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <span className="text-amber-400">📊</span> Level
+                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                    <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                      <span className="text-amber-500">📊</span> Level
                     </div>
-                    <div className="text-sm font-bold text-white mt-1">{course.level}</div>
+                    <div className="text-sm font-bold text-slate-900 mt-1">{course.level}</div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <span className="text-amber-400">⭐</span> Rating
+                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                    <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                      <span className="text-amber-500">⭐</span> Rating
                     </div>
-                    <div className="text-sm font-bold text-white mt-1">
-                      {course.rating} / 5.0 <span className="text-[11px] font-normal text-slate-400">({course.students})</span>
+                    <div className="text-sm font-bold text-slate-900 mt-1">
+                      {course.rating} / 5.0 <span className="text-[11px] font-normal text-slate-500">({course.students})</span>
                     </div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <span className="text-emerald-400">🌐</span> Language
+                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                    <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                      <span className="text-emerald-600">🌐</span> Language
                     </div>
-                    <div className="text-sm font-bold text-white mt-1 truncate">{course.language}</div>
+                    <div className="text-sm font-bold text-slate-900 mt-1 truncate">{course.language}</div>
                   </div>
                 </div>
 
                 {/* Mentor Quick Bio Banner */}
-                <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-4 flex-wrap">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between gap-4 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-purple-600/30 text-purple-300 font-bold flex items-center justify-center text-lg border border-purple-500/40">
+                    <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 font-bold flex items-center justify-center text-lg border border-blue-200">
                       👨‍🏫
                     </div>
                     <div>
-                      <div className="text-xs text-slate-400">Lead Senior Mentor:</div>
-                      <div className="text-sm font-bold text-white">
+                      <div className="text-xs text-slate-500">Lead Senior Mentor:</div>
+                      <div className="text-sm font-bold text-slate-900">
                         {course.mentor}{" "}
-                        <span className="text-xs font-normal text-purple-300">({course.mentorCompany})</span>
+                        <span className="text-xs font-normal text-blue-600">({course.mentorCompany})</span>
                       </div>
                     </div>
                   </div>
-                  <div className="text-xs text-slate-300 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+                  <div className="text-xs text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 font-medium">
                     ⭐ {course.mentorExp || "10+ Years"} Industry Experience
                   </div>
                 </div>
@@ -504,8 +501,8 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
 
               {/* Right Enrollment Sticky Card */}
               <div className="lg:col-span-4 sticky top-28">
-                <div className="p-6 sm:p-7 rounded-3xl bg-slate-900/95 border border-purple-500/30 shadow-2xl shadow-purple-950/60 space-y-6">
-                  <div className="relative rounded-2xl overflow-hidden aspect-video border border-slate-800 bg-black">
+                <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 shadow-xl space-y-6">
+                  <div className="relative rounded-2xl overflow-hidden aspect-video border border-slate-200 bg-slate-900">
                     {isPlayingPreview ? (
                       <video
                         src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
@@ -526,7 +523,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                           <button
                             type="button"
                             onClick={() => setIsPlayingPreview(true)}
-                            className="w-14 h-14 rounded-full bg-purple-600 text-white flex items-center justify-center text-2xl shadow-xl shadow-purple-600/50 hover:scale-110 transition-transform cursor-pointer"
+                            className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl shadow-xl shadow-blue-600/50 hover:scale-110 transition-transform cursor-pointer"
                             title="Watch Course Preview Video"
                           >
                             ▶
@@ -540,13 +537,13 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                     <button
                       type="button"
                       onClick={handleAutoSaveProgress}
-                      className="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <span>{progressSaved ? "✓ Progress Saved" : "💾 Auto-Save Progress"}</span>
                     </button>
                     <Link
                       to={`/learn/${course.id || course._id || "course"}`}
-                      className="text-purple-400 hover:text-purple-300 font-semibold no-underline"
+                      className="text-indigo-600 hover:text-indigo-700 font-semibold no-underline"
                     >
                       LMS Player ↗
                     </Link>
@@ -554,9 +551,9 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
 
                   <div>
                     <div className="flex items-baseline gap-3">
-                      <span className="text-3xl font-extrabold text-white font-sans">{course.price}</span>
+                      <span className="text-3xl font-extrabold text-slate-900 font-sans">{course.price}</span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">Includes One-on-One Live Mentorship, HD Recordings & Verified Certification</p>
+                    <p className="text-xs text-slate-500 mt-1">Includes One-on-One Live Mentorship, HD Recordings & Verified Certification</p>
                   </div>
 
                   <div className="space-y-3">
@@ -566,7 +563,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       id="buy-now-btn"
                       onClick={handleBuyNow}
                       disabled={isPaying || enrolling}
-                      className="w-full py-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:to-purple-500 shadow-xl shadow-cyan-950/60 hover:shadow-cyan-500/30 transition-all cursor-pointer flex items-center justify-center gap-2 transform active:scale-98"
+                      className="w-full py-4 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl shadow-blue-600/25 transition-all cursor-pointer flex items-center justify-center gap-2 transform active:scale-98"
                     >
                       {isPaying ? (
                         <>
@@ -582,10 +579,10 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                     </button>
 
                     {/* Razorpay Gateway Trust Micro-Badge */}
-                    <div className="flex items-center justify-center gap-2 text-[11px] text-gray-400 py-1 bg-black/30 rounded-lg border border-white/5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <div className="flex items-center justify-center gap-2 text-[11px] text-slate-600 py-1 bg-slate-50 rounded-lg border border-slate-200">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       <span>Razorpay Verified</span>
-                      <span className="text-gray-600">•</span>
+                      <span className="text-slate-300">•</span>
                       <span>UPI / Cards / NetBanking</span>
                     </div>
 
@@ -593,7 +590,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       type="button"
                       onClick={handleEnroll}
                       disabled={enrolling || isPaying}
-                      className="w-full py-3 rounded-xl font-bold text-xs text-white bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 shadow-md shadow-purple-900/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-xl font-bold text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
                       {enrolling ? "Enrolling..." : "Enroll with Existing Student Access"}
                     </button>
@@ -601,36 +598,36 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                     <button
                       type="button"
                       onClick={handleBookDemo}
-                      className="w-full py-2.5 rounded-xl font-bold text-xs text-emerald-300 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-2.5 rounded-xl font-bold text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
-                      <I.Sparkles /> Book Free 45-Min Live Demo
+                      <I.Sparkles /> Book Free 45-Min Consultation
                     </button>
 
                     <button
                       type="button"
                       onClick={handleDownloadSyllabus}
-                      className="w-full py-2.5 rounded-xl font-semibold text-xs text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                      className="w-full py-2.5 rounded-xl font-semibold text-xs text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <span>📥</span> Download Full Syllabus PDF
                     </button>
                   </div>
 
                   {/* Bullet perks */}
-                  <div className="pt-4 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+                  <div className="pt-4 border-t border-slate-200 space-y-2 text-xs text-slate-600">
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400"><I.Check /></span>
+                      <span className="text-emerald-600 font-bold">✓</span>
                       <span>One-on-One Live Screen-Sharing with Senior Mentor</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400"><I.Check /></span>
+                      <span className="text-emerald-600 font-bold">✓</span>
                       <span>Real-time Code Reviews & Capstone Architecture</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400"><I.Check /></span>
+                      <span className="text-emerald-600 font-bold">✓</span>
                       <span>100% Money-Back Guarantee (7 Days)</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-400"><I.Check /></span>
+                      <span className="text-emerald-600 font-bold">✓</span>
                       <span>KR Global Learning Verified Certificate</span>
                     </div>
                   </div>
@@ -643,7 +640,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
         {/* ─────────────────────────────────────────────────────────────────────────────
             SECTION: 6 LMS TABS NAVIGATION
         ───────────────────────────────────────────────────────────────────────────── */}
-        <section className="sticky top-16 z-30 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 py-3 shadow-md">
+        <section className="sticky top-16 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 py-3 shadow-xs">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto no-scrollbar">
             {[
               { key: "overview", label: "Overview", icon: "📋" },
@@ -651,7 +648,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
               { key: "notes", label: "Notes & Cheatsheets", icon: "📝" },
               { key: "assignments", label: "Assignments", icon: "🚀" },
               { key: "discussion", label: "Discussion Q&A", icon: "💬" },
-              { key: "reviews", label: "Reviews & Alumni", icon: "⭐" },
+              { key: "reviews", label: "Reviews & Feedback", icon: "⭐" },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -659,8 +656,8 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                 onClick={() => setActiveTab(tab.key as any)}
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   activeTab === tab.key
-                    ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-900/40 border border-purple-400/40"
-                    : "bg-slate-900/60 text-slate-400 hover:text-slate-200 border border-slate-800 hover:bg-slate-800"
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/30 border border-blue-600"
+                    : "bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-200/70"
                 }`}
               >
                 <span>{tab.icon}</span>
@@ -671,19 +668,19 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
         </section>
 
         {/* ─────────────────────────────────────────────────────────────────────────────
-            SECTION 2: CURRICULUM & 7-PHASE LEARNING ROADMAP (PHASE 13 SECTION 7)
+            SECTION 2: CURRICULUM & 7-PHASE LEARNING ROADMAP
         ───────────────────────────────────────────────────────────────────────────── */}
         {(activeTab === "overview" || activeTab === "curriculum") && (
-          <section className="py-16 border-b border-slate-800/80">
+          <section className="py-16 border-b border-slate-200 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-3xl mb-10">
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full border border-purple-500/30 uppercase tracking-wider">
+                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200 uppercase tracking-wider">
                   7-Phase Structured Roadmap
                 </span>
-                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white mt-3">
+                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 mt-3">
                   Comprehensive Course Roadmap & Progression
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400 mt-2">
+                <p className="text-xs sm:text-sm text-slate-600 mt-2">
                   Designed by senior tech leads. Progress systematically through Beginner, Intermediate, Advanced, Projects, Assessment, Certification Preparation, and Resources.
                 </p>
               </div>
@@ -703,7 +700,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Developer environment setup & Git workflows",
                     ],
                     milestone: "Diagnostic Skill Checkpoint Passed",
-                    accent: "border-purple-500/30 bg-purple-950/20 text-purple-300",
+                    accent: "border-blue-200 bg-slate-50 text-blue-700",
                   },
                   {
                     stage: "Phase 2: Intermediate",
@@ -717,7 +714,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Authentication, authorization & security protocols",
                     ],
                     milestone: "Microservices Deployment Checkpoint",
-                    accent: "border-cyan-500/30 bg-cyan-950/20 text-cyan-300",
+                    accent: "border-cyan-200 bg-slate-50 text-cyan-700",
                   },
                   {
                     stage: "Phase 3: Advanced",
@@ -731,7 +728,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Observability with Prometheus, Grafana & Jaeger",
                     ],
                     milestone: "High-Concurrency Architecture Defense",
-                    accent: "border-emerald-500/30 bg-emerald-950/20 text-emerald-300",
+                    accent: "border-emerald-200 bg-slate-50 text-emerald-700",
                   },
                   {
                     stage: "Phase 4: Projects",
@@ -745,7 +742,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Real-time chaos engineering & fault resilience",
                     ],
                     milestone: "Production Capstone Code Merged",
-                    accent: "border-amber-500/30 bg-amber-950/20 text-amber-300",
+                    accent: "border-amber-200 bg-slate-50 text-amber-800",
                   },
                   {
                     stage: "Phase 5: Assessment",
@@ -759,7 +756,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Performance benchmark & load testing evaluation",
                     ],
                     milestone: "Senior Mentor Assessment Cleared",
-                    accent: "border-rose-500/30 bg-rose-950/20 text-rose-300",
+                    accent: "border-rose-200 bg-slate-50 text-rose-700",
                   },
                   {
                     stage: "Phase 6: Certification Preparation",
@@ -773,7 +770,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Verifiable certificate with scannable QR code",
                     ],
                     milestone: "Verified Certificate Issued",
-                    accent: "border-blue-500/30 bg-blue-950/20 text-blue-300",
+                    accent: "border-indigo-200 bg-slate-50 text-indigo-700",
                   },
                   {
                     stage: "Phase 7: Resources",
@@ -787,38 +784,38 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                       "Lifetime access to 1080p recorded mentor sessions",
                     ],
                     milestone: "Full Repository & Resource Access",
-                    accent: "border-teal-500/30 bg-teal-950/20 text-teal-300",
+                    accent: "border-teal-200 bg-slate-50 text-teal-700",
                   },
                 ].map((mod, idx) => (
                   <div
                     key={idx}
-                    className={`p-6 rounded-3xl bg-slate-900/80 border ${mod.accent} hover:scale-[1.02] transition-all shadow-xl space-y-4 flex flex-col justify-between`}
+                    className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all space-y-4 flex flex-col justify-between shadow-xs"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xl">{mod.icon}</span>
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
                           {mod.badge}
                         </span>
                       </div>
-                      <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
                         {mod.stage}
                       </div>
-                      <h3 className="font-sans font-bold text-base text-white">{mod.title}</h3>
+                      <h3 className="font-sans font-bold text-base text-slate-900">{mod.title}</h3>
 
-                      <ul className="space-y-2 text-xs text-slate-300 pt-1">
+                      <ul className="space-y-2 text-xs text-slate-600 pt-1">
                         {mod.topics.map((t, tidx) => (
                           <li key={tidx} className="flex items-start gap-2">
-                            <span className="text-emerald-400 mt-0.5 font-bold">✓</span>
+                            <span className="text-emerald-600 mt-0.5 font-bold">✓</span>
                             <span>{t}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+                    <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
                       <span>Milestone:</span>
-                      <strong className="text-slate-200">{mod.milestone}</strong>
+                      <strong className="text-slate-800 font-semibold">{mod.milestone}</strong>
                     </div>
                   </div>
                 ))}
@@ -831,16 +828,16 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
             TAB: NOTES & CHEATSHEETS
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "notes" && (
-          <section className="py-16 border-b border-slate-800/80">
+          <section className="py-16 border-b border-slate-200 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
               <div>
-                <span className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs font-bold rounded-full border border-cyan-500/30 uppercase tracking-wider">
+                <span className="px-3 py-1 bg-cyan-50 text-cyan-700 text-xs font-bold rounded-full border border-cyan-200 uppercase tracking-wider">
                   Downloadable Study Materials
                 </span>
-                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white mt-3">
+                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 mt-3">
                   Lecture Notes, Diagrams & Blueprints
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   High-resolution architectural flowcharts and production cheatsheets curated by our mentors.
                 </p>
               </div>
@@ -849,16 +846,16 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                 {lectureNotes.map((note) => (
                   <div
                     key={note.id}
-                    className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-cyan-500/40 transition-all flex items-center justify-between gap-4"
+                    className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all flex items-center justify-between gap-4 shadow-xs"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg border border-cyan-500/20 shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg border border-blue-200 shrink-0">
                         📄
                       </div>
                       <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-white">{note.title}</h4>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
-                          <span className="text-purple-400 font-mono">{note.type}</span>
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900">{note.title}</h4>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-1">
+                          <span className="text-blue-600 font-mono font-semibold">{note.type}</span>
                           <span>•</span>
                           <span>{note.size}</span>
                         </div>
@@ -868,7 +865,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                     <button
                       type="button"
                       onClick={() => setToast({ message: `✓ Download initiated for: ${note.title}`, type: "success" })}
-                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold border border-slate-700 transition-colors shrink-0 cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 transition-colors shrink-0 cursor-pointer"
                     >
                       Download ↓
                     </button>
@@ -883,16 +880,16 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
             TAB: ASSIGNMENTS
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "assignments" && (
-          <section className="py-16 border-b border-slate-800/80">
+          <section className="py-16 border-b border-slate-200 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
               <div>
-                <span className="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-wider">
+                <span className="px-3 py-1 bg-amber-50 text-amber-800 text-xs font-bold rounded-full border border-amber-200 uppercase tracking-wider">
                   Hands-On Milestones
                 </span>
-                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white mt-3">
+                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 mt-3">
                   Production Capstone Assignments
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   Submit real repositories and receive line-by-line mentor PR evaluations.
                 </p>
               </div>
@@ -901,26 +898,26 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                 {courseAssignments.map((asg) => (
                   <div
                     key={asg.id}
-                    className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all space-y-4"
+                    className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all space-y-4 shadow-xs"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold">
+                        <span className="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">
                           {asg.status}
                         </span>
-                        <h3 className="font-sans font-bold text-base text-white mt-2">{asg.title}</h3>
+                        <h3 className="font-sans font-bold text-base text-slate-900 mt-2">{asg.title}</h3>
                       </div>
-                      <div className="text-xs text-amber-400 font-mono">
+                      <div className="text-xs text-amber-700 font-mono font-semibold">
                         ⏰ Deadline: {asg.deadline} • {asg.maxPoints} Pts
                       </div>
                     </div>
 
                     <div className="space-y-1.5 pt-2">
-                      <p className="text-xs font-bold text-slate-300">Deliverables & Technical Constraints:</p>
-                      <ul className="space-y-1 text-xs text-slate-400">
+                      <p className="text-xs font-bold text-slate-700">Deliverables & Technical Constraints:</p>
+                      <ul className="space-y-1 text-xs text-slate-600">
                         {asg.specs.map((s, sidx) => (
                           <li key={sidx} className="flex items-center gap-2">
-                            <span className="text-cyan-400">⚡</span>
+                            <span className="text-blue-600">⚡</span>
                             <span>{s}</span>
                           </li>
                         ))}
@@ -932,14 +929,14 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                         href={asg.repo}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 transition no-underline flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-800 border border-slate-200 transition no-underline flex items-center gap-1.5"
                       >
                         <span>🐙 Starter Repo</span>
                       </a>
                       <button
                         type="button"
                         onClick={() => navigate(`/dashboard/assignments`)}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-xs font-bold text-white shadow-md shadow-purple-900/30 transition cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-xs font-bold text-white shadow-sm transition cursor-pointer"
                       >
                         Submit to LMS Portal →
                       </button>
@@ -955,33 +952,33 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
             TAB: DISCUSSION Q&A
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "discussion" && (
-          <section className="py-16 border-b border-slate-800/80">
+          <section className="py-16 border-b border-slate-200 bg-white">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
               <div>
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full border border-purple-500/30 uppercase tracking-wider">
+                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200 uppercase tracking-wider">
                   Community Q&A Forum
                 </span>
-                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white mt-3">
+                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 mt-3">
                   Ask Mentors & Fellow Students
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                  Have an architecture doubt or debugging error? Senior mentors reply within 4 hours.
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Have an architecture doubt or debugging error? Senior mentors reply promptly.
                 </p>
               </div>
 
               {/* Ask Input */}
-              <form onSubmit={handlePostQuestion} className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+              <form onSubmit={handlePostQuestion} className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
                 <textarea
                   rows={3}
                   value={newQuestionText}
                   onChange={(e) => setNewQuestionText(e.target.value)}
                   placeholder="Post your architecture or implementation question here..."
-                  className="w-full p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-white placeholder-slate-500 outline-none focus:border-cyan-500"
+                  className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition"
                 />
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-xs font-bold text-white shadow-md transition cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-xs font-bold text-white shadow-sm transition cursor-pointer"
                   >
                     Post Question 🚀
                   </button>
@@ -991,35 +988,35 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
               {/* Threads */}
               <div className="space-y-4">
                 {discussions.map((d) => (
-                  <div key={d.id} className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-4">
+                  <div key={d.id} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <img src={d.avatar} alt={d.author} className="w-9 h-9 rounded-xl object-cover ring-1 ring-purple-500/30" />
+                        <img src={d.avatar} alt={d.author} className="w-9 h-9 rounded-xl object-cover ring-1 ring-blue-200" />
                         <div>
-                          <div className="text-xs font-bold text-white">{d.author}</div>
-                          <div className="text-[10px] text-slate-400">{d.role} • {d.time}</div>
+                          <div className="text-xs font-bold text-slate-900">{d.author}</div>
+                          <div className="text-[10px] text-slate-500">{d.role} • {d.time}</div>
                         </div>
                       </div>
-                      <span className="text-[11px] font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                      <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
                         ▲ {d.upvotes}
                       </span>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
                       {d.question}
                     </p>
 
                     {d.answers && d.answers.length > 0 && (
-                      <div className="pl-4 border-l-2 border-purple-500/40 space-y-3 pt-1">
+                      <div className="pl-4 border-l-2 border-blue-300 space-y-3 pt-1">
                         {d.answers.map((a, aidx) => (
-                          <div key={aidx} className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1.5">
+                          <div key={aidx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-purple-300">{a.author}</span>
-                              <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                              <span className="text-xs font-bold text-blue-700">{a.author}</span>
+                              <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-semibold">
                                 Verified Mentor Answer
                               </span>
                             </div>
-                            <p className="text-xs text-slate-300 leading-relaxed">{a.answer}</p>
+                            <p className="text-xs text-slate-600 leading-relaxed">{a.answer}</p>
                           </div>
                         ))}
                       </div>
@@ -1035,38 +1032,38 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
             TAB: REVIEWS
         ───────────────────────────────────────────────────────────────────────────── */}
         {activeTab === "reviews" && (
-          <section className="py-16 border-b border-slate-800/80">
+          <section className="py-16 border-b border-slate-200 bg-white">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 rounded-3xl bg-slate-900/80 border border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 rounded-3xl bg-slate-50 border border-slate-200 shadow-xs">
                 <div>
-                  <span className="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-wider">
-                    Verified Feedback
+                  <span className="px-3 py-1 bg-amber-50 text-amber-800 text-xs font-bold rounded-full border border-amber-200 uppercase tracking-wider">
+                    Student Reviews
                   </span>
                   <div className="flex items-baseline gap-3 mt-3">
-                    <span className="text-4xl sm:text-5xl font-extrabold text-white">4.9</span>
-                    <span className="text-amber-400 text-xl">★★★★★</span>
-                    <span className="text-xs text-slate-400">(420+ Verified Students)</span>
+                    <span className="text-4xl sm:text-5xl font-extrabold text-slate-900">4.9</span>
+                    <span className="text-amber-500 text-xl">★★★★★</span>
+                    <span className="text-xs text-slate-500">(Student Reviews)</span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">98% of graduates reported securing senior engineering offers within 90 days.</p>
+                  <p className="text-xs text-slate-600 mt-1">Learners consistently rate our One-on-One curriculum and mentor guidance highly for practical depth.</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {studentReviews.map((rev, ridx) => (
-                  <div key={ridx} className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition shadow-xl space-y-3 flex flex-col justify-between">
+                  <div key={ridx} className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-amber-300 transition shadow-xs space-y-3 flex flex-col justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-amber-400 text-sm">★★★★★</span>
+                        <span className="text-amber-500 text-sm">★★★★★</span>
                         <span className="text-[10px] text-slate-500">{rev.date}</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed italic">
+                      <p className="text-xs text-slate-600 leading-relaxed italic">
                         "{rev.comment}"
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800/80">
-                      <div className="text-xs font-bold text-white">{rev.name}</div>
-                      <div className="text-[11px] text-emerald-400 font-semibold">{rev.company}</div>
+                    <div className="pt-3 border-t border-slate-100">
+                      <div className="text-xs font-bold text-slate-900">{rev.name}</div>
+                      <div className="text-[11px] text-blue-700 font-semibold">{rev.company}</div>
                     </div>
                   </div>
                 ))}
@@ -1078,16 +1075,16 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
         {/* ─────────────────────────────────────────────────────────────────────────────
             SECTION 3: REAL-WORLD CAPSTONE PROJECTS
         ───────────────────────────────────────────────────────────────────────────── */}
-        <section className="py-16 border-b border-slate-800/80 bg-slate-900/30">
+        <section className="py-16 border-b border-slate-200 bg-slate-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mb-10">
-              <span className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs font-bold rounded-full border border-cyan-500/30 uppercase tracking-wider">
+              <span className="px-3 py-1 bg-cyan-50 text-cyan-700 text-xs font-bold rounded-full border border-cyan-200 uppercase tracking-wider">
                 Hands-On Engineering
               </span>
-              <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white mt-3">
+              <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 mt-3">
                 Production Capstones You Will Build
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-2">
+              <p className="text-xs sm:text-sm text-slate-600 mt-2">
                 Employers don't want toy projects. You will build and deploy real-world production-grade architectures.
               </p>
             </div>
@@ -1096,16 +1093,16 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
               {capstoneProjects.map((p, idx) => (
                 <div
                   key={idx}
-                  className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/40 transition-all shadow-xl space-y-4"
+                  className="p-6 rounded-3xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all shadow-xs space-y-4"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl font-bold border border-cyan-500/20">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold border border-blue-200">
                     💻
                   </div>
-                  <h3 className="font-sans font-bold text-base text-white">{p.title}</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">{p.desc}</p>
+                  <h3 className="font-sans font-bold text-base text-slate-900">{p.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{p.desc}</p>
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {p.tags.map((t, tidx) => (
-                      <span key={tidx} className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-slate-300">
+                      <span key={tidx} className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
                         {t}
                       </span>
                     ))}
@@ -1119,31 +1116,31 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
         {/* ─────────────────────────────────────────────────────────────────────────────
             SECTION 4: VERIFICATION & CERTIFICATION PREVIEW
         ───────────────────────────────────────────────────────────────────────────── */}
-        <section className="py-16 border-b border-slate-800/80">
+        <section className="py-16 border-b border-slate-200 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-6 space-y-5">
-                <span className="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-wider">
+                <span className="px-3 py-1 bg-amber-50 text-amber-800 text-xs font-bold rounded-full border border-amber-200 uppercase tracking-wider">
                   Verified Credential
                 </span>
-                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white">
+                <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900">
                   Earn Your Industry-Recognized Certificate
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   Upon completion of your capstone code review and syllabus milestones, you will be awarded an official KR GLOBAL LEARNING PRIVATE LIMITED Certificate of Accomplishment.
                 </p>
 
-                <div className="space-y-2.5 text-xs text-slate-300">
+                <div className="space-y-2.5 text-xs text-slate-600">
                   <div className="flex items-center gap-2">
-                    <span className="text-emerald-400">✓</span>
+                    <span className="text-emerald-600 font-bold">✓</span>
                     <span><strong>Verified Technology Training</strong> Completion Credential</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-emerald-400">✓</span>
+                    <span className="text-emerald-600 font-bold">✓</span>
                     <span>Online verifiable QR code & unique certificate ID</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-emerald-400">✓</span>
+                    <span className="text-emerald-600 font-bold">✓</span>
                     <span>Easily exportable to LinkedIn Licenses & Certifications</span>
                   </div>
                 </div>
@@ -1151,7 +1148,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                 <div className="pt-2">
                   <Link
                     to="/certificates"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all no-underline"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl border border-slate-200 transition-all no-underline"
                   >
                     <span>🏆</span> Learn About Certification Process
                   </Link>
@@ -1160,15 +1157,15 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
 
               {/* Certificate Mockup Visual */}
               <div className="lg:col-span-6">
-                <div className="p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-purple-950/40 to-slate-900 border-2 border-amber-500/30 shadow-2xl space-y-6 text-center relative overflow-hidden">
-                  <div className="absolute top-2 right-4 text-xs font-bold text-amber-400 uppercase tracking-widest opacity-60">
+                <div className="p-8 rounded-3xl bg-slate-900 border-2 border-amber-400/40 shadow-xl space-y-6 text-center relative overflow-hidden text-white">
+                  <div className="absolute top-2 right-4 text-xs font-bold text-amber-400 uppercase tracking-widest opacity-80">
                     KR GLOBAL LEARNING VERIFIED
                   </div>
                   <div className="text-2xl font-extrabold text-white tracking-wide font-sans">
                     CERTIFICATE OF ACCOMPLISHMENT
                   </div>
                   <p className="text-xs text-slate-400 uppercase tracking-wider">This is proudly presented to</p>
-                  <div className="text-xl font-bold text-purple-300 font-serif italic underline decoration-purple-500">
+                  <div className="text-xl font-bold text-amber-300 font-serif italic underline decoration-amber-500">
                     {user?.name || "Student Name"}
                   </div>
                   <p className="text-xs text-slate-300 max-w-md mx-auto">
@@ -1177,7 +1174,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                   </p>
                   <div className="pt-4 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
                     <span>Verification: KR Global Learning Registry</span>
-                    <span className="font-mono text-purple-400">ID: KR-{course.id?.toUpperCase() || "TECH-2026"}</span>
+                    <span className="font-mono text-cyan-400">ID: KR-{course.id?.toUpperCase() || "TECH-2026"}</span>
                   </div>
                 </div>
               </div>
@@ -1188,13 +1185,13 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
         {/* ─────────────────────────────────────────────────────────────────────────────
             SECTION 5: FREQUENTLY ASKED QUESTIONS
         ───────────────────────────────────────────────────────────────────────────── */}
-        <section className="py-16 border-b border-slate-800/80 bg-slate-900/20">
+        <section className="py-16 border-b border-slate-200 bg-slate-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="text-center space-y-2">
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full border border-purple-500/30 uppercase tracking-wider">
+              <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200 uppercase tracking-wider">
                 Clear Answers
               </span>
-              <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-white">
+              <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900">
                 Frequently Asked Questions
               </h2>
             </div>
@@ -1203,18 +1200,18 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
               {faqs.map((f, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl bg-slate-900/80 border border-slate-800 overflow-hidden transition-all"
+                  className="rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden transition-all"
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full p-5 text-left flex items-center justify-between text-sm font-bold text-white hover:text-purple-300 transition-colors cursor-pointer"
+                    className="w-full p-5 text-left flex items-center justify-between text-sm font-bold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer"
                   >
                     <span>{f.q}</span>
-                    <span className="text-purple-400 text-base">{openFaq === i ? "−" : "+"}</span>
+                    <span className="text-blue-600 text-base font-bold">{openFaq === i ? "−" : "+"}</span>
                   </button>
                   {openFaq === i && (
-                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
                       {f.a}
                     </div>
                   )}
@@ -1227,25 +1224,25 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
         {/* ─────────────────────────────────────────────────────────────────────────────
             SECTION 6: FREE DEMO CTA BANNER
         ───────────────────────────────────────────────────────────────────────────── */}
-        <section className="py-16 bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-950 border-b border-slate-800/80 text-center relative overflow-hidden">
+        <section className="py-16 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-center relative overflow-hidden shadow-xl">
           <div className="max-w-4xl mx-auto px-4 relative z-10 space-y-6">
-            <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/30 uppercase tracking-wider">
+            <span className="px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full border border-white/30 uppercase tracking-wider">
               Zero Commitment · 100% Free
             </span>
             <h2 className="font-sans font-extrabold text-3xl sm:text-4xl text-white">
               Try a Free 45-Minute Free One-on-One Learning Consultation Session
             </h2>
-            <p className="text-slate-300 text-sm max-w-xl mx-auto leading-relaxed">
+            <p className="text-blue-100 text-sm max-w-xl mx-auto leading-relaxed">
               Meet your senior mentor, evaluate our One-on-One pair-programming curriculum for{" "}
-              <strong className="text-purple-300">{course.title}</strong>, and ask any questions before enrolling.
+              <strong className="text-white font-semibold">{course.title}</strong>, and ask any questions before enrolling.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <button
                 type="button"
                 onClick={handleBookDemo}
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-2xl shadow-xl shadow-purple-900/50 transition-all cursor-pointer flex items-center gap-2"
+                className="px-8 py-4 bg-white hover:bg-slate-50 text-blue-700 font-extrabold text-sm rounded-2xl shadow-xl transition-all cursor-pointer flex items-center gap-2"
               >
-                <I.Sparkles /> Book Free One-on-One Learning Consultation for This Course
+                <I.Sparkles /> Book Free Consultation for This Course
               </button>
               <a
                 href={`https://wa.me/919311073936?text=${encodeURIComponent(
@@ -1253,7 +1250,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-4 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-bold text-sm rounded-2xl border border-emerald-500/40 transition-all no-underline flex items-center gap-2"
+                className="px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-2xl shadow-md transition-all no-underline flex items-center gap-2"
               >
                 <I.MessageCircle /> Chat on WhatsApp
               </a>
@@ -1265,14 +1262,14 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
             SECTION 7: RELATED COURSES
         ───────────────────────────────────────────────────────────────────────────── */}
         {relatedCourses.length > 0 && (
-          <section className="py-16">
+          <section className="py-16 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Explore More</span>
-                  <h2 className="font-sans font-extrabold text-2xl text-white mt-1">Related Courses in {course.category}</h2>
+                  <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Explore More</span>
+                  <h2 className="font-sans font-extrabold text-2xl text-slate-900 mt-1">Related Courses in {course.category}</h2>
                 </div>
-                <Link to="/courses" className="text-xs font-bold text-purple-400 hover:text-purple-300 no-underline">
+                <Link to="/courses" className="text-xs font-bold text-blue-600 hover:text-blue-800 no-underline">
                   View All Courses →
                 </Link>
               </div>

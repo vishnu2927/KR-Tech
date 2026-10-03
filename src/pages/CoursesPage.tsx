@@ -211,7 +211,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
   const courseFaqs = [
     {
       q: "Can I customize the course syllabus according to my specific requirements?",
-      a: "Yes! Because all classes are 1-on-1 live, your mentor can adjust topics, focus extra hours on difficult concepts, or tailor assignments to your college/work project needs.",
+      a: "Yes! Because all classes are One-on-One live, your mentor can adjust topics, focus extra hours on difficult concepts, or tailor assignments to your college/work project needs.",
     },
     {
       q: "What if I miss a live class due to an emergency or exam?",
@@ -252,19 +252,19 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
       ───────────────────────────────────────────────────────────────────────────── */}
       <section
         style={{
-          background: "linear-gradient(135deg,#0F0A1E 0%,#1B0E33 100%)",
-          padding: "70px 0 80px",
+          background: "linear-gradient(180deg, #EFF6FF 0%, #EEF2FF 50%, #FFFFFF 100%)",
+          padding: "70px 0 60px",
           position: "relative",
           overflow: "hidden",
           textAlign: "center",
         }}
       >
-        <div className="orb" style={{ width: 500, height: 500, top: -180, left: -100, background: "rgba(124,58,237,0.3)" }} />
-        <div className="orb" style={{ width: 400, height: 400, bottom: -120, right: -60, background: "rgba(6,182,212,0.22)" }} />
+        <div className="orb" style={{ width: 500, height: 500, top: -180, left: -100, background: "rgba(37,99,235,0.12)" }} />
+        <div className="orb" style={{ width: 400, height: 400, bottom: -120, right: -60, background: "rgba(6,182,212,0.12)" }} />
 
         <div className="container-xl" style={{ position: "relative", zIndex: 1 }}>
-          <span className="badge badge-dark" style={{ marginBottom: 18, display: "inline-block" }}>
-            ⭐ One-on-One Live Coding Programs
+          <span className="badge badge-purple" style={{ marginBottom: 18, display: "inline-block" }}>
+            ⭐ One-on-One Live Mentorship Programs
           </span>
 
           <h1
@@ -272,7 +272,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
               fontFamily: "Poppins, sans-serif",
               fontWeight: 900,
               fontSize: "clamp(2.2rem, 5vw, 3.8rem)",
-              color: "white",
+              color: "#0F172A",
               lineHeight: 1.15,
               maxWidth: 900,
               margin: "0 auto 18px",
@@ -284,7 +284,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
           <p
             style={{
               fontSize: "clamp(15px, 2vw, 18px)",
-              color: "rgba(255,255,255,0.78)",
+              color: "#475569",
               maxWidth: 720,
               margin: "0 auto 36px",
               lineHeight: 1.75,
@@ -301,12 +301,12 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
               className="btn-primary"
               style={{ padding: "14px 34px", fontSize: 15, borderRadius: 16 }}
             >
-              <I.Sparkles /> Book Free Demo
+              <I.Sparkles /> Book Free Consultation
             </button>
             <Link
               to="/contact"
-              className="btn-ghost-white"
-              style={{ padding: "14px 30px", fontSize: 15, borderRadius: 16, textDecoration: "none" }}
+              className="btn-ghost"
+              style={{ padding: "14px 30px", fontSize: 15, borderRadius: 16, textDecoration: "none", background: "white", border: "1.5px solid #E2E8F0", color: "#334155" }}
             >
               <I.Users /> Talk to Mentor
             </Link>
@@ -324,7 +324,7 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
             }}
           >
             {[
-              { n: "Industry Courses", icon: <I.Code /> },
+              { n: "84 Live Courses", icon: <I.Code /> },
               { n: "Expert Tech Mentors", icon: <I.Award /> },
               { n: "One-on-One Live Sessions", icon: <I.Users /> },
               { n: "Recorded Lectures Included", icon: <I.Play /> },
@@ -337,16 +337,16 @@ export default function CoursesPage({ onOpenDemoModal }: { onOpenDemoModal: (cou
                   gap: 8,
                   padding: "10px 18px",
                   borderRadius: 14,
-                  background: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  backdropFilter: "blur(14px)",
-                  color: "white",
+                  background: "white",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                  color: "#1E293B",
                   fontSize: 13,
                   fontWeight: 600,
                   fontFamily: "Poppins, sans-serif",
                 }}
               >
-                <span style={{ color: "#67E8F9" }}>{s.icon}</span>
+                <span style={{ color: "#2563EB" }}>{s.icon}</span>
                 {s.n}
               </div>
             ))}

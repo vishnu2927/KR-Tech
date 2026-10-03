@@ -226,7 +226,7 @@ export default function FreeDemoPage() {
                   How Your <span className="gradient-text">Demo Class</span> Works
                 </h2>
                 <p className="section-desc" style={{ marginTop: 14 }}>
-                  In this 45-minute live 1-on-1 session, we introduce you to our teaching approach, evaluate your current
+                  In this 45-minute live One-on-One session, we introduce you to our teaching approach, evaluate your current
                   coding background, and demonstrate practical live programming.
                 </p>
 

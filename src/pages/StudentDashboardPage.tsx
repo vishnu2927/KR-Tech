@@ -463,7 +463,7 @@ Verification:    KR Global Learning Registry Verified Training Credential
                 <div className="text-2xl lg:text-3xl font-extrabold text-white font-sans tracking-tight mb-1">
                   {enrollments.length} <span className="text-xs font-normal text-purple-300">Tracks</span>
                 </div>
-                <div className="text-[11px] text-slate-400">Live One-on-One Pair Programming with FAANG Staff</div>
+                <div className="text-[11px] text-slate-400">Live One-on-One Pair Programming with Senior Industry Mentors</div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800 mt-3">
                   <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full w-[80%]" />
                 </div>

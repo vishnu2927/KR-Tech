@@ -288,7 +288,7 @@ export default function PdfViewerModal({
                 }}
                 className="px-3 py-1.5 rounded-lg text-purple-700 bg-purple-50 hover:bg-purple-100 font-bold transition-colors cursor-pointer"
               >
-                Need 1-on-1 Guidance? Book Free Demo →
+                Need One-on-One Guidance? Book Free Demo →
               </button>
             )}
             <button

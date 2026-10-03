@@ -415,7 +415,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
                     Struggling to crack technical rounds on this topic?
                   </h2>
                   <p className="text-xs text-purple-200/90 leading-relaxed mb-5">
-                    Connect 1-on-1 with senior architects from Amazon, Microsoft & PayPal. Book a free live demonstration class.
+                    Connect One-on-One with senior industry mentors and enterprise architects. Book a free live demonstration class.
                   </p>
 
                   <button
@@ -423,7 +423,7 @@ export default function ResourceDetailPage({ onOpenDemoModal }: ResourceDetailPa
                     onClick={() => onOpenDemoModal && onOpenDemoModal(resource.title)}
                     className="w-full py-3 rounded-xl bg-white hover:bg-purple-50 text-purple-950 font-extrabold text-xs transition-all shadow-lg text-center cursor-pointer"
                   >
-                    Book Free 1-on-1 Demo →
+                    Book Free One-on-One Demo →
                   </button>
                 </div>
               </div>

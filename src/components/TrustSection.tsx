@@ -4,109 +4,103 @@ import { I } from "./Icons";
 export default function TrustSection() {
   const trustCards = [
     {
-      title: "Expert Mentors",
-      desc: "Learn directly from senior architects and engineering leads with deep hands-on production experience.",
+      title: "Experienced Mentors",
+      desc: "Learn directly from senior engineers and architects with deep hands-on production experience.",
       icon: <I.Users />,
-      accent: "from-purple-500 to-indigo-500",
-      pill: "1-on-1 Guidance",
-      pillColor: "text-purple-400 bg-purple-500/10 border-purple-500/20",
+      pill: "One-on-One Guidance",
+      pillColor: "text-indigo-700 bg-indigo-50 border-indigo-200",
+      iconBg: "bg-indigo-50 text-indigo-700",
     },
     {
       title: "Practical Projects",
       desc: "Build real enterprise microservices, cloud deployments, and scalable platforms with line-by-line pull request code reviews.",
       icon: <I.Code />,
-      accent: "from-cyan-500 to-blue-500",
       pill: "Production Stacks",
-      pillColor: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+      pillColor: "text-blue-700 bg-blue-50 border-blue-200",
+      iconBg: "bg-blue-50 text-blue-700",
     },
     {
-      title: "Certification-Oriented Learning",
+      title: "Certification Preparation",
       desc: "Curricula tailored to industry credentials from AWS, Microsoft Azure, Cisco, and SAP with complete mock exam preparation.",
       icon: <I.Award />,
-      accent: "from-emerald-500 to-teal-500",
       pill: "Global Standards",
-      pillColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      pillColor: "text-purple-700 bg-purple-50 border-purple-200",
+      iconBg: "bg-purple-50 text-purple-700",
     },
     {
-      title: "Personalized Learning Roadmap",
+      title: "Personalized Roadmap",
       desc: "Step-by-step learning progression calibrated to your experience level, goals, and schedule from beginner to advanced.",
       icon: <I.Sparkles />,
-      accent: "from-amber-500 to-orange-500",
       pill: "Custom Syllabus",
-      pillColor: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+      pillColor: "text-amber-700 bg-amber-50 border-amber-200",
+      iconBg: "bg-amber-50 text-amber-700",
     },
     {
-      title: "AI-Powered Study Assistant",
-      desc: "24×7 intelligent companion for instant concept clarification, real-time code debugging, smart notes, and interactive quizzes.",
+      title: "Interactive Study Materials",
+      desc: "Instant concept clarification, real-time code reviews, smart architecture notes, and hands-on practice quizzes.",
       icon: <I.Bot />,
-      accent: "from-rose-500 to-pink-500",
-      pill: "Instant Answers",
-      pillColor: "text-rose-400 bg-rose-500/10 border-rose-500/20",
+      pill: "Learning Tools",
+      pillColor: "text-rose-700 bg-rose-50 border-rose-200",
+      iconBg: "bg-rose-50 text-rose-700",
     },
     {
       title: "24×7 Student Support",
       desc: "Dedicated academic support helpline, active doubt-clearing circles, and round-the-clock student assistance.",
       icon: <I.Headset />,
-      accent: "from-teal-500 to-emerald-500",
       pill: "Always Available",
-      pillColor: "text-teal-400 bg-teal-500/10 border-teal-500/20",
+      pillColor: "text-teal-700 bg-teal-50 border-teal-200",
+      iconBg: "bg-teal-50 text-teal-700",
     },
   ];
 
   return (
-    <section id="trust-section" className="relative py-20 bg-[#070913] border-t border-purple-500/20 overflow-hidden">
-      {/* Ambient Glow Orbs */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
-
+    <section id="trust-section" className="relative py-20 bg-slate-50 border-t border-slate-200/80 overflow-hidden text-slate-900">
       <div className="container-xl relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-4 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Verified Training Excellence
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-4 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Training Excellence
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-['Poppins'] tracking-tight">
-            Why Students Trust <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">KR Global Learning</span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-sans">
+            Why Students Trust <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">KR Global Learning</span>
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base mt-3 leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
             Delivering the rigor, real-world practical experience, and continuous technology skill acceleration that learners and working professionals rely on.
           </p>
         </div>
 
-        {/* 6 Modern Glass Cards */}
+        {/* 6 Modern Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {trustCards.map((item, idx) => (
             <div
               key={idx}
-              className="group relative rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-800/90 p-6 hover:border-cyan-500/40 hover:bg-slate-900/90 hover:shadow-2xl hover:shadow-purple-950/40 transition-all duration-300 flex flex-col justify-between"
+              className="group relative rounded-2xl bg-white border border-slate-200 p-6 hover:border-blue-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between shadow-xs"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div
-                    className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.accent} p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300`}
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-xs group-hover:scale-105 transition-transform duration-300 ${item.iconBg}`}
                   >
-                    <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-white">
-                      {item.icon}
-                    </div>
+                    {item.icon}
                   </div>
-                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${item.pillColor}`}>
+                  <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${item.pillColor}`}>
                     {item.pill}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white font-['Poppins'] mb-2.5 group-hover:text-cyan-300 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 mb-2.5 group-hover:text-blue-600 transition-colors font-sans">
                   {item.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
 
-              <div className="mt-6 pt-3.5 border-t border-slate-800/70 flex items-center justify-between text-xs text-slate-400 font-medium">
-                <span className="flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Verified Standard
+              <div className="mt-6 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span className="flex items-center gap-1.5 text-emerald-700 font-bold text-[11px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Standard
                 </span>
-                <span className="text-cyan-400 text-[11px] font-semibold flex items-center gap-1">
+                <span className="text-blue-600 text-[11px] font-bold flex items-center gap-1">
                   Skill Focused →
                 </span>
               </div>
@@ -117,3 +111,4 @@ export default function TrustSection() {
     </section>
   );
 }
+

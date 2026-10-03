@@ -99,21 +99,21 @@ export default function FAQPage() {
       description="Find answers to all questions about enrollment, One-on-One live classes, certificates, fees, and 24x7 helpdesk at KR GLOBAL LEARNING PRIVATE LIMITED."
       canonical="https://krgloballearning.com/faq"
     >
-      <main className="min-h-screen bg-[#070913] text-slate-100 pt-[90px] relative overflow-hidden">
-        {/* Ambient Glows */}
-        <div className="absolute top-10 left-1/3 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-80 right-10 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
+      <main className="min-h-screen bg-slate-50 text-slate-900 pt-[90px] relative overflow-hidden">
+        {/* Soft Ambient Background Glows */}
+        <div className="absolute top-10 left-1/3 w-96 h-96 bg-blue-200/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-80 right-10 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none" />
 
         {/* HERO SECTION */}
         <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-5 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-blue-200 text-blue-700 text-xs font-semibold mb-5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
             Everything You Need to Know
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 font-['Poppins']">
-            Frequently Asked <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">Questions</span>
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4 font-['Poppins']">
+            Frequently Asked <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">Questions</span>
           </h1>
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8">
             Got questions about our One-on-One live training, certifications, mentors, or support? Find quick answers below or speak to our 24×7 helpdesk.
           </p>
 
@@ -124,7 +124,7 @@ export default function FAQPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search questions by keyword (e.g. enroll, One-on-One, certificate, projects)..."
-              className="w-full px-5 py-3.5 pl-12 rounded-2xl bg-slate-900/80 border border-slate-700/80 focus:border-purple-500 focus:outline-none text-sm text-white placeholder-slate-500 backdrop-blur-xl shadow-xl shadow-purple-950/20"
+              className="w-full px-5 py-3.5 pl-12 rounded-2xl bg-white border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:outline-none text-sm text-slate-900 placeholder-slate-400 shadow-sm transition"
             />
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
               <I.Search />
@@ -133,7 +133,7 @@ export default function FAQPage() {
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 Clear
               </button>
@@ -141,7 +141,7 @@ export default function FAQPage() {
           </div>
         </section>
 
-        {/* ACCORDION SECTION (SECTION G SPECIFICATION) */}
+        {/* ACCORDION SECTION */}
         <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
           <div className="space-y-4">
             {filteredFaqs.map((faq) => {
@@ -149,10 +149,10 @@ export default function FAQPage() {
               return (
                 <div
                   key={faq.id}
-                  className={`rounded-2xl transition-all duration-300 border ${
+                  className={`rounded-2xl transition-all duration-300 border bg-white ${
                     isOpen
-                      ? "bg-slate-900/90 border-purple-500/50 shadow-xl shadow-purple-950/20"
-                      : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
+                      ? "border-blue-300 shadow-md ring-1 ring-blue-100"
+                      : "border-slate-200/90 shadow-sm hover:border-slate-300"
                   }`}
                 >
                   <button
@@ -161,16 +161,16 @@ export default function FAQPage() {
                     className="w-full text-left px-6 py-5 flex items-center justify-between gap-4 cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                      <span className="text-[10px] uppercase font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                         {faq.category}
                       </span>
-                      <h3 className="text-base sm:text-lg font-bold text-white font-['Poppins']">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 font-['Poppins']">
                         {faq.question}
                       </h3>
                     </div>
                     <div
-                      className={`w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 transition-transform duration-300 ${
-                        isOpen ? "rotate-180 text-purple-400 bg-purple-950/50" : ""
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 ${
+                        isOpen ? "rotate-180 text-blue-600 bg-blue-50" : "text-slate-400 bg-slate-100"
                       }`}
                     >
                       <I.ChevronDown />
@@ -178,7 +178,7 @@ export default function FAQPage() {
                   </button>
 
                   {isOpen && (
-                    <div className="px-6 pb-6 pt-1 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-slate-800/80 mt-1">
+                    <div className="px-6 pb-6 pt-2 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100">
                       {faq.answer}
                     </div>
                   )}
@@ -187,11 +187,11 @@ export default function FAQPage() {
             })}
 
             {filteredFaqs.length === 0 && (
-              <div className="text-center py-12 bg-slate-900/40 rounded-2xl border border-slate-800">
-                <p className="text-slate-400 text-sm">No FAQs matched "{search}".</p>
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <p className="text-slate-500 text-sm">No FAQs matched "{search}".</p>
                 <button
                   onClick={() => setSearch("")}
-                  className="mt-3 px-4 py-2 rounded-xl bg-purple-600 text-xs font-bold text-white"
+                  className="mt-3 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white transition cursor-pointer shadow-sm"
                 >
                   Reset Search
                 </button>
@@ -200,11 +200,11 @@ export default function FAQPage() {
           </div>
 
           {/* Still Have Questions Card */}
-          <div className="mt-12 rounded-3xl bg-gradient-to-r from-purple-950/60 via-slate-900/80 to-slate-950/90 border border-purple-500/30 p-8 text-center backdrop-blur-xl">
+          <div className="mt-12 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-blue-400/30 p-8 text-center text-white shadow-xl shadow-blue-500/15">
             <h3 className="text-xl font-bold text-white font-['Poppins'] mb-2">
               Still have questions or need personalized guidance?
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto mb-6">
+            <p className="text-xs sm:text-sm text-blue-100 max-w-xl mx-auto mb-6">
               Our academic advisors are available 24×7 to walk you through our course syllabus, schedule a free mentor demo, or help you choose the right career path.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -212,13 +212,13 @@ export default function FAQPage() {
                 href="https://wa.me/919311073936?text=Hi%20KR%20Global%20Learning,%20I%20have%20questions%20regarding%20courses."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-2 no-underline transition"
+                className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-2 no-underline transition"
               >
                 <I.MessageCircle /> Chat on WhatsApp (+91 9311073936)
               </a>
               <Link
                 to="/contact"
-                className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md transition no-underline"
+                className="px-6 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-blue-700 font-bold text-xs shadow-md transition no-underline"
               >
                 Contact Helpdesk
               </Link>

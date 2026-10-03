@@ -11,152 +11,58 @@ export default function Newsletter() {
   };
 
   return (
-    <section
-      style={{
-        padding: "80px 0",
-        position: "relative",
-        overflow: "hidden",
-        background: "linear-gradient(140deg,#7C3AED 0%,#5B21B6 45%,#0891B2 100%)",
-      }}
-    >
-      <div
-        className="orb"
-        style={{ width: 440, height: 440, top: -160, right: -80, background: "rgba(255,255,255,0.08)" }}
-      />
-      <div
-        className="orb"
-        style={{ width: 300, height: 300, bottom: -100, left: "15%", background: "rgba(255,255,255,0.05)" }}
-      />
+    <section className="py-20 bg-slate-900 relative overflow-hidden text-white border-t border-slate-800">
+      {/* Soft background ambient gradient */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="container-xl" style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
-        <span
-          className="badge"
-          style={{ background: "rgba(255,255,255,0.18)", color: "white", marginBottom: 20, display: "inline-block" }}
-        >
-          Stay Updated
+      <div className="container-xl relative z-10 text-center">
+        <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">
+          <I.Sparkles /> STAY UPDATED
         </span>
-        <h2
-          style={{
-            fontFamily: "Poppins,sans-serif",
-            fontWeight: 800,
-            fontSize: "clamp(1.6rem,4vw,2.6rem)",
-            color: "white",
-            lineHeight: 1.2,
-            marginBottom: 16,
-          }}
-        >
+        <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight mb-3">
           Get Free Study Materials & Tech Roadmaps
         </h2>
-        <p
-          style={{
-            fontSize: 16,
-            color: "rgba(255,255,255,0.8)",
-            marginBottom: 36,
-            maxWidth: 540,
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          Join 50,000+ engineers receiving weekly developer tips, system design cheat sheets, and course updates.
+        <p className="text-sm sm:text-base text-slate-400 mb-8 max-w-xl mx-auto">
+          Receive weekly developer tips, system design cheat sheets, and technology course updates directly in your inbox.
         </p>
 
         {done ? (
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "16px 32px",
-              borderRadius: 20,
-              background: "rgba(255,255,255,0.18)",
-              border: "1px solid rgba(255,255,255,0.35)",
-            }}
-          >
-            <span
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                background: "#22C55E",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-              }}
-            >
-              <I.Check />
+          <div className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-semibold shadow-md">
+            <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shrink-0">
+              ✓
             </span>
-            <span style={{ fontFamily: "Poppins,sans-serif", fontWeight: 600, color: "white" }}>
-              You're subscribed! Welcome to the KR Global Learning community.
-            </span>
+            <span>You're subscribed! Welcome to the KR Global Learning community.</span>
           </div>
         ) : (
           <form
             onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              gap: 12,
-              maxWidth: 540,
-              margin: "0 auto",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}
+            className="flex gap-3 max-w-lg mx-auto flex-wrap justify-center"
           >
-            <div
-              style={{
-                flex: 1,
-                minWidth: 240,
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "14px 20px",
-                borderRadius: 16,
-                background: "rgba(255,255,255,0.15)",
-                border: "1px solid rgba(255,255,255,0.25)",
-              }}
-            >
-              <I.Mail />
+            <div className="flex-1 min-w-[240px] flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200">
+              <span className="text-slate-400"><I.Mail /></span>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                style={{
-                  flex: 1,
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  fontFamily: "Inter,sans-serif",
-                  fontSize: 14,
-                  color: "white",
-                }}
+                className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder:text-slate-500 font-sans"
               />
             </div>
             <button
               type="submit"
-              style={{
-                padding: "14px 28px",
-                borderRadius: 16,
-                fontFamily: "Poppins,sans-serif",
-                fontWeight: 700,
-                fontSize: 14,
-                background: "white",
-                color: "#7C3AED",
-                border: "none",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-              }}
+              className="px-6 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md cursor-pointer whitespace-nowrap"
             >
               Subscribe Free
             </button>
           </form>
         )}
-        <p style={{ marginTop: 16, fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
+        <p className="mt-4 text-xs text-slate-500">
           No spam. Unsubscribe anytime. We respect your privacy.
         </p>
       </div>
     </section>
   );
 }
+

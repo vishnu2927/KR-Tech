@@ -15,25 +15,24 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
   ];
 
   return (
-    <section className="relative overflow-hidden bg-hero pt-28 pb-20 sm:pb-28" style={{ minHeight: "94vh", display: "flex", flexDirection: "column" }}>
+    <section className="relative overflow-hidden bg-hero pt-28 pb-20 sm:pb-28 border-b border-slate-200/80" style={{ minHeight: "94vh", display: "flex", flexDirection: "column" }}>
       {/* Dynamic ambient floating gradients */}
-      <div className="orb" style={{ width: 720, height: 720, top: -200, left: -160, background: "rgba(124,58,237,0.32)" }} />
-      <div className="orb" style={{ width: 560, height: 560, top: 40, right: -160, background: "rgba(6,182,212,0.26)" }} />
-      <div className="orb" style={{ width: 440, height: 440, bottom: -80, left: "32%", background: "rgba(99,102,241,0.22)" }} />
+      <div className="orb" style={{ width: 620, height: 620, top: -160, left: -120, background: "rgba(37,99,235,0.12)" }} />
+      <div className="orb" style={{ width: 520, height: 520, top: 40, right: -120, background: "rgba(124,58,237,0.10)" }} />
+      <div className="orb" style={{ width: 440, height: 440, bottom: -80, left: "32%", background: "rgba(6,182,212,0.10)" }} />
 
       <div className="container-xl relative z-10 flex-1 flex flex-col items-center justify-center text-center">
         {/* Top Live Training Pill Badge */}
         <div
-          className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full mb-6 fade-up-1"
+          className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full mb-6 fade-up-1 shadow-sm"
           style={{
-            background: "rgba(15, 10, 35, 0.8)",
-            border: "1px solid rgba(6, 182, 212, 0.4)",
+            background: "#EFF6FF",
+            border: "1px solid #BFDBFE",
             backdropFilter: "blur(16px)",
-            boxShadow: "0 0 25px rgba(6, 182, 212, 0.25)",
           }}
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
-          <span style={{ fontFamily: "Poppins,sans-serif", fontSize: 13, fontWeight: 700, color: "#67E8F9" }}>
+          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+          <span style={{ fontFamily: "Poppins,sans-serif", fontSize: 13, fontWeight: 700, color: "#1D4ED8" }}>
             ONE-ON-ONE LIVE TRAINING · TECHNOLOGY COURSES · PERSONALIZED MENTORSHIP
           </span>
         </div>
@@ -45,15 +44,16 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             fontWeight: 900,
             fontSize: "clamp(2.5rem, 6vw, 4.6rem)",
             lineHeight: 1.1,
-            color: "white",
+            color: "#0F172A",
             maxWidth: 960,
             marginBottom: 20,
-            textShadow: "0 8px 40px rgba(124,58,237,0.45)",
             letterSpacing: "-0.035em",
           }}
         >
           Master Software Engineering with{" "}
-          <span className="gradient-text-warm">1-on-1 Live Mentorship.</span>
+          <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            One-on-One Live Mentorship.
+          </span>
         </h1>
 
         {/* Hero Subtitle */}
@@ -63,7 +63,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             fontFamily: "Inter,sans-serif",
             fontSize: "clamp(15px, 1.8vw, 18px)",
             lineHeight: 1.75,
-            color: "rgba(243, 244, 246, 0.85)",
+            color: "#475569",
             maxWidth: 820,
             marginBottom: 34,
             letterSpacing: "0.01em",
@@ -84,8 +84,8 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               fontWeight: 700,
               borderRadius: 16,
               cursor: "pointer",
-              background: "linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)",
-              boxShadow: "0 10px 35px rgba(124, 58, 237, 0.45)",
+              background: "linear-gradient(135deg, #2563EB 0%, #4F46E5 100%)",
+              boxShadow: "0 10px 25px rgba(37, 99, 235, 0.35)",
             }}
           >
             <I.Sparkles /> Book Free Consultation
@@ -99,9 +99,10 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               fontWeight: 600,
               borderRadius: 16,
               textDecoration: "none",
-              border: "1px solid rgba(255,255,255,0.25)",
-              background: "rgba(255,255,255,0.06)",
-              backdropFilter: "blur(12px)",
+              border: "1.5px solid #CBD5E1",
+              background: "#FFFFFF",
+              color: "#0F172A",
+              boxShadow: "0 4px 12px rgba(15, 23, 42, 0.05)",
             }}
           >
             Explore Courses <I.ArrowRight />
@@ -114,14 +115,13 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             <Link
               key={c.label}
               to={`/courses?category=${encodeURIComponent(c.query)}`}
-              className="text-xs font-semibold px-4 py-2 rounded-full transition-all hover:border-cyan-400 hover:text-cyan-200"
+              className="text-xs font-semibold px-4 py-2 rounded-full transition-all hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 shadow-xs"
               style={{
                 fontFamily: "Poppins,sans-serif",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.14)",
-                color: "rgba(255,255,255,0.88)",
+                background: "#FFFFFF",
+                border: "1px solid #E2E8F0",
+                color: "#334155",
                 textDecoration: "none",
-                backdropFilter: "blur(10px)",
               }}
             >
               ⚡ {c.label}
@@ -141,13 +141,12 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             className="floating-card hidden lg:flex items-center gap-3.5 px-4 py-3 rounded-2xl"
             style={{
               position: "absolute",
-              top: -24,
-              left: -32,
+              top: -20,
+              left: -28,
               zIndex: 30,
-              background: "rgba(18, 12, 38, 0.88)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(167, 139, 250, 0.35)",
-              boxShadow: "0 20px 45px rgba(0,0,0,0.6)",
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 12px 30px rgba(15, 23, 42, 0.08)",
               animation: "float-1 5s ease-in-out infinite",
             }}
           >
@@ -156,7 +155,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
                 width: 42,
                 height: 42,
                 borderRadius: 12,
-                background: "linear-gradient(135deg, #7C3AED, #06B6D4)",
+                background: "linear-gradient(135deg, #2563EB, #4F46E5)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -166,10 +165,10 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               <I.Users />
             </div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
+              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "#0F172A" }}>
                 Senior Tech Mentors
               </div>
-              <div style={{ fontSize: 11, color: "#A5F3FC", fontWeight: 500 }}>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>
                 Enterprise Architects & Technical Mentors
               </div>
             </div>
@@ -181,12 +180,11 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             style={{
               position: "absolute",
               top: -15,
-              right: -28,
+              right: -24,
               zIndex: 30,
-              background: "rgba(18, 12, 38, 0.88)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(6, 182, 212, 0.4)",
-              boxShadow: "0 20px 45px rgba(0,0,0,0.6)",
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 12px 30px rgba(15, 23, 42, 0.08)",
               animation: "float-2 6s ease-in-out infinite",
             }}
           >
@@ -195,7 +193,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
                 width: 42,
                 height: 42,
                 borderRadius: 12,
-                background: "linear-gradient(135deg, #06B6D4, #3B82F6)",
+                background: "linear-gradient(135deg, #06B6D4, #2563EB)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -205,10 +203,10 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               <I.Code />
             </div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
+              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "#0F172A" }}>
                 One-on-One Live Coding
               </div>
-              <div style={{ fontSize: 11, color: "#DDD6FE", fontWeight: 500 }}>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>
                 Screen share & Line-by-Line PRs
               </div>
             </div>
@@ -220,12 +218,11 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             style={{
               position: "absolute",
               bottom: 24,
-              left: -35,
+              left: -28,
               zIndex: 30,
-              background: "rgba(18, 12, 38, 0.88)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(124, 58, 237, 0.4)",
-              boxShadow: "0 20px 45px rgba(0,0,0,0.6)",
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 12px 30px rgba(15, 23, 42, 0.08)",
               animation: "float-3 5.5s ease-in-out infinite",
             }}
           >
@@ -244,10 +241,10 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               <I.Award />
             </div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
+              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "#0F172A" }}>
                 Comprehensive Course Catalog
               </div>
-              <div style={{ fontSize: 11, color: "#A7F3D0", fontWeight: 500 }}>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>
                 Industry-Aligned Syllabus
               </div>
             </div>
@@ -259,12 +256,11 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
             style={{
               position: "absolute",
               bottom: 30,
-              right: -32,
+              right: -24,
               zIndex: 30,
-              background: "rgba(18, 12, 38, 0.88)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(245, 158, 11, 0.4)",
-              boxShadow: "0 20px 45px rgba(0,0,0,0.6)",
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              boxShadow: "0 12px 30px rgba(15, 23, 42, 0.08)",
               animation: "float-1 6.5s ease-in-out infinite",
             }}
           >
@@ -283,10 +279,10 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               <I.Sparkles />
             </div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "white" }}>
+              <div style={{ fontFamily: "Poppins,sans-serif", fontWeight: 700, fontSize: 13, color: "#0F172A" }}>
                 Verified Certifications
               </div>
-              <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 500 }}>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>
                 Practical Project Mastery
               </div>
             </div>
@@ -296,16 +292,16 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
           <div
             className="w-full rounded-3xl overflow-hidden text-left"
             style={{
-              background: "rgba(11, 7, 24, 0.95)",
-              border: "1px solid rgba(167, 139, 250, 0.25)",
-              boxShadow: "0 30px 100px rgba(124, 58, 237, 0.35), 0 0 40px rgba(6, 182, 212, 0.2)",
+              background: "#0F172A",
+              border: "1px solid #334155",
+              boxShadow: "0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 30px rgba(37, 99, 235, 0.15)",
             }}
           >
             {/* macOS Window Controls & Tabs Header */}
             <div
               className="flex items-center justify-between px-4 py-3 border-b"
               style={{
-                background: "rgba(22, 15, 45, 0.9)",
+                background: "#1E293B",
                 borderColor: "rgba(255, 255, 255, 0.08)",
               }}
             >
@@ -313,8 +309,8 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
                 <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
                 <span className="w-3 h-3 rounded-full bg-yellow-500/80 inline-block" />
                 <span className="w-3 h-3 rounded-full bg-green-500/80 inline-block" />
-                <span className="ml-3 text-xs font-mono text-gray-400 hidden sm:inline">
-                  kr-global-live-session · OrderProcessingService.java
+                <span className="ml-3 text-xs font-mono text-slate-400 hidden sm:inline">
+                  kr-global-live-session · OrderProcessingService.java (Interactive Demo)
                 </span>
               </div>
 
@@ -322,82 +318,82 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
               <div className="flex items-center gap-1">
                 <span
                   className="text-xs px-3 py-1 rounded-t-lg font-mono text-cyan-300 font-semibold flex items-center gap-1.5"
-                  style={{ background: "rgba(11, 7, 24, 0.9)", borderBottom: "2px solid #06B6D4" }}
+                  style={{ background: "#0F172A", borderBottom: "2px solid #06B6D4" }}
                 >
                   ☕ OrderService.java
                 </span>
-                <span className="text-xs px-3 py-1 rounded-t-lg font-mono text-gray-400 hidden sm:inline">
+                <span className="text-xs px-3 py-1 rounded-t-lg font-mono text-slate-400 hidden sm:inline">
                   ⚛️ App.tsx
                 </span>
-                <span className="text-xs px-3 py-1 rounded-t-lg font-mono text-gray-500 hidden md:inline">
+                <span className="text-xs px-3 py-1 rounded-t-lg font-mono text-slate-500 hidden md:inline">
                   📊 system-design.puml
                 </span>
               </div>
 
               <div className="flex items-center gap-2 text-xs text-emerald-400 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span className="hidden sm:inline">One-on-One LIVE</span>
+                <span className="hidden sm:inline font-semibold">ONE-ON-ONE LIVE CODE LAB</span>
               </div>
             </div>
 
             {/* Code Body & Mentor Picture-in-Picture */}
-            <div className="p-5 sm:p-6 font-mono text-xs sm:text-sm text-gray-300 relative overflow-hidden">
+            <div className="p-5 sm:p-6 font-mono text-xs sm:text-sm text-slate-200 relative overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 {/* Syntax Highlighted Java / Spring Code */}
                 <div className="lg:col-span-8 space-y-1">
                   <div className="text-purple-400 font-semibold">@Service</div>
                   <div className="text-purple-400 font-semibold">
-                    @Transactional<span className="text-gray-400">(rollbackFor = Exception.class)</span>
+                    @Transactional<span className="text-slate-400">(rollbackFor = Exception.class)</span>
                   </div>
                   <div>
                     <span className="text-blue-400">public class</span>{" "}
                     <span className="text-yellow-300 font-bold">OrderProcessingService</span>{" "}
-                    <span className="text-gray-400">&#123;</span>
+                    <span className="text-slate-400">&#123;</span>
                   </div>
-                  <div className="pl-4 text-gray-500 italic">
+                  <div className="pl-4 text-slate-400 italic">
                     // One-on-One Live Mentor Review: Implementing Distributed SAGA with Kafka
                   </div>
                   <div className="pl-4">
                     <span className="text-purple-400">@CircuitBreaker</span>
-                    <span className="text-gray-400">(name = </span>
+                    <span className="text-slate-400">(name = </span>
                     <span className="text-emerald-300">"paymentGateway"</span>
-                    <span className="text-gray-400">, fallbackMethod = </span>
+                    <span className="text-slate-400">, fallbackMethod = </span>
                     <span className="text-emerald-300">"fallbackPayment"</span>
-                    <span className="text-gray-400">)</span>
+                    <span className="text-slate-400">)</span>
                   </div>
                   <div className="pl-4">
                     <span className="text-blue-400">public</span>{" "}
                     <span className="text-cyan-300">CompletableFuture&lt;OrderReceipt&gt;</span>{" "}
                     <span className="text-amber-300">processOrder</span>
-                    <span className="text-gray-400">(OrderRequest req) &#123;</span>
+                    <span className="text-slate-400">(OrderRequest req) &#123;</span>
                   </div>
-                  <div className="pl-8 text-gray-300">
+                  <div className="pl-8 text-slate-200">
                     <span className="text-blue-400">log</span>.info(
                     <span className="text-emerald-300">"Processing live transaction ID: &#123;&#125;"</span>, req.getId());
                   </div>
-                  <div className="pl-8 text-cyan-400">
+                  <div className="pl-8 text-cyan-300">
                     return kafkaProducer.send(ORDER_TOPIC, req)
                   </div>
-                  <div className="pl-12 text-gray-400">
+                  <div className="pl-12 text-slate-400">
                     .thenApply(record -&gt; receiptGenerator.create(record));
                   </div>
-                  <div className="pl-4 text-gray-400">&#125;</div>
-                  <div className="text-gray-400">&#125;</div>
+                  <div className="pl-4 text-slate-400">&#125;</div>
+                  <div className="text-slate-400">&#125;</div>
 
                   {/* Terminal Output snippet */}
                   <div
-                    className="mt-4 p-3 rounded-xl border border-white/10 font-mono text-[11px] sm:text-xs"
-                    style={{ background: "rgba(0, 0, 0, 0.45)" }}
+                    className="mt-4 p-3 rounded-xl border border-slate-700/80 font-mono text-[11px] sm:text-xs"
+                    style={{ background: "rgba(0, 0, 0, 0.55)" }}
                   >
-                    <div className="text-gray-400 flex items-center justify-between border-b border-white/10 pb-1 mb-1.5">
-                      <span>TERMINAL — KR GLOBAL LEARNING CLOUD RUNNER</span>
-                      <span className="text-cyan-400">K8s Cluster: Production Ready</span>
+                    <div className="text-slate-400 flex items-center justify-between border-b border-slate-700/80 pb-1 mb-1.5">
+                      <span>TERMINAL — KR GLOBAL LEARNING CODE RUNNER</span>
+                      <span className="text-cyan-300">Interactive Sandbox</span>
                     </div>
                     <div className="text-emerald-400">
                       ✓ Build SUCCESS · 52/52 Microservice Integration Tests Passed (0 errors)
                     </div>
-                    <div className="text-purple-300">
-                      ⚡ Docker container deployed to AWS EKS: ingress-endpoint.krglobal.internal
+                    <div className="text-indigo-300">
+                      ⚡ Docker container verified: OrderProcessingService ready for live deployment
                     </div>
                   </div>
                 </div>
@@ -405,18 +401,18 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
                 {/* Right Side: Mentor Video Screen-Share PiP Overlay */}
                 <div className="lg:col-span-4 flex flex-col justify-between">
                   <div
-                    className="rounded-2xl p-3 border border-purple-500/30 relative overflow-hidden"
+                    className="rounded-2xl p-3 border border-slate-700 relative overflow-hidden"
                     style={{
-                      background: "linear-gradient(135deg, rgba(30, 15, 60, 0.85), rgba(15, 10, 30, 0.95))",
+                      background: "linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98))",
                       boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
                     }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-                        LIVE One-on-One SCREEN SHARE
+                        LIVE ONE-ON-ONE PAIR CODING
                       </span>
-                      <span className="text-[11px] text-cyan-300 font-sans font-semibold">Session #1820</span>
+                      <span className="text-[11px] text-cyan-300 font-sans font-semibold">Interactive Demo</span>
                     </div>
 
                     <div className="relative rounded-xl overflow-hidden mb-2.5">
@@ -429,7 +425,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
                       <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
                         <div className="text-left">
                           <div className="font-sans font-bold text-xs text-white">Siddharth Rao</div>
-                          <div className="text-[10px] text-cyan-300 font-sans">Staff Software Engineer</div>
+                          <div className="text-[10px] text-cyan-300 font-sans">Senior Tech Architect</div>
                         </div>
                         <span className="text-emerald-400 text-xs">🎙️ Audio On</span>
                       </div>
@@ -437,27 +433,27 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
 
                     {/* Mentor Feedback Bubble */}
                     <div
-                      className="p-2.5 rounded-xl text-[11px] font-sans text-gray-200 border border-white/10"
+                      className="p-2.5 rounded-xl text-[11px] font-sans text-slate-200 border border-white/10"
                       style={{ background: "rgba(255, 255, 255, 0.05)" }}
                     >
-                      <p className="line-clamp-3 italic text-purple-200">
+                      <p className="line-clamp-3 italic text-indigo-200">
                         "Your Saga pattern handles failures cleanly! Let's test the outbox publisher with our mock Kafka cluster next."
                       </p>
                     </div>
                   </div>
 
                   {/* Quick Booking Callout */}
-                  <div className="mt-3 p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 text-center">
-                    <div className="text-xs font-bold text-cyan-300 font-sans mb-1">
+                  <div className="mt-3 p-3 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-center">
+                    <div className="text-xs font-bold text-indigo-300 font-sans mb-1">
                       Ready for One-on-One Live Coding?
                     </div>
-                    <div className="text-[11px] text-gray-300 font-sans mb-2">
-                      Zero commitment. 45-min live session with an architect.
+                    <div className="text-[11px] text-slate-300 font-sans mb-2">
+                      Zero commitment. 45-min live session with an experienced mentor.
                     </div>
                     <button
                       type="button"
                       onClick={() => onOpenDemoModal && onOpenDemoModal()}
-                      className="w-full py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 transition-all cursor-pointer font-sans shadow"
+                      className="w-full py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all cursor-pointer font-sans shadow"
                     >
                       Claim Your Free One-on-One Learning Consultation
                     </button>

@@ -100,7 +100,7 @@ Verified by KR Global Learning (https://krgloballearning.com)
 
     const body = resource.content || resource.description;
     const footer = `\n\n================================================================================
-Need 1-on-1 mentorship or live instructor training?
+Need One-on-One mentorship or live instructor training?
 Book your free demo session at KR Global Learning: https://krgloballearning.com/free-demo
 ================================================================================`;
 

@@ -29,9 +29,10 @@ export default function Home({ onOpenDemoModal }: { onOpenDemoModal: (courseOrMe
         SchemaBuilder.getWebSiteSchema(),
       ]}
     >
-      <main className="bg-dark-obsidian text-white min-h-screen">
+      <main className="bg-white text-slate-900 min-h-screen">
         {/* 1. Software Learning Pair-Programming Hero */}
         <Hero onOpenDemoModal={() => onOpenDemoModal()} />
+
 
         {/* 2. Animated Stats Bar (Courses, Mentorship Ratio, Certifications) */}
         <StudentSuccessMetrics />

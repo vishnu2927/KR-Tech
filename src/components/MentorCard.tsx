@@ -19,13 +19,12 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col justify-between bg-white/95 backdrop-blur-md rounded-3xl border border-purple-100 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(124,58,237,0.18)] hover:border-purple-300 overflow-hidden">
+    <div className="group relative flex flex-col justify-between bg-white rounded-3xl border border-slate-200 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-blue-300 overflow-hidden">
       {/* Top Banner Accent */}
-      <div className="h-20 bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:12px_12px]" />
+      <div className="h-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden">
         <div className="absolute top-3 right-3 flex items-center gap-1.5">
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white backdrop-blur-md shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></span>
             One-on-One Mentor
           </span>
         </div>
@@ -40,14 +39,14 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
             className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold" title="Online for One-on-One Booking">
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold" title="Available for One-on-One Booking">
             ✓
           </div>
         </div>
 
-        {/* 10+ Years Experience Badge */}
-        <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs">
-          ⚡ {mentor.exp} Exp
+        {/* Experience Badge */}
+        <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+          ⚡ {mentor.exp}
         </span>
       </div>
 
@@ -56,7 +55,7 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
         {/* Name & Specialization */}
         <div className="mb-3">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-sans font-extrabold text-lg text-gray-900 group-hover:text-purple-700 transition-colors">
+            <h3 className="font-sans font-extrabold text-lg text-slate-900 group-hover:text-blue-600 transition-colors">
               {mentor.name}
             </h3>
             {/* LinkedIn Icon */}
@@ -64,7 +63,7 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
               href={mentor.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-[#0077B5] text-gray-500 hover:text-white flex items-center justify-center transition-all"
+              className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-[#0077B5] text-slate-500 hover:text-white flex items-center justify-center transition-all"
               aria-label={`${mentor.name} on LinkedIn`}
               title="LinkedIn Profile"
             >
@@ -74,42 +73,42 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
             </a>
           </div>
 
-          <div className="text-xs font-semibold text-purple-600 mb-0.5">
+          <div className="text-xs font-bold text-indigo-600 mb-0.5">
             {mentor.role}
           </div>
-          <div className="text-xs text-gray-500 font-medium">
-            {mentor.specialization} <span className="text-gray-400">({mentor.company})</span>
+          <div className="text-xs text-slate-500 font-medium">
+            {mentor.specialization} <span className="text-slate-400">({mentor.company})</span>
           </div>
         </div>
 
         {/* Rating & Languages Bar */}
-        <div className="grid grid-cols-2 gap-2 py-2 px-3 rounded-xl bg-gray-50 border border-gray-100 text-xs text-gray-600 mb-3.5">
+        <div className="grid grid-cols-2 gap-2 py-2 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 mb-3.5">
           <div className="flex items-center gap-1.5">
             <span className="text-amber-500 font-bold"><I.Star /></span>
-            <span className="font-extrabold text-gray-900">{mentor.rating}</span>
-            <span className="text-gray-400 text-[11px]">({mentor.reviewsCount})</span>
+            <span className="font-extrabold text-slate-900">{mentor.rating}</span>
+            <span className="text-slate-400 text-[11px]">({mentor.reviewsCount})</span>
           </div>
           <div className="flex items-center gap-1.5 truncate" title={mentor.languages.join(", ")}>
             <span className="text-cyan-600 text-xs">🌐</span>
-            <span className="truncate text-[11px] font-medium text-gray-700">{mentor.languages.join(", ")}</span>
+            <span className="truncate text-[11px] font-medium text-slate-700">{mentor.languages.join(", ")}</span>
           </div>
         </div>
 
         {/* Bio Preview */}
-        <p className="text-xs text-gray-600 leading-relaxed mb-3.5 line-clamp-2">
+        <p className="text-xs text-slate-600 leading-relaxed mb-3.5 line-clamp-2">
           {mentor.bio}
         </p>
 
         {/* Skills Chips */}
         <div className="mb-4">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
             Key Technical Skills:
           </span>
           <div className="flex flex-wrap gap-1">
             {mentor.skills.slice(0, 5).map((skill, idx) => (
               <span
                 key={idx}
-                className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-purple-50/80 text-purple-700 border border-purple-100"
+                className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200"
               >
                 {skill}
               </span>
@@ -119,20 +118,21 @@ export default function MentorCard({ mentor, onBookSession }: MentorCardProps) {
       </div>
 
       {/* Action Footer */}
-      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between gap-3">
+      <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
         <div className="text-left">
-          <span className="text-[10px] text-gray-400 font-medium block">One-on-One Live Students</span>
-          <span className="text-xs font-extrabold text-gray-900">{mentor.studentsCount} Trained</span>
+          <span className="text-[10px] text-slate-500 font-medium block">Format</span>
+          <span className="text-xs font-bold text-slate-800">One-on-One Live Guidance</span>
         </div>
 
         <button
           type="button"
           onClick={handleBook}
-          className="px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+          className="px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
         >
-          <I.Sparkles /> Book One-on-One Learning Session
+          <I.Sparkles /> Book Consultation
         </button>
       </div>
     </div>
   );
 }
+
