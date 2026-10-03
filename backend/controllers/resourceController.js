@@ -37,12 +37,20 @@ const getResources = async (req, res) => {
       ];
     }
 
-    const resources = await Resource.find(query).sort({ createdAt: -1 });
+    if (mongoose.connection.readyState === 1) {
+      const resources = await Resource.find(query).sort({ createdAt: -1 }).lean();
+      return res.json({
+        success: true,
+        count: resources.length,
+        resources,
+      });
+    }
 
-    res.json({
+    return res.json({
       success: true,
-      count: resources.length,
-      resources,
+      count: 0,
+      resources: [],
+      mode: 'resilient-offline',
     });
   } catch (error) {
     console.error('Get Resources Error:', error);

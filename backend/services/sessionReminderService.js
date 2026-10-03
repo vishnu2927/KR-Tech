@@ -3,6 +3,7 @@
  * Checks scheduled LiveSessions and triggers email notifications for enrolled students.
  */
 
+const mongoose = require('mongoose');
 const LiveSession = require('../models/LiveSession');
 const Enrollment = require('../models/Enrollment');
 const User = require('../models/User');
@@ -18,6 +19,9 @@ const checkAndSendReminders = async () => {
   const result = { checked: 0, sent24h: 0, sent30m: 0 };
 
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return result;
+    }
     const now = Date.now();
     const window24h = 24 * 60 * 60 * 1000;
     const window30m = 30 * 60 * 1000;

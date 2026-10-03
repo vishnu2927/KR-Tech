@@ -3,12 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import FreeDemoModal from "./components/FreeDemoModal";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import OfflineBanner from "./components/common/OfflineBanner";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import FloatingContactButtons from "./components/FloatingContactButtons";
+
+const FreeDemoModal = lazy(() => import("./components/FreeDemoModal"));
 
 // Lazy-loaded routes for code-splitting and performance optimization
 const Home = lazy(() => import("./pages/Home"));
@@ -98,7 +99,7 @@ const SuperAdminPage = lazy(() => import("./pages/SuperAdminPage"));
 const AdminMonitoringPage = lazy(() => import("./pages/AdminMonitoringPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const NotFoundPage = lazy(() => import("./components/common/NotFoundPage"));
-import PWAInstallBanner from "./components/pwa/PWAInstallBanner";
+const PWAInstallBanner = lazy(() => import("./components/pwa/PWAInstallBanner"));
 
 // Scroll to top automatically on route changes or hash scroll
 function ScrollToTop() {
@@ -573,18 +574,24 @@ function AppContent() {
 
             {!isSuperAdmin && <Footer />}
 
-            {!isSuperAdmin && <FloatingContactButtons />}
+            {!isSuperAdmin && (
+              <Suspense fallback={null}>
+                <PWAInstallBanner />
+              </Suspense>
+            )}
 
-            {!isSuperAdmin && <PWAInstallBanner />}
-
-            <FreeDemoModal
-              isOpen={demoModalOpen}
-              defaultCourse={selectedCourse}
-              onClose={() => {
-                setDemoModalOpen(false);
-                setSelectedCourse(undefined);
-              }}
-            />
+            {demoModalOpen && (
+              <Suspense fallback={null}>
+                <FreeDemoModal
+                  isOpen={demoModalOpen}
+                  defaultCourse={selectedCourse}
+                  onClose={() => {
+                    setDemoModalOpen(false);
+                    setSelectedCourse(undefined);
+                  }}
+                />
+              </Suspense>
+            )}
     </div>
   );
 }

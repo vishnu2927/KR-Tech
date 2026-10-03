@@ -72,4 +72,10 @@ const courseSchema = new mongoose.Schema(
   }
 );
 
+// High-Performance Query Indexes (Note: `id` already indexed via unique: true)
+courseSchema.index({ category: 1 });
+courseSchema.index({ categoryGroup: 1 });
+courseSchema.index({ isPopular: 1, rating: -1 });
+courseSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Course', courseSchema);

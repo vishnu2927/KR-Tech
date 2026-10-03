@@ -75,7 +75,7 @@ const getCourses = async (req, res) => {
           { categoryGroup: { $regex: search, $options: 'i' } },
         ];
       }
-      const courses = await Course.find(query).sort({ createdAt: -1 });
+      const courses = await Course.find(query).sort({ createdAt: -1 }).lean();
       return res.json({
         success: true,
         count: courses.length,
@@ -117,27 +117,25 @@ const getCourseById = async (req, res) => {
     let course = null;
 
     if (mongoose.connection.readyState === 1) {
-      // 1. Try finding by MongoDB ObjectId
-      if (mongoose.Types.ObjectId.isValid(id)) {
-        course = await Course.findById(id);
-      }
+      // 1. Try finding by custom 'id' (slug) first (fast indexed lookup)
+      course = await Course.findOne({
+        $or: [
+          { id: id },
+          { id: id.toLowerCase() },
+          { title: { $regex: new RegExp(`^${id.replace(/-/g, ' ')}$`, 'i') } },
+        ],
+      }).lean();
 
-      // 2. Try finding by custom 'id' (slug)
-      if (!course) {
-        course = await Course.findOne({
-          $or: [
-            { id: id },
-            { id: id.toLowerCase() },
-            { title: { $regex: new RegExp(`^${id.replace(/-/g, ' ')}$`, 'i') } },
-          ],
-        });
+      // 2. Try finding by MongoDB ObjectId
+      if (!course && mongoose.Types.ObjectId.isValid(id)) {
+        course = await Course.findById(id).lean();
       }
 
       // 3. Try fuzzy title search
       if (!course) {
         course = await Course.findOne({
           title: { $regex: id.replace(/-/g, ' '), $options: 'i' },
-        });
+        }).lean();
       }
 
       if (course) {

@@ -149,46 +149,91 @@ function normalizeCourse(raw: any): Course {
   };
 }
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const CACHE_TTL_MS = 60000; // 60 seconds
+const memoryCache = new Map<string, CacheEntry<any>>();
+const inFlightRequests = new Map<string, Promise<any>>();
+
+function getFromCache<T>(key: string): T | null {
+  const entry = memoryCache.get(key);
+  if (entry && Date.now() - entry.timestamp < CACHE_TTL_MS) {
+    return entry.data;
+  }
+  memoryCache.delete(key);
+  return null;
+}
+
+function setToCache<T>(key: string, data: T): void {
+  memoryCache.set(key, { data, timestamp: Date.now() });
+}
+
+export function invalidateCourseCache(): void {
+  memoryCache.clear();
+  inFlightRequests.clear();
+}
+
 export const courseService = {
   /**
-   * Get all courses from MongoDB Atlas
+   * Get all courses from MongoDB Atlas (cached)
    */
   async getAllCourses(): Promise<Course[]> {
     return this.getCourses();
   },
 
   /**
-   * Get courses with optional category and search filters
+   * Get courses with optional category and search filters (with in-flight deduplication & caching)
    */
   async getCourses(params?: { category?: string; search?: string }): Promise<Course[]> {
-    try {
-      const res = await api.get<{ success: boolean; courses: any[]; count?: number }>("/courses", { params });
-      if (res.data?.courses && Array.isArray(res.data.courses) && res.data.courses.length > 0) {
-        return res.data.courses.map(normalizeCourse);
+    const cacheKey = `courses_${params?.category || "all"}_${params?.search || ""}`;
+    const cached = getFromCache<Course[]>(cacheKey);
+    if (cached) return cached;
+
+    if (inFlightRequests.has(cacheKey)) {
+      return inFlightRequests.get(cacheKey)!;
+    }
+
+    const fetchPromise = (async () => {
+      try {
+        const res = await api.get<{ success: boolean; courses: any[]; count?: number }>("/courses", { params });
+        if (res.data?.courses && Array.isArray(res.data.courses) && res.data.courses.length > 0) {
+          const normalized = res.data.courses.map(normalizeCourse);
+          setToCache(cacheKey, normalized);
+          return normalized;
+        }
+      } catch (err) {
+        console.warn("API GET /courses notice:", err);
       }
-    } catch (err) {
-      console.warn("API GET /courses notice:", err);
-    }
-    // Reliable static catalog fallback
-    let list = ALL_COURSES;
-    if (params?.category && params.category !== "All") {
-      const catLower = params.category.toLowerCase();
-      list = list.filter(
-        (c) =>
-          c.category.toLowerCase().includes(catLower) ||
-          c.categoryGroup.toLowerCase().includes(catLower)
-      );
-    }
-    if (params?.search) {
-      const q = params.search.toLowerCase();
-      list = list.filter(
-        (c) =>
-          c.title.toLowerCase().includes(q) ||
-          c.category.toLowerCase().includes(q) ||
-          c.categoryGroup.toLowerCase().includes(q)
-      );
-    }
-    return list;
+      // Reliable static catalog fallback
+      let list = ALL_COURSES;
+      if (params?.category && params.category !== "All") {
+        const catLower = params.category.toLowerCase();
+        list = list.filter(
+          (c) =>
+            c.category.toLowerCase().includes(catLower) ||
+            c.categoryGroup.toLowerCase().includes(catLower)
+        );
+      }
+      if (params?.search) {
+        const q = params.search.toLowerCase();
+        list = list.filter(
+          (c) =>
+            c.title.toLowerCase().includes(q) ||
+            c.category.toLowerCase().includes(q) ||
+            c.categoryGroup.toLowerCase().includes(q)
+        );
+      }
+      setToCache(cacheKey, list);
+      return list;
+    })().finally(() => {
+      inFlightRequests.delete(cacheKey);
+    });
+
+    inFlightRequests.set(cacheKey, fetchPromise);
+    return fetchPromise;
   },
 
   /**
@@ -201,18 +246,35 @@ export const courseService = {
   },
 
   /**
-   * Get single course by ID or slug
+   * Get single course by ID or slug (resolves immediately if catalog in memory)
    */
   async getCourseById(id: string): Promise<Course | null> {
+    const cacheKey = `course_${id}`;
+    const cached = getFromCache<Course>(cacheKey);
+    if (cached) return cached;
+
+    // Fast resolution: Check if catalog already loaded in memory
+    const allCached = getFromCache<Course[]>("courses_all_");
+    if (allCached) {
+      const found = allCached.find((c) => c.id === id || c._id === id);
+      if (found) {
+        setToCache(cacheKey, found);
+        return found;
+      }
+    }
+
     try {
       const res = await api.get<{ success: boolean; course: any }>(`/courses/${id}`);
       if (res.data?.course) {
-        return normalizeCourse(res.data.course);
+        const normalized = normalizeCourse(res.data.course);
+        setToCache(cacheKey, normalized);
+        return normalized;
       }
     } catch {
       // Direct query fallback
       const all = await this.getCourses();
       const found = all.find((c) => c.id === id || c._id === id);
+      if (found) setToCache(cacheKey, found);
       return found || null;
     }
     return null;
@@ -222,6 +284,7 @@ export const courseService = {
    * Create a new course in MongoDB Atlas
    */
   async createCourse(courseData: CoursePayload): Promise<Course | null> {
+    invalidateCourseCache();
     try {
       const res = await api.post<{ success: boolean; course: any }>("/courses", courseData);
       if (res.data?.course) {
@@ -237,6 +300,7 @@ export const courseService = {
    * Update an existing course in MongoDB Atlas
    */
   async updateCourse(id: string, courseData: Partial<CoursePayload>): Promise<Course | null> {
+    invalidateCourseCache();
     try {
       const res = await api.put<{ success: boolean; course: any }>(`/courses/${id}`, courseData);
       if (res.data?.course) {
@@ -252,6 +316,7 @@ export const courseService = {
    * Delete a course from MongoDB Atlas
    */
   async deleteCourse(id: string): Promise<boolean> {
+    invalidateCourseCache();
     try {
       await api.delete(`/courses/${id}`);
       return true;

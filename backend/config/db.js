@@ -4,8 +4,14 @@ let isConnected = false;
 
 const connectDB = async () => {
   if (isConnected) return;
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  if (!uri) {
+    console.log('⚠️ MongoDB Atlas Notice: No MONGO_URI or MONGODB_URI configured.');
+    console.log('⚡ Active Dual-Engine Mode: Express running with in-memory resilient fallback store.');
+    return;
+  }
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 15000,
     });
     isConnected = true;
