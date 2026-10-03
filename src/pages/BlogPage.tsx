@@ -385,8 +385,8 @@ export default function BlogPage() {
     <div className="min-h-screen bg-[#0A0D14] text-slate-100 pb-24">
       <SEO
         title="Engineering Blog & System Design Insights | KR Global Learning"
-        description="Deep-dive articles on Distributed Systems, High-Scale Backend Engineering, AWS Cloud DevOps, and Tier-1 Tech Interview strategies by Staff Engineers."
-        keywords="System Design Blog, Microservices, Redis Caching, Kubernetes EKS, Staff Engineer Interview, React 19, Spring Boot, KR Global Learning"
+        description="Deep-dive articles on Distributed Systems, High-Scale Backend Engineering, AWS Cloud DevOps, and Technical Interview strategies by Senior Technical Mentors."
+        keywords="System Design Blog, Microservices, Redis Caching, Kubernetes EKS, Tech Interview, React 19, Spring Boot, KR Global Learning"
         canonical="https://krtech.in/blogs"
       />
 

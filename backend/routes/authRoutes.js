@@ -18,6 +18,8 @@ const {
   logoutAll,
   getUserSessions,
   revokeSession,
+  googleAuthStart,
+  googleAuthCallback,
 } = require('../controllers/authController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -44,6 +46,10 @@ const otpVerifyLimiter = rateLimit({
     message: 'Too many OTP verification attempts. Please wait 15 minutes before retrying.',
   },
 });
+
+// Google OAuth 2.0 Endpoints
+router.get('/google', googleAuthStart);
+router.get('/google/callback', googleAuthCallback);
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);

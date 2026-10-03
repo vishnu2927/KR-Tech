@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import SEO from "../components/common/SEO";
 
 export default function LoginPage() {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -11,10 +12,19 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<"student" | "admin">("student");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [socialLoading, setSocialLoading] = useState<string | null>(null);
-
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (oauthError === "google_not_configured") {
+      setError("Google OAuth is not configured on this server. Please use email and password.");
+    } else if (oauthError === "email_not_verified") {
+      setError("Your Google account email is unverified. Please verify your Google email first.");
+    } else if (oauthError) {
+      setError("Google authentication failed. Please use standard email and password.");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,29 +51,7 @@ export default function LoginPage() {
 
   const handleRoleSelect = (role: "student" | "admin") => {
     setSelectedRole(role);
-    if (role === "admin") {
-      setEmail("admin@krtech.com");
-      setPassword("admin123");
-    } else {
-      setEmail("student@krtech.edu");
-      setPassword("password123");
-    }
     setError("");
-  };
-
-  const handleSocialLogin = (provider: string) => {
-    setError("");
-    setSocialLoading(provider);
-    setTimeout(async () => {
-      try {
-        const loggedUser = await login("student@krtech.edu", "password123", rememberMe);
-        setSocialLoading(null);
-        navigate("/dashboard");
-      } catch {
-        setSocialLoading(null);
-        setError(`${provider} Authentication: Please use standard credentials or register a new student account.`);
-      }
-    }, 650);
   };
 
   return (
@@ -160,28 +148,28 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="text-emerald-400 font-semibold">✓ Global Industry Certification</span>
-              <span className="text-purple-300">Q1 2026 Cohort</span>
+              <span className="text-emerald-400 font-semibold">✓ Certification Preparation</span>
+              <span className="text-purple-300">Live Mentorship</span>
             </div>
           </div>
 
           {/* 4 Key Platform Metrics */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <div className="p-3.5 rounded-2xl bg-slate-900/50 border border-white/5">
-              <span className="text-2xl font-extrabold text-white block">15,000+</span>
-              <span className="text-xs text-slate-400">Active Students</span>
+              <span className="text-2xl font-extrabold text-white block">84</span>
+              <span className="text-xs text-slate-400">Technology & Certification Courses</span>
             </div>
             <div className="p-3.5 rounded-2xl bg-slate-900/50 border border-white/5">
-              <span className="text-2xl font-extrabold text-cyan-400 block">98.4%</span>
-              <span className="text-xs text-slate-400">Practical Mastery Rate</span>
+              <span className="text-2xl font-extrabold text-cyan-400 block">1-on-1</span>
+              <span className="text-xs text-slate-400">One-on-One Mentorship</span>
             </div>
             <div className="p-3.5 rounded-2xl bg-slate-900/50 border border-white/5">
-              <span className="text-2xl font-extrabold text-purple-400 block">50+</span>
-              <span className="text-xs text-slate-400">Masterclasses</span>
+              <span className="text-2xl font-extrabold text-purple-400 block">100%</span>
+              <span className="text-xs text-slate-400">Practical Projects & Labs</span>
             </div>
             <div className="p-3.5 rounded-2xl bg-slate-900/50 border border-white/5">
-              <span className="text-2xl font-extrabold text-amber-400 block">30+</span>
-              <span className="text-xs text-slate-400">MAANG Mentors</span>
+              <span className="text-2xl font-extrabold text-amber-400 block">Global</span>
+              <span className="text-xs text-slate-400">Certification Preparation</span>
             </div>
           </div>
         </div>
@@ -233,7 +221,7 @@ export default function LoginPage() {
                 <span className="text-2xl">🎓</span>
                 <div className="min-w-0">
                   <span className="block text-xs font-bold truncate text-white">Student Portal</span>
-                  <span className="block text-[10px] text-purple-300 truncate">Demo Credentials</span>
+                  <span className="block text-[10px] text-purple-300 truncate">Learner Sign In</span>
                 </div>
               </button>
 
@@ -249,7 +237,7 @@ export default function LoginPage() {
                 <span className="text-2xl">👑</span>
                 <div className="min-w-0">
                   <span className="block text-xs font-bold truncate text-white">Admin Suite</span>
-                  <span className="block text-[10px] text-indigo-300 truncate">Superuser Access</span>
+                  <span className="block text-[10px] text-indigo-300 truncate">Administrator Sign In</span>
                 </div>
               </button>
             </div>
@@ -374,60 +362,33 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Social Divider */}
-            <div className="relative my-6 text-center">
+            {/* Google OAuth Section */}
+            <div className="relative my-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/10" />
               </div>
-              <span className="relative px-3 bg-slate-900 text-[11px] font-mono font-bold text-slate-400 uppercase">
-                Or Continue With
-              </span>
+              <div className="relative flex justify-center text-[10px] uppercase">
+                <span className="bg-slate-900/90 px-3 text-slate-400 font-semibold tracking-wider">
+                  Or continue with
+                </span>
+              </div>
             </div>
 
-            {/* Social Logins: Google, GitHub, LinkedIn */}
-            <div className="grid grid-cols-3 gap-2.5">
-              {/* Google */}
-              <button
-                type="button"
-                disabled={Boolean(socialLoading) || loading}
-                onClick={() => handleSocialLogin("Google")}
-                className="py-2.5 px-3 rounded-xl bg-slate-950/60 hover:bg-slate-800 border border-white/10 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer shadow-xs disabled:opacity-50"
-              >
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                  <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z" />
-                  <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z" />
-                  <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-2.9z" />
-                  <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z" />
-                </svg>
-                <span className="hidden sm:inline">Google</span>
-              </button>
-
-              {/* GitHub */}
-              <button
-                type="button"
-                disabled={Boolean(socialLoading) || loading}
-                onClick={() => handleSocialLogin("GitHub")}
-                className="py-2.5 px-3 rounded-xl bg-slate-950/60 hover:bg-slate-800 border border-white/10 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer shadow-xs disabled:opacity-50"
-              >
-                <svg className="w-4 h-4 shrink-0 fill-white" viewBox="0 0 24 24">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                </svg>
-                <span className="hidden sm:inline">GitHub</span>
-              </button>
-
-              {/* LinkedIn */}
-              <button
-                type="button"
-                disabled={Boolean(socialLoading) || loading}
-                onClick={() => handleSocialLogin("LinkedIn")}
-                className="py-2.5 px-3 rounded-xl bg-slate-950/60 hover:bg-slate-800 border border-white/10 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer shadow-xs disabled:opacity-50"
-              >
-                <svg className="w-4 h-4 shrink-0 fill-[#0A66C2]" viewBox="0 0 24 24">
-                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z" />
-                </svg>
-                <span className="hidden sm:inline">LinkedIn</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = "/api/auth/google";
+              }}
+              className="w-full py-3 px-4 rounded-xl border border-white/10 bg-slate-950/60 hover:bg-slate-800/60 text-white text-xs font-semibold flex items-center justify-center gap-3 transition-all cursor-pointer hover:border-purple-500/40"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+              </svg>
+              <span>Continue with Google</span>
+            </button>
 
             {/* Bottom Footer Navigation */}
             <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">

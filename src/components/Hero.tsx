@@ -170,7 +170,7 @@ export default function Hero({ onOpenDemoModal }: { onOpenDemoModal?: () => void
                 10+ Senior Mentors
               </div>
               <div style={{ fontSize: 11, color: "#A5F3FC", fontWeight: 500 }}>
-                Enterprise Architects & Staff Engineers
+                Enterprise Architects & Technical Mentors
               </div>
             </div>
           </div>

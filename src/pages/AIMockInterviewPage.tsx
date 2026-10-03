@@ -107,7 +107,7 @@ export default function AIMockInterviewPage() {
     <div className="min-h-screen bg-[#070913] text-white pt-20 pb-16 px-4 sm:px-6 lg:px-8">
       <SEO
         title="AI Mock Interview Bot (Technical & HR) | KR Global Learning"
-        description="Practice simulated MAANG technical and HR behavioral interviews with real-time vocal scoring, filler word analysis, and model answer comparison."
+        description="Practice simulated top-tier tech technical and HR behavioral interviews with real-time vocal scoring, filler word analysis, and model answer comparison."
       />
 
       <div className="max-w-6xl mx-auto space-y-8">

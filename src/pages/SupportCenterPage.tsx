@@ -194,7 +194,7 @@ export default function SupportCenterPage() {
           <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl">
             <p className="text-xs text-slate-400 font-medium">Resolved & Closed</p>
             <h4 className="text-2xl font-black text-emerald-400 mt-1">{stats.resolved}</h4>
-            <span className="text-[11px] text-emerald-300 font-semibold">98.4% Satisfaction</span>
+            <span className="text-[11px] text-emerald-300 font-semibold">SLA Performance Verified</span>
           </div>
         </div>
 

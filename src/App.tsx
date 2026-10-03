@@ -45,6 +45,7 @@ const SignupPage = lazy(() => import("./pages/SignupPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage"));
 const SecurityPage = lazy(() => import("./pages/SecurityPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const MyCoursesPage = lazy(() => import("./pages/MyCoursesPage"));
@@ -565,6 +566,7 @@ function AppContent() {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="*" element={<NotFoundPage />} />

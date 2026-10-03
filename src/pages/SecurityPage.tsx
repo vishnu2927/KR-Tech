@@ -12,6 +12,7 @@ export default function SecurityPage() {
   const [loadingSessions, setLoadingSessions] = useState<boolean>(true);
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [loggingOutAll, setLoggingOutAll] = useState<boolean>(false);
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
   // Password update form
   const [currentPassword, setCurrentPassword] = useState("");
@@ -23,6 +24,15 @@ export default function SecurityPage() {
 
   // General feedback
   const [bannerMsg, setBannerMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const maskIp = (ip?: string) => {
+    if (!ip || ip === "::1" || ip === "127.0.0.1") return ip || "127.0.0.1";
+    const parts = ip.split(".");
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.***.***`;
+    }
+    return ip;
+  };
 
   const fetchSessions = async () => {
     setLoadingSessions(true);
@@ -53,10 +63,8 @@ export default function SecurityPage() {
     }
   };
 
-  const handleLogoutAll = async () => {
-    if (!window.confirm("Are you sure you want to log out from all devices? You will be signed out immediately.")) {
-      return;
-    }
+  const confirmLogoutAll = async () => {
+    setShowLogoutModal(false);
     setLoggingOutAll(true);
     try {
       await logoutAll();
@@ -72,8 +80,8 @@ export default function SecurityPage() {
     setPasswordError(null);
     setPasswordSuccess(null);
 
-    if (newPassword.length < 6) {
-      setPasswordError("New password must be at least 6 characters long.");
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters long.");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -84,7 +92,7 @@ export default function SecurityPage() {
     setUpdatingPassword(true);
     try {
       await updateProfile({ password: newPassword });
-      setPasswordSuccess("Password updated securely in MongoDB Atlas!");
+      setPasswordSuccess("Password updated securely in database!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -138,7 +146,7 @@ export default function SecurityPage() {
             <button
               type="button"
               disabled={loggingOutAll || sessions.length === 0}
-              onClick={handleLogoutAll}
+              onClick={() => setShowLogoutModal(true)}
               className="px-4 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 hover:text-rose-200 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {loggingOutAll ? (
@@ -190,7 +198,7 @@ export default function SecurityPage() {
                     </span>
                   </h2>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Sessions authorized with JWT & MongoDB Atlas TTL refresh tokens.
+                    Sessions authorized with JWT & secure hashed refresh tokens.
                   </p>
                 </div>
 
@@ -206,7 +214,7 @@ export default function SecurityPage() {
               {loadingSessions ? (
                 <div className="py-12 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
                   <span className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-                  <span>Loading active sessions from Atlas...</span>
+                  <span>Loading active sessions...</span>
                 </div>
               ) : sessions.length === 0 ? (
                 <div className="py-8 text-center text-slate-400 text-xs bg-slate-950/60 rounded-2xl border border-slate-800">
@@ -245,19 +253,17 @@ export default function SecurityPage() {
                             </span>
                             {session.isCurrent && (
                               <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-semibold">
-                                Current Session
+                                Current Device
                               </span>
                             )}
                           </div>
 
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400 mt-1">
-                            <span>IP: <code className="text-slate-300">{session.ipAddress}</code></span>
+                            <span>IP: <code className="text-slate-300">{maskIp(session.ipAddress)}</code></span>
+                            <span>•</span>
+                            <span>Location: <span className="text-slate-300">{session.location || "Location unavailable"}</span></span>
                             <span>•</span>
                             <span>Last Active: {formatDate(session.lastActive)}</span>
-                            <span>•</span>
-                            <span className="text-slate-500">
-                              TTL: 30d Refresh Token
-                            </span>
                           </div>
                         </div>
                       </div>
@@ -300,7 +306,7 @@ export default function SecurityPage() {
                     ✓
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-white">MongoDB TTL Indices</h4>
+                    <h4 className="text-xs font-bold text-white">TTL Expiration Indices</h4>
                     <p className="text-[11px] text-slate-400">Auto-Expiry on OTP & Sessions</p>
                   </div>
                 </div>
@@ -320,8 +326,8 @@ export default function SecurityPage() {
                     ⚡
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-white">Refresh Token Rotation</h4>
-                    <p className="text-[11px] text-slate-400">Session model connected in Atlas</p>
+                    <h4 className="text-xs font-bold text-white">Refresh Token Hashing</h4>
+                    <p className="text-[11px] text-slate-400">SHA-256 hashed session storage</p>
                   </div>
                 </div>
               </div>
@@ -336,7 +342,7 @@ export default function SecurityPage() {
                 <span>🔑 Change Password</span>
               </h2>
               <p className="text-xs text-slate-400 mb-4">
-                Update your student portal password. All other active sessions will be terminated automatically.
+                Update your account password. All other active sessions will be invalidated automatically.
               </p>
 
               {passwordError && (
@@ -361,7 +367,7 @@ export default function SecurityPage() {
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Min. 6 characters"
+                    placeholder="Min. 8 characters"
                     className="w-full px-3.5 py-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                   />
                 </div>
@@ -403,7 +409,7 @@ export default function SecurityPage() {
                 Need Help?
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                If you suspect unauthorized access to your KR Global Learning student profile, please contact IT Security immediately.
+                If you suspect unauthorized access to your KR Global Learning account, please contact IT Security immediately.
               </p>
               <div className="pt-2">
                 <a
@@ -417,6 +423,39 @@ export default function SecurityPage() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal for Logout All Devices */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md p-6 rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl font-bold mx-auto">
+              🚪
+            </div>
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-bold text-white">Log Out All Devices</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                This will sign you out from all active devices. You will need to log back in on this device and any others.
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold text-xs transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmLogoutAll}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors shadow-lg shadow-rose-900/40 cursor-pointer"
+              >
+                Log Out All Devices
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

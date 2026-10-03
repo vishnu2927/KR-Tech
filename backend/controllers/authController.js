@@ -4,12 +4,16 @@ const User = require('../models/User');
 const Lead = require('../models/Lead');
 const Otp = require('../models/Otp');
 const Session = require('../models/Session');
+const AuthAuditLog = require('../models/AuthAuditLog');
 const { sendWelcomeEmail, sendOtpResetEmail } = require('../services/emailService');
 
-// Helper to generate JWT Access Token (30d)
-const generateToken = (id, role, email) => {
+// State store for Google OAuth CSRF validation (TTL 10 mins)
+const oauthStateCache = new Map();
+
+// Helper to generate JWT Access Token (30d default, or 7d)
+const generateToken = (id, role, email, sessionId = null) => {
   return jwt.sign(
-    { id, role, email },
+    { id, role, email, sessionId },
     process.env.JWT_SECRET || 'krtech_super_secret_jwt_key_2026_production',
     { expiresIn: '30d' }
   );
@@ -18,6 +22,11 @@ const generateToken = (id, role, email) => {
 // Helper to generate secure cryptographic Refresh Token
 const generateRefreshToken = () => {
   return crypto.randomBytes(40).toString('hex');
+};
+
+// Helper to hash refresh tokens with SHA-256
+const hashRefreshToken = (token) => {
+  return crypto.createHash('sha256').update(String(token)).digest('hex');
 };
 
 // Helper to parse user agent for device, browser, OS
@@ -42,7 +51,34 @@ const parseUserAgent = (uaString = '') => {
   };
 };
 
-// Helper to create and persist session record in MongoDB Atlas
+// Helper to log security authentication audit events
+const logAuthAudit = async ({ userId, email, eventType, role = 'student', req, success = true, details = '' }) => {
+  try {
+    const ua = parseUserAgent(req?.headers ? req.headers['user-agent'] : '');
+    const ipAddress =
+      req?.ip ||
+      req?.headers?.['x-forwarded-for'] ||
+      req?.socket?.remoteAddress ||
+      '127.0.0.1';
+
+    await AuthAuditLog.create({
+      userId,
+      email: email ? email.toLowerCase().trim() : undefined,
+      eventType,
+      role,
+      ipAddress: String(ipAddress).split(',')[0].trim(),
+      deviceInfo: ua.deviceInfo,
+      browser: ua.browser,
+      os: ua.os,
+      success,
+      details,
+    });
+  } catch (err) {
+    console.warn('Auth Audit Logging notice:', err.message);
+  }
+};
+
+// Helper to create and persist hashed session record in MongoDB Atlas
 const createSessionRecord = async ({ userId, rememberMe = true, req }) => {
   try {
     const ua = parseUserAgent(req?.headers ? req.headers['user-agent'] : '');
@@ -51,35 +87,49 @@ const createSessionRecord = async ({ userId, rememberMe = true, req }) => {
       req?.headers?.['x-forwarded-for'] ||
       req?.socket?.remoteAddress ||
       '127.0.0.1';
-    const refreshToken = generateRefreshToken();
+    const rawRefreshToken = generateRefreshToken();
+    const refreshTokenHash = hashRefreshToken(rawRefreshToken);
     const sessionDays = rememberMe ? 30 : 7;
     const expiresAt = new Date(Date.now() + sessionDays * 24 * 60 * 60 * 1000);
 
     const session = await Session.create({
       user: userId,
-      refreshToken,
+      refreshToken: rawRefreshToken,
+      refreshTokenHash,
       deviceInfo: ua.deviceInfo,
       browser: ua.browser,
       os: ua.os,
-      ipAddress,
+      ipAddress: String(ipAddress).split(',')[0].trim(),
+      location: 'Location unavailable',
       isCurrent: true,
       lastActive: new Date(),
       expiresAt,
     });
 
-    return { refreshToken, session };
+    return { refreshToken: rawRefreshToken, session };
   } catch (err) {
     console.warn('Session Creation Notice:', err.message);
-    return { refreshToken: generateRefreshToken() };
+    const rawRefreshToken = generateRefreshToken();
+    return { refreshToken: rawRefreshToken };
   }
 };
 
-// @desc    Register a new user
+// Helper to normalize phone numbers consistently (E.164 canonical format)
+const normalizePhone = (raw) => {
+  if (!raw) return '';
+  const digits = String(raw).replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.length === 10) return '+91' + digits;
+  if (digits.length === 12 && digits.startsWith('91')) return '+' + digits;
+  return '+' + digits;
+};
+
+// @desc    Register a new student user
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, phone, role, course } = req.body;
+    const { name, email, password, phone, course } = req.body;
 
     // 1. Validate required fields
     if (!name || !name.trim()) {
@@ -88,40 +138,46 @@ const registerUser = async (req, res) => {
     if (!email || !email.trim()) {
       return res.status(400).json({ success: false, message: 'Please provide a valid email address.' });
     }
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid phone number.' });
+    }
     if (!password) {
       return res.status(400).json({ success: false, message: 'Please provide a secure password.' });
     }
 
-    // 2. Email format validation
+    // 2. Email normalization & format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const normalizedEmail = email.toLowerCase().trim();
     if (!emailRegex.test(normalizedEmail)) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid email address.' });
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address format.' });
     }
 
-    // 3. Password length validation
-    if (password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
+    // 3. Phone normalization & format validation
+    const normalizedPhone = normalizePhone(phone);
+    const phoneDigits = String(phone).replace(/\D/g, '');
+    if (!normalizedPhone || phoneDigits.length < 7 || phoneDigits.length > 15) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid phone number (7-15 digits).' });
     }
 
-    // 4. Phone validation (optional field, but if provided, validate length)
-    let cleanedPhone = '';
-    if (phone && phone.trim()) {
-      cleanedPhone = phone.trim();
-      const phoneDigits = cleanedPhone.replace(/\D/g, '');
-      if (phoneDigits.length < 7 || phoneDigits.length > 15) {
-        return res.status(400).json({ success: false, message: 'Please provide a valid phone number (7-15 digits).' });
-      }
+    // 4. Password length validation (8+ characters)
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long.' });
     }
 
-    // Check if user already exists in MongoDB
-    const userExists = await User.findOne({ email: normalizedEmail });
-    if (userExists) {
-      return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
+    // 5. Database-level & application check: Duplicate Email (HTTP 409 Conflict)
+    const existingEmail = await User.findOne({ email: normalizedEmail });
+    if (existingEmail) {
+      return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
     }
 
-    // Determine user role
-    const userRole = role === 'admin' || normalizedEmail === 'admin@krtech.com' ? 'admin' : 'student';
+    // 6. Database-level & application check: Duplicate Phone (HTTP 409 Conflict)
+    const existingPhone = await User.findOne({ phone: normalizedPhone });
+    if (existingPhone) {
+      return res.status(409).json({ success: false, message: 'An account with this phone number already exists.' });
+    }
+
+    // 7. Role Security: Public registration always enforces 'student' role (Ignore client-supplied role)
+    const userRole = 'student';
 
     const enrolledCourses = [];
     if (course) {
@@ -137,7 +193,7 @@ const registerUser = async (req, res) => {
       name: name.trim(),
       email: normalizedEmail,
       password,
-      phone: cleanedPhone,
+      phone: normalizedPhone,
       role: userRole,
       enrolledCourses,
     });
@@ -149,10 +205,19 @@ const registerUser = async (req, res) => {
       });
 
       // Generate Refresh Token and persist Session in MongoDB Atlas
-      const { refreshToken } = await createSessionRecord({
+      const { refreshToken, session } = await createSessionRecord({
         userId: user._id,
         rememberMe: true,
         req,
+      });
+
+      await logAuthAudit({
+        userId: user._id,
+        email: user.email,
+        eventType: 'LOGIN_SUCCESS',
+        role: user.role,
+        req,
+        details: 'User registered & authenticated successfully',
       });
 
       res.status(201).json({
@@ -166,7 +231,7 @@ const registerUser = async (req, res) => {
           enrolledCourses: user.enrolledCourses,
           createdAt: user.createdAt,
         },
-        token: generateToken(user._id, user.role, user.email),
+        token: generateToken(user._id, user.role, user.email, session?._id),
         refreshToken,
         message: 'Account registered successfully in MongoDB Atlas!',
       });
@@ -174,6 +239,15 @@ const registerUser = async (req, res) => {
       res.status(400).json({ success: false, message: 'Invalid user data received' });
     }
   } catch (error) {
+    if (error.code === 11000) {
+      if (error.keyPattern?.email || error.message?.includes('email')) {
+        return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
+      }
+      if (error.keyPattern?.phone || error.message?.includes('phone')) {
+        return res.status(409).json({ success: false, message: 'An account with this phone number already exists.' });
+      }
+      return res.status(409).json({ success: false, message: 'An account with these details already exists.' });
+    }
     console.error('Registration error:', error);
     res.status(500).json({ success: false, message: error.message || 'Server error during registration' });
   }
@@ -203,6 +277,7 @@ const loginUser = async (req, res) => {
         adminUser = await User.create({
           name: 'KR Tech Administrator',
           email: 'admin@krtech.com',
+          phone: '+919876543210',
           password: 'admin123',
           role: 'admin',
         });
@@ -214,6 +289,15 @@ const loginUser = async (req, res) => {
         req,
       });
 
+      await logAuthAudit({
+        userId: adminUser._id,
+        email: adminUser.email,
+        eventType: 'LOGIN_SUCCESS',
+        role: 'admin',
+        req,
+        details: 'Admin user login successful',
+      });
+
       return res.json({
         success: true,
         user: {
@@ -221,7 +305,7 @@ const loginUser = async (req, res) => {
           name: adminUser.name,
           email: adminUser.email,
           role: 'admin',
-          phone: adminUser.phone || '+91 98765 43210',
+          phone: adminUser.phone || '+919876543210',
           createdAt: adminUser.createdAt,
         },
         token: generateToken(adminUser._id, 'admin', adminUser.email),
@@ -234,10 +318,19 @@ const loginUser = async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
       // Create Session in Atlas for refresh tokens
-      const { refreshToken } = await createSessionRecord({
+      const { refreshToken, session } = await createSessionRecord({
         userId: user._id,
         rememberMe: !!rememberMe,
         req,
+      });
+
+      await logAuthAudit({
+        userId: user._id,
+        email: user.email,
+        eventType: 'LOGIN_SUCCESS',
+        role: user.role,
+        req,
+        details: 'Standard user login successful',
       });
 
       res.json({
@@ -251,11 +344,18 @@ const loginUser = async (req, res) => {
           enrolledCourses: user.enrolledCourses || [],
           createdAt: user.createdAt,
         },
-        token: generateToken(user._id, user.role, user.email),
+        token: generateToken(user._id, user.role, user.email, session?._id),
         refreshToken,
         message: 'Login successful!',
       });
     } else {
+      await logAuthAudit({
+        email: normalizedEmail,
+        eventType: 'LOGIN_FAILED',
+        req,
+        success: false,
+        details: 'Invalid credentials attempt',
+      });
       res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
   } catch (error) {
@@ -271,7 +371,10 @@ const logoutUser = async (req, res) => {
   try {
     const refreshToken = req.body?.refreshToken || req.headers['x-refresh-token'];
     if (refreshToken) {
-      await Session.deleteOne({ refreshToken });
+      const hash = hashRefreshToken(refreshToken);
+      await Session.deleteOne({
+        $or: [{ refreshTokenHash: hash }, { refreshToken }],
+      });
     }
     res.json({
       success: true,
@@ -282,6 +385,343 @@ const logoutUser = async (req, res) => {
       success: true,
       message: 'User logged out successfully.',
     });
+  }
+};
+
+// @desc    Refresh access token using valid refresh token (Token Rotation)
+// @route   POST /api/auth/refresh-token
+// @access  Public
+const refreshTokenHandler = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).json({ success: false, message: 'Refresh token is required.' });
+    }
+
+    const hash = hashRefreshToken(refreshToken);
+
+    const session = await Session.findOne({
+      $or: [{ refreshTokenHash: hash }, { refreshToken }],
+      expiresAt: { $gt: new Date() },
+    }).populate('user', '-password');
+
+    if (!session || !session.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired refresh token. Please sign in again.',
+      });
+    }
+
+    // Refresh Token Rotation: Generate new token & update session hash
+    const newRawRefreshToken = generateRefreshToken();
+    const newHash = hashRefreshToken(newRawRefreshToken);
+
+    session.refreshToken = newRawRefreshToken;
+    session.refreshTokenHash = newHash;
+    session.lastActive = new Date();
+    session.expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await session.save();
+
+    const newAccessToken = generateToken(session.user._id, session.user.role, session.user.email, session._id);
+
+    res.json({
+      success: true,
+      token: newAccessToken,
+      refreshToken: newRawRefreshToken,
+      user: {
+        id: session.user._id,
+        name: session.user.name,
+        email: session.user.email,
+        phone: session.user.phone,
+        role: session.user.role,
+        avatar: session.user.avatar,
+        enrolledCourses: session.user.enrolledCourses || [],
+        createdAt: session.user.createdAt,
+      },
+      message: 'Access token refreshed successfully.',
+    });
+  } catch (error) {
+    console.error('Refresh Token Error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Server error during token refresh' });
+  }
+};
+
+// @desc    Logout from all devices & terminate all sessions
+// @route   POST /api/auth/logout-all
+// @access  Private
+const logoutAll = async (req, res) => {
+  try {
+    const result = await Session.deleteMany({ user: req.user._id });
+    await logAuthAudit({
+      userId: req.user._id,
+      email: req.user.email,
+      eventType: 'LOGOUT_ALL',
+      role: req.user.role,
+      req,
+      details: `Logged out from all ${result.deletedCount} devices`,
+    });
+
+    res.json({
+      success: true,
+      message: `Successfully logged out from all devices (${result.deletedCount} session${result.deletedCount === 1 ? '' : 's'} terminated).`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error('Logout All Error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Failed to terminate all sessions' });
+  }
+};
+
+// @desc    Get all active sessions / devices for current user
+// @route   GET /api/auth/sessions
+// @access  Private
+const getUserSessions = async (req, res) => {
+  try {
+    const sessions = await Session.find({
+      user: req.user._id,
+      expiresAt: { $gt: new Date() },
+    }).sort({ lastActive: -1 });
+
+    const formattedSessions = sessions.map((s, idx) => {
+      const isCurrent = req.sessionId ? String(s._id) === String(req.sessionId) : idx === 0;
+      // Mask IP address (e.g. 192.168.1.100 -> 192.168.***.***)
+      const parts = String(s.ipAddress || '127.0.0.1').split('.');
+      const maskedIp = parts.length === 4 ? `${parts[0]}.${parts[1]}.***.***` : s.ipAddress;
+
+      return {
+        id: s._id,
+        deviceInfo: s.deviceInfo,
+        browser: s.browser,
+        os: s.os,
+        ipAddress: maskedIp,
+        location: s.location || 'Location unavailable',
+        lastActive: s.lastActive,
+        createdAt: s.createdAt,
+        expiresAt: s.expiresAt,
+        isCurrent,
+      };
+    });
+
+    res.json({
+      success: true,
+      count: formattedSessions.length,
+      sessions: formattedSessions,
+    });
+  } catch (error) {
+    console.error('Get User Sessions Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Revoke a specific device session
+// @route   DELETE /api/auth/sessions/:sessionId
+// @access  Private
+const revokeSession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const session = await Session.findOne({ _id: sessionId, user: req.user._id });
+    if (!session) {
+      return res.status(404).json({ success: false, message: 'Session not found or already terminated.' });
+    }
+
+    await Session.deleteOne({ _id: sessionId });
+
+    await logAuthAudit({
+      userId: req.user._id,
+      email: req.user.email,
+      eventType: 'SESSION_REVOKED',
+      role: req.user.role,
+      req,
+      details: `Revoked session ${sessionId}`,
+    });
+
+    res.json({ success: true, message: 'Device session revoked successfully.' });
+  } catch (error) {
+    console.error('Revoke Session Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Initiate Real Google OAuth 2.0 Flow
+// @route   GET /api/auth/google
+// @access  Public
+const googleAuthStart = async (req, res) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const callbackUrl =
+    process.env.GOOGLE_CALLBACK_URL ||
+    `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+
+  if (!clientId || !clientSecret) {
+    // If OAuth is not configured, inform safely
+    if (req.accepts('html')) {
+      return res.redirect('/login?error=google_not_configured');
+    }
+    return res.status(503).json({
+      success: false,
+      configured: false,
+      message: 'Google OAuth is not configured on this server. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in backend/.env',
+    });
+  }
+
+  // Generate cryptographically secure CSRF state
+  const state = crypto.randomBytes(32).toString('hex');
+  oauthStateCache.set(state, { createdAt: Date.now() });
+
+  // Clean expired states older than 10 mins
+  const now = Date.now();
+  for (const [key, val] of oauthStateCache.entries()) {
+    if (now - val.createdAt > 10 * 60 * 1000) {
+      oauthStateCache.delete(key);
+    }
+  }
+
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+    clientId
+  )}&redirect_uri=${encodeURIComponent(
+    callbackUrl
+  )}&response_type=code&scope=openid%20email%20profile&state=${encodeURIComponent(
+    state
+  )}&prompt=select_account`;
+
+  res.redirect(googleAuthUrl);
+};
+
+// @desc    Google OAuth 2.0 Authorization Callback
+// @route   GET /api/auth/google/callback
+// @access  Public
+const googleAuthCallback = async (req, res) => {
+  try {
+    const { code, state, error } = req.query;
+
+    if (error) {
+      await logAuthAudit({
+        eventType: 'GOOGLE_OAUTH_FAILED',
+        req,
+        success: false,
+        details: `Google returned error: ${error}`,
+      });
+      return res.redirect(`/login?error=${encodeURIComponent(error)}`);
+    }
+
+    if (!state || !oauthStateCache.has(state)) {
+      await logAuthAudit({
+        eventType: 'GOOGLE_OAUTH_FAILED',
+        req,
+        success: false,
+        details: 'Invalid or expired CSRF state parameter',
+      });
+      return res.redirect('/login?error=invalid_csrf_state');
+    }
+    oauthStateCache.delete(state);
+
+    if (!code) {
+      return res.redirect('/login?error=missing_authorization_code');
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const callbackUrl =
+      process.env.GOOGLE_CALLBACK_URL ||
+      `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+
+    if (!clientId || !clientSecret) {
+      return res.redirect('/login?error=google_not_configured');
+    }
+
+    // Exchange authorization code for tokens
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code: String(code),
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: callbackUrl,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    const tokenData = await tokenResponse.json();
+    if (!tokenResponse.ok || !tokenData.access_token) {
+      console.error('Google token exchange failed:', tokenData);
+      return res.redirect('/login?error=token_exchange_failed');
+    }
+
+    // Retrieve verified profile
+    const userinfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const profile = await userinfoResponse.json();
+
+    if (!userinfoResponse.ok || !profile.email) {
+      return res.redirect('/login?error=profile_fetch_failed');
+    }
+
+    if (!profile.email_verified) {
+      return res.redirect('/login?error=unverified_google_email');
+    }
+
+    const normalizedEmail = profile.email.toLowerCase().trim();
+    const googleSub = profile.sub;
+
+    // Check if user already exists
+    let user = await User.findOne({
+      $or: [{ googleId: googleSub }, { email: normalizedEmail }],
+    });
+
+    if (user) {
+      // Link Google identity if not linked
+      if (!user.googleId) {
+        user.googleId = googleSub;
+        if (!user.authProviders) user.authProviders = [];
+        user.authProviders.push({ provider: 'google', providerId: googleSub });
+        await user.save();
+      }
+      await logAuthAudit({
+        userId: user._id,
+        email: user.email,
+        eventType: 'GOOGLE_OAUTH_LINKED',
+        role: user.role,
+        req,
+        details: 'Google identity linked to existing user account',
+      });
+    } else {
+      // Create new student user (NEVER admin!)
+      user = await User.create({
+        name: profile.name || 'Google Learner',
+        email: normalizedEmail,
+        googleId: googleSub,
+        role: 'student',
+        avatar: profile.picture || '',
+        authProviders: [{ provider: 'google', providerId: googleSub }],
+      });
+
+      sendWelcomeEmail(user).catch(() => {});
+
+      await logAuthAudit({
+        userId: user._id,
+        email: user.email,
+        eventType: 'GOOGLE_OAUTH_SUCCESS',
+        role: 'student',
+        req,
+        details: 'New student account created via Google OAuth',
+      });
+    }
+
+    const { refreshToken, session } = await createSessionRecord({
+      userId: user._id,
+      rememberMe: true,
+      req,
+    });
+
+    const jwtToken = generateToken(user._id, user.role, user.email, session?._id);
+
+    // Redirect to frontend auth callback handler
+    res.redirect(`/auth/callback?token=${encodeURIComponent(jwtToken)}&refreshToken=${encodeURIComponent(refreshToken)}`);
+  } catch (err) {
+    console.error('Google OAuth callback error:', err);
+    res.redirect('/login?error=oauth_internal_error');
   }
 };
 
@@ -313,14 +753,31 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (req.body.name) user.name = req.body.name.trim();
-    if (req.body.phone !== undefined) user.phone = req.body.phone.trim();
+    if (req.body.phone !== undefined) {
+      const norm = normalizePhone(req.body.phone);
+      if (norm) {
+        const existing = await User.findOne({ phone: norm, _id: { $ne: user._id } });
+        if (existing) {
+          return res.status(409).json({ success: false, message: 'This phone number is already registered to another account.' });
+        }
+        user.phone = norm;
+      }
+    }
     if (req.body.avatar !== undefined) user.avatar = req.body.avatar;
 
     if (req.body.password) {
+      if (req.body.password.length < 8) {
+        return res.status(400).json({ success: false, message: 'New password must be at least 8 characters long.' });
+      }
       user.password = req.body.password;
     }
 
     const updatedUser = await user.save();
+
+    // If password was updated, terminate all other sessions
+    if (req.body.password) {
+      await Session.deleteMany({ user: user._id });
+    }
 
     res.json({
       success: true,
@@ -494,6 +951,15 @@ const forgotPassword = async (req, res) => {
         otp,
         expiryMinutes: 10,
       });
+
+      await logAuthAudit({
+        userId: user._id,
+        email: user.email,
+        eventType: 'PASSWORD_RESET_REQUEST',
+        role: user.role,
+        req,
+        details: 'Password reset OTP requested',
+      });
     }
 
     // Generic response to prevent email enumeration
@@ -608,10 +1074,10 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long.',
+        message: 'Password must be at least 8 characters long.',
       });
     }
 
@@ -648,11 +1114,20 @@ const resetPassword = async (req, res) => {
     user.password = newPassword; // Mongoose pre('save') hashes it securely with bcrypt
     await user.save();
 
-    // Invalidate and delete used OTP automatically from Atlas (Requirement 10)
+    // Invalidate and delete used OTP automatically from Atlas
     await Otp.deleteMany({ email: normalizedEmail });
 
     // Revoke all active sessions on password reset for security
     await Session.deleteMany({ user: user._id });
+
+    await logAuthAudit({
+      userId: user._id,
+      email: user.email,
+      eventType: 'PASSWORD_RESET_SUCCESS',
+      role: user.role,
+      req,
+      details: 'Password reset completed and all prior sessions invalidated',
+    });
 
     res.json({
       success: true,
@@ -660,129 +1135,6 @@ const resetPassword = async (req, res) => {
     });
   } catch (error) {
     console.error('Reset Password Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Refresh access token using valid refresh token
-// @route   POST /api/auth/refresh-token
-// @access  Public
-const refreshTokenHandler = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-      return res.status(400).json({ success: false, message: 'Refresh token is required.' });
-    }
-
-    const session = await Session.findOne({
-      refreshToken,
-      expiresAt: { $gt: new Date() },
-    }).populate('user', '-password');
-
-    if (!session || !session.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid or expired refresh token. Please sign in again.',
-      });
-    }
-
-    // Update last activity timestamp
-    session.lastActive = new Date();
-    await session.save();
-
-    const newAccessToken = generateToken(session.user._id, session.user.role, session.user.email);
-
-    res.json({
-      success: true,
-      token: newAccessToken,
-      refreshToken: session.refreshToken,
-      user: {
-        id: session.user._id,
-        name: session.user.name,
-        email: session.user.email,
-        phone: session.user.phone,
-        role: session.user.role,
-        avatar: session.user.avatar,
-        enrolledCourses: session.user.enrolledCourses || [],
-        createdAt: session.user.createdAt,
-      },
-      message: 'Access token refreshed successfully.',
-    });
-  } catch (error) {
-    console.error('Refresh Token Error:', error);
-    res.status(500).json({ success: false, message: error.message || 'Server error during token refresh' });
-  }
-};
-
-// @desc    Logout from all devices & terminate all sessions
-// @route   POST /api/auth/logout-all
-// @access  Private
-const logoutAll = async (req, res) => {
-  try {
-    const result = await Session.deleteMany({ user: req.user._id });
-    res.json({
-      success: true,
-      message: `Successfully logged out from all devices (${result.deletedCount} session${result.deletedCount === 1 ? '' : 's'} terminated).`,
-      deletedCount: result.deletedCount,
-    });
-  } catch (error) {
-    console.error('Logout All Error:', error);
-    res.status(500).json({ success: false, message: error.message || 'Failed to terminate all sessions' });
-  }
-};
-
-// @desc    Get all active sessions / devices for current user
-// @route   GET /api/auth/sessions
-// @access  Private
-const getUserSessions = async (req, res) => {
-  try {
-    const sessions = await Session.find({
-      user: req.user._id,
-      expiresAt: { $gt: new Date() },
-    }).sort({ lastActive: -1 });
-
-    const userAgent = req.headers['user-agent'] || '';
-
-    const formattedSessions = sessions.map((s, idx) => {
-      const isCurrent = idx === 0 || (s.browser && userAgent.toLowerCase().includes(s.browser.toLowerCase()));
-      return {
-        id: s._id,
-        deviceInfo: s.deviceInfo,
-        browser: s.browser,
-        os: s.os,
-        ipAddress: s.ipAddress,
-        lastActive: s.lastActive,
-        expiresAt: s.expiresAt,
-        isCurrent,
-      };
-    });
-
-    res.json({
-      success: true,
-      count: formattedSessions.length,
-      sessions: formattedSessions,
-    });
-  } catch (error) {
-    console.error('Get User Sessions Error:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Revoke a specific device session
-// @route   DELETE /api/auth/sessions/:sessionId
-// @access  Private
-const revokeSession = async (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const session = await Session.findOne({ _id: sessionId, user: req.user._id });
-    if (!session) {
-      return res.status(404).json({ success: false, message: 'Session not found or already terminated.' });
-    }
-
-    await Session.deleteOne({ _id: sessionId });
-    res.json({ success: true, message: 'Device session revoked successfully.' });
-  } catch (error) {
-    console.error('Revoke Session Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -804,4 +1156,6 @@ module.exports = {
   logoutAll,
   getUserSessions,
   revokeSession,
+  googleAuthStart,
+  googleAuthCallback,
 };

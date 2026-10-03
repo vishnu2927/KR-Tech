@@ -90,26 +90,26 @@ export default function MentorsPage({ onOpenDemoModal }: { onOpenDemoModal?: (me
           </h1>
 
           <p className="text-base sm:text-lg text-purple-100/80 max-w-2xl mx-auto leading-relaxed mb-8">
-            Learn directly from leaders with <strong className="text-white font-semibold">10+ years of real industry experience</strong> at Amazon, Microsoft, Razorpay, and Atlassian. Get personalized one-on-one sessions tailored to your goals.
+            Learn directly from leaders with <strong className="text-white font-semibold">10+ years of real industry experience</strong>. Get personalized one-on-one sessions tailored to your goals.
           </p>
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4 border-t border-purple-500/20">
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-white font-sans">10+</div>
-              <div className="text-xs text-purple-200 mt-1">Specialized Tech Leads</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-white font-sans">84</div>
+              <div className="text-xs text-purple-200 mt-1">Available Tech Courses</div>
             </div>
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
               <div className="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-sans">10+ Years</div>
               <div className="text-xs text-purple-200 mt-1">Average Industry Exp</div>
             </div>
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-300 font-sans">4.95 / 5.0</div>
-              <div className="text-xs text-purple-200 mt-1">Student Satisfaction</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-amber-300 font-sans">1-on-1</div>
+              <div className="text-xs text-purple-200 mt-1">Dedicated Mentorship</div>
             </div>
             <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-300 font-sans">15,000+</div>
-              <div className="text-xs text-purple-200 mt-1">One-on-One Learning Sessions Conducted</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-300 font-sans">100%</div>
+              <div className="text-xs text-purple-200 mt-1">Practical Projects & Labs</div>
             </div>
           </div>
         </div>

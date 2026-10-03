@@ -152,7 +152,7 @@ export default function MentorQAPage() {
     <div className="min-h-screen bg-[#070913] text-white pt-20 pb-16 px-4 sm:px-6 lg:px-8">
       <SEO
         title="Mentor Q&A Forum | KR Global Learning"
-        description="Direct technical mentorship from VP & Staff Engineers at Google, Uber, and Microsoft. Ask architecture, code review, and career questions."
+        description="Direct technical mentorship from Experienced Technical Practitioners & Mentors. Ask architecture, code review, and career questions."
       />
 
       <div className="max-w-7xl mx-auto space-y-8">
@@ -167,7 +167,7 @@ export default function MentorQAPage() {
                 Mentor Q&A Advisory Board
               </h1>
               <p className="text-slate-400 text-sm md:text-base max-w-2xl">
-                Get answers from MAANG staff architects on high-throughput distributed systems, tricky concurrency bugs, and certification roadmap guidance.
+                Get answers from experienced technical practitioners on high-throughput distributed systems, tricky concurrency bugs, and certification roadmap guidance.
               </p>
             </div>
 

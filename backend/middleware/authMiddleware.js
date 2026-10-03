@@ -16,6 +16,7 @@ const protect = async (req, res, next) => {
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'Not authorized, user not found' });
       }
+      req.sessionId = decoded.sessionId;
       return next();
     } catch (error) {
       console.error('JWT Verification error:', error.message);

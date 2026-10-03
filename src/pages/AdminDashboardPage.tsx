@@ -1405,8 +1405,8 @@ export default function AdminDashboardPage() {
                   <span>Enrolled Students</span>
                   <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px]">+14.2%</span>
                 </div>
-                <div className="text-2xl font-extrabold text-white">{(stats.totalStudents || 15420).toLocaleString()}+</div>
-                <div className="text-[11px] text-slate-400 mt-1">98.4% Course Completion Rate</div>
+                <div className="text-2xl font-extrabold text-white">{(stats.totalStudents || leads.length || 0).toLocaleString()}</div>
+                <div className="text-[11px] text-slate-400 mt-1">Active Enrolled Students</div>
               </div>
 
               <div className="p-5 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-lg hover:border-purple-500/40 transition-all">

@@ -55,6 +55,7 @@ export interface DeviceSession {
   browser: string;
   os: string;
   ipAddress: string;
+  location?: string;
   lastActive: string;
   expiresAt: string;
   isCurrent: boolean;
@@ -84,6 +85,21 @@ export const authService = {
       const msg = err.response?.data?.message || err.message || "Registration failed";
       throw new Error(msg);
     }
+  },
+
+  /**
+   * Login user with external/OAuth tokens (e.g., Google OAuth callback)
+   */
+  async loginWithToken(token: string, refreshToken?: string): Promise<User> {
+    localStorage.setItem(TOKEN_KEY, token);
+    if (refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    }
+    const profile = await this.getProfile();
+    if (!profile) {
+      throw new Error("Failed to load user profile with session token");
+    }
+    return profile;
   },
 
   /**
@@ -328,25 +344,10 @@ export const authService = {
   },
 
   /**
-   * Ensure admin JWT token is present for protected Atlas APIs
+   * Ensure admin JWT token is present
    */
   async ensureAdminToken(): Promise<string | null> {
-    let token = localStorage.getItem(TOKEN_KEY);
-    if (!token || token.startsWith("mock-")) {
-      try {
-        const response = await api.post<AuthResponse>("/auth/login", {
-          email: "admin@krtech.com",
-          password: "admin123",
-        });
-        if (response.data?.token) {
-          localStorage.setItem(TOKEN_KEY, response.data.token);
-          localStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
-          return response.data.token;
-        }
-      } catch (err) {
-        console.warn("Auto admin session notice:", err);
-      }
-    }
+    const token = localStorage.getItem(TOKEN_KEY);
     return token;
   },
 

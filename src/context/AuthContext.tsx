@@ -27,6 +27,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password?: string, rememberMe?: boolean) => Promise<User>;
+  loginWithOAuthTokens: (token: string, refreshToken?: string) => Promise<User>;
   signup: (userData: { name: string; email: string; phone: string; course: string; password?: string }) => Promise<User>;
   logout: () => void;
   logoutAll: () => Promise<void>;
@@ -145,6 +146,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&h=160&fit=crop&crop=faces&auto=format"),
       enrolledCourses: res.user.enrolledCourses || [],
       createdAt: res.user.createdAt,
+    };
+
+    setUser(loggedInUser);
+    return loggedInUser;
+  };
+
+  const loginWithOAuthTokens = async (token: string, refreshToken?: string): Promise<User> => {
+    const profile = await authService.loginWithToken(token, refreshToken);
+    const loggedInUser: User = {
+      id: profile.id,
+      name: profile.name,
+      email: profile.email,
+      role: profile.role,
+      phone: profile.phone,
+      avatar: profile.avatar || (profile.role === "admin"
+        ? "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=160&h=160&fit=crop&crop=faces&auto=format"
+        : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&h=160&fit=crop&crop=faces&auto=format"),
+      enrolledCourses: profile.enrolledCourses || [],
+      createdAt: profile.createdAt,
     };
 
     setUser(loggedInUser);

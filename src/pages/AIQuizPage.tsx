@@ -145,7 +145,7 @@ export default function AIQuizPage() {
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
                   <span>🏆 Global Batch Leaderboard</span>
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">Rankings updated in real-time across all 15,000+ students</p>
+                <p className="text-xs text-slate-400 mt-0.5">Rankings updated in real-time across active enrolled students</p>
               </div>
               <span className="text-xs text-purple-400 font-mono font-bold">Spring 2026 Season</span>
             </div>

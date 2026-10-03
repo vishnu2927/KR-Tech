@@ -76,7 +76,7 @@ export default function AdminLmsPage() {
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white">AI Learning Management Console</h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
-              KR GLOBAL LEARNING PRIVATE LIMITED • Complete oversight of 15,000+ students, AI prompts, curriculum modules, and live pair-coding sessions.
+              KR GLOBAL LEARNING PRIVATE LIMITED • Complete oversight of enrolled students, AI prompts, curriculum modules, and live pair-coding sessions.
             </p>
           </div>
           <span className="text-4xl">👑</span>

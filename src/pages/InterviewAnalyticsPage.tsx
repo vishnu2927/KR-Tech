@@ -56,7 +56,7 @@ export default function InterviewAnalyticsPage() {
                 {readiness?.overallReadinessPercent || 84}%
               </div>
               <span className="text-[10px] text-purple-300 font-bold block">
-                {readiness?.targetTier || 'Tier-1 MAANG Ready'}
+                {readiness?.targetTier || 'Tier-1 Tech Ready'}
               </span>
             </div>
           </div>

@@ -14,9 +14,9 @@ interface Metric {
 export default function StudentSuccessMetrics() {
   const metrics: Metric[] = [
     {
-      target: 55,
-      suffix: "+",
-      label: "Certified Live Courses",
+      target: 84,
+      suffix: "",
+      label: "Live Tech Courses",
       sublabel: "Atlas MongoDB Synced",
       icon: "📚",
       accent: "#06B6D4",
@@ -25,8 +25,8 @@ export default function StudentSuccessMetrics() {
     {
       target: 10,
       suffix: "+",
-      label: "Expert Industry Mentors",
-      sublabel: "Google, Amazon, Razorpay",
+      label: "Expert Tech Mentors",
+      sublabel: "Experienced Practitioners",
       icon: "⚡",
       accent: "#A78BFA",
       glow: "rgba(167,139,250,0.25)",
@@ -41,28 +41,28 @@ export default function StudentSuccessMetrics() {
       glow: "rgba(56,189,248,0.25)",
     },
     {
-      target: 500,
-      suffix: "+",
-      label: "Capstone Projects Built",
-      sublabel: "Production-Grade SaaS & AI",
+      target: 100,
+      suffix: "%",
+      label: "Practical Labs Built",
+      sublabel: "Production-Grade Projects",
       icon: "🚀",
       accent: "#10B981",
       glow: "rgba(16,185,129,0.25)",
     },
     {
-      target: 100,
-      suffix: "+",
-      label: "Industry Certifications",
+      target: 84,
+      suffix: "",
+      label: "Certification Roadmaps",
       sublabel: "Vendor-Aligned Syllabus",
       icon: "🏆",
       accent: "#F59E0B",
       glow: "rgba(245,158,11,0.25)",
     },
     {
-      target: 98,
+      target: 100,
       suffix: "%",
-      label: "Practical Learning Success",
-      sublabel: "One-on-One Mastery Rate",
+      label: "One-on-One Attention",
+      sublabel: "Tailored Learning Path",
       icon: "⭐",
       accent: "#EC4899",
       glow: "rgba(236,72,153,0.25)",
@@ -109,7 +109,7 @@ export default function StudentSuccessMetrics() {
             Engineered for <span className="gradient-text-warm">High-Impact Tech Careers</span>
           </h2>
           <p className="text-sm sm:text-base text-gray-400 mt-3 max-w-2xl mx-auto">
-            From zero to architecting distributed systems. Experience why 15,000+ engineers trust KR Global Learning for One-on-One mastery.
+            From fundamentals to advanced system architectures. Experience KR Global Learning for One-on-One tech mastery.
           </p>
         </div>
 

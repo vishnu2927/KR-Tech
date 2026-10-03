@@ -47,7 +47,7 @@ const SAMPLE_RESUME: ResumeData = {
       location: 'Bangalore, India',
       duration: 'May 2025 – Present',
       bullets: [
-        'Architected real-time WebSocket chat rooms supporting 15,000+ students with Socket.IO and Redis PubSub.',
+        'Architected real-time WebSocket chat rooms supporting 10,000+ concurrent users with Socket.IO and Redis PubSub.',
         'Engineered Cache-Aside pattern utilizing Redis Cluster, reducing PostgreSQL database query volume by 65%.',
         'Implemented automated JWT token rotation with bcrypt password hashing and rate-limited API gateways.',
       ],
@@ -101,7 +101,7 @@ export default function ResumeBuilderPage() {
               WYSIWYG Resume Builder
             </h1>
             <p className="text-xs md:text-sm text-slate-400">
-              Built specifically to pass MAANG Workday, Greenhouse, and Lever ATS scanners.
+              Built specifically to pass enterprise Workday, Greenhouse, and Lever ATS scanners.
             </p>
           </div>
 

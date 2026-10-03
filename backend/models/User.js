@@ -15,16 +15,34 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
+      index: true,
     },
     phone: {
       type: String,
-      default: '',
+      unique: true,
+      trim: true,
+      sparse: true,
+      index: true,
     },
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
-      minlength: [6, 'Password must be at least 6 characters long'],
+      minlength: [8, 'Password must be at least 8 characters long'],
+      required: function () {
+        return !this.googleId;
+      },
     },
+    googleId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    authProviders: [
+      {
+        provider: { type: String, enum: ['local', 'google'] },
+        providerId: { type: String },
+        linkedAt: { type: Date, default: Date.now },
+      },
+    ],
     role: {
       type: String,
       enum: ['superAdmin', 'admin', 'mentor', 'counselor', 'student'],
@@ -50,7 +68,7 @@ const userSchema = new mongoose.Schema(
 
 // Encrypt password before saving
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
@@ -60,6 +78,7 @@ userSchema.pre('save', async function (next) {
 
 // Compare entered password with hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

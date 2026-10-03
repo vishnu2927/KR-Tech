@@ -240,7 +240,7 @@ export default function CommunityFeedPage() {
                 Student Community & Tech Forum
               </h1>
               <p className="text-slate-400 text-sm md:text-base max-w-2xl">
-                Collaborate with 15,000+ peers, crack MAANG interview rounds, participate in LeetCode solution debates, and get answers from verified industry mentors.
+                Collaborate with peers, practice technical interview rounds, participate in LeetCode solution debates, and get answers from verified industry mentors.
               </p>
             </div>
 

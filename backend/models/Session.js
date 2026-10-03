@@ -10,6 +10,11 @@ const SessionSchema = new mongoose.Schema(
     },
     refreshToken: {
       type: String,
+      sparse: true,
+      index: true,
+    },
+    refreshTokenHash: {
+      type: String,
       required: true,
       unique: true,
       index: true,
@@ -29,6 +34,10 @@ const SessionSchema = new mongoose.Schema(
     ipAddress: {
       type: String,
       default: '127.0.0.1',
+    },
+    location: {
+      type: String,
+      default: 'Location unavailable',
     },
     isCurrent: {
       type: Boolean,
