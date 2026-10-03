@@ -20,11 +20,43 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io Real-Time Server Setup
+// 1. CORS Whitelist Configuration
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  'https://krgloballearning.com',
+  'https://www.krgloballearning.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:8443',
+  'https://krtech.in',
+  'https://krtech.vercel.app',
+].filter(Boolean);
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (
+    allowedOrigins.includes(origin) ||
+    origin.endsWith('.vercel.app') ||
+    origin.endsWith('.krgloballearning.com') ||
+    (origin.startsWith('http://localhost:') && process.env.NODE_ENV !== 'production')
+  ) {
+    return true;
+  }
+  return false;
+};
+
+// Socket.io Real-Time Server Setup with Shared CORS Policy
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Socket.io CORS Policy: Origin not allowed.'));
+    },
     methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 app.set('io', io);
@@ -43,35 +75,16 @@ io.on('connection', (socket) => {
   });
 });
 
-// 1. Security Headers via Helmet
+// 2. Security Headers via Helmet
 app.use(helmet({
   crossOriginResourcePolicy: false,
   crossOriginOpenerPolicy: false,
 }));
 
-// 2. CORS Whitelist Configuration
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'https://krgloballearning.com',
-  'https://www.krgloballearning.com',
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:8443',
-  'https://krtech.in',
-  'https://krtech.vercel.app',
-].filter(Boolean);
-
+// 3. Express CORS Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) {
-      return callback(null, true);
-    }
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.endsWith('.vercel.app') ||
-      origin.endsWith('.krgloballearning.com') ||
-      (origin.startsWith('http://localhost:') && process.env.NODE_ENV !== 'production')
-    ) {
+    if (isOriginAllowed(origin)) {
       return callback(null, true);
     }
     if (process.env.NODE_ENV === 'production') {
@@ -204,11 +217,16 @@ app.use((req, res) => {
 });
 
 // Global Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled Server Error:', err.stack);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('Unhandled Server Error:', err.stack);
+  } else {
+    console.error('Unhandled Server Error:', err.message);
+  }
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : (err.message || 'Internal Server Error'),
   });
 });
 
