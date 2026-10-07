@@ -44,7 +44,7 @@ export function CourseCard({
           </span>
 
           {course.badge && (
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-400 text-slate-950 shadow-md">
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-600 text-white shadow-md border border-indigo-400/40 backdrop-blur-md">
               {course.badge}
             </span>
           )}

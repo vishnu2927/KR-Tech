@@ -85,26 +85,15 @@ function normalizeCourse(raw: any): Course {
   // All courses strictly use actual USD pricing without fake crossed-out original prices
   const origPriceStr = "";
 
-  // Duration in Hours
+  // Standardized Course Duration (40–42 Hours based on Complexity)
   let durationHours = typeof raw.durationHours === "number" ? raw.durationHours : undefined;
-  let durationStr = raw.duration || "80 Hours";
-
-  if (durationHours) {
-    durationStr = `${durationHours} Hours`;
-  } else if (durationStr.toLowerCase().includes("week")) {
-    const num = parseInt(durationStr.replace(/[^0-9]/g, "")) || 8;
-    durationHours = num <= 6 ? 40 : num <= 8 ? 80 : num <= 10 ? 100 : 120;
-    durationStr = `${durationHours} Hours`;
-  } else if (durationStr.toLowerCase().includes("month")) {
-    const num = parseFloat(durationStr.replace(/[^0-9.]/g, "")) || 3;
-    durationHours = Math.round(num * 30);
-    durationStr = `${durationHours} Hours`;
-  } else if (!durationStr.toLowerCase().includes("hour")) {
-    durationHours = 80;
-    durationStr = "80 Hours";
+  if (typeof durationHours === "number" && durationHours >= 40 && durationHours <= 42) {
+    // Valid standardized range
   } else {
-    durationHours = parseInt(durationStr.replace(/[^0-9]/g, "")) || 80;
+    const lvl = (raw.level || "").toLowerCase();
+    durationHours = lvl === "beginner" ? 40 : lvl === "advanced" ? 42 : 41;
   }
+  const durationStr = `${durationHours} Hours`;
 
   const ratingStr = typeof raw.rating === "number"
     ? raw.rating.toFixed(1)

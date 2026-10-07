@@ -32,8 +32,8 @@ export default function TrustSection() {
       desc: "Step-by-step learning progression calibrated to your experience level, goals, and schedule from beginner to advanced.",
       icon: <I.Sparkles />,
       pill: "Custom Syllabus",
-      pillColor: "text-amber-700 bg-amber-50 border-amber-200",
-      iconBg: "bg-amber-50 text-amber-700",
+      pillColor: "text-cyan-700 bg-cyan-50 border-cyan-200",
+      iconBg: "bg-cyan-50 text-cyan-700",
     },
     {
       title: "Interactive Study Materials",

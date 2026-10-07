@@ -79,7 +79,6 @@ const MentorQAPage = lazy(() => import("./pages/MentorQAPage"));
 const BadgesPage = lazy(() => import("./pages/BadgesPage"));
 const AIMockInterviewPage = lazy(() => import("./pages/AIMockInterviewPage"));
 const ResumeBuilderPage = lazy(() => import("./pages/ResumeBuilderPage"));
-const CodingPlaygroundPage = lazy(() => import("./pages/CodingPlaygroundPage"));
 const DSAProblemsPage = lazy(() => import("./pages/DSAProblemsPage"));
 const InterviewAnalyticsPage = lazy(() => import("./pages/InterviewAnalyticsPage"));
 const SystemDesignPage = lazy(() => import("./pages/SystemDesignPage"));
@@ -547,8 +546,6 @@ function AppContent() {
                   <Route path="/interview/prep" element={<AIMockInterviewPage />} />
                   <Route path="/resume/analyzer" element={<ResumeAnalyzerPage />} />
                   <Route path="/resume/builder" element={<ResumeBuilderPage />} />
-                  <Route path="/compiler" element={<CodingPlaygroundPage />} />
-                  <Route path="/playground" element={<CodingPlaygroundPage />} />
                   <Route path="/dsa/problems" element={<DSAProblemsPage />} />
                   <Route path="/dsa/practice" element={<DSAProblemsPage />} />
                   <Route path="/interview/analytics" element={<InterviewAnalyticsPage />} />

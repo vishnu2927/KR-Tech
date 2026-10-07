@@ -70,8 +70,8 @@ export default function FreeResources() {
       tag: "Project Guide",
       desc: "Structured guide for presenting software engineering capstones, architectural documentation, and GitHub repositories.",
       icon: <I.Briefcase />,
-      iconBg: "bg-amber-50 text-amber-700 border-amber-200",
-      badgeBg: "bg-amber-50 text-amber-700 border-amber-200",
+      iconBg: "bg-blue-50 text-blue-700 border-blue-200",
+      badgeBg: "bg-blue-50 text-blue-700 border-blue-200",
     },
     {
       title: "Python Automation & Web Scraping Playbook",

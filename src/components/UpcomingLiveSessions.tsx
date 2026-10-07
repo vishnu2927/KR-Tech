@@ -126,7 +126,7 @@ export default function UpcomingLiveSessions({
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                     {s.seatsLeft} live slots left
                   </span>
-                  <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                  <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
                     {s.badge}
                   </span>
                 </div>

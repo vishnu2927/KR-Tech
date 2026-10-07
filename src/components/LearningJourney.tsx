@@ -44,8 +44,8 @@ export default function LearningJourney({ onOpenDemo }: { onOpenDemo?: () => voi
       title: "Hands-on Capstone Projects",
       desc: "Architect scalable distributed systems (Microservices, Kafka Pipelines, AI Agents, Cloud Infra) ready for live deployment and technical demonstration.",
       icon: <I.Award />,
-      accentBg: "bg-amber-50 text-amber-700 border-amber-200",
-      nodeBg: "bg-amber-600 text-white",
+      accentBg: "bg-blue-50 text-blue-700 border-blue-200",
+      nodeBg: "bg-blue-600 text-white",
     },
     {
       num: "06",
@@ -53,8 +53,8 @@ export default function LearningJourney({ onOpenDemo }: { onOpenDemo?: () => voi
       title: "Course Completion & Verifiable Credential",
       desc: "Earn an official verified certificate of completion with unique Credential ID and live QR verification upon meeting curriculum criteria.",
       icon: <I.Check />,
-      accentBg: "bg-purple-50 text-purple-700 border-purple-200",
-      nodeBg: "bg-purple-600 text-white",
+      accentBg: "bg-indigo-50 text-indigo-700 border-indigo-200",
+      nodeBg: "bg-indigo-600 text-white",
     },
   ];
 
@@ -62,14 +62,14 @@ export default function LearningJourney({ onOpenDemo }: { onOpenDemo?: () => voi
     <section id="journey" className="py-24 bg-slate-50 text-slate-900 relative overflow-hidden border-t border-slate-200/80">
       <div className="container-xl relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 shadow-xs mb-3">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs mb-3">
             <I.Sparkles /> 6-PHASE STRUCTURED ROADMAP
           </span>
           <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-slate-900 tracking-tight">
-            Your Structured <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Learning Journey</span>
+            Your Structured <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">Learning Journey</span>
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl mx-auto">
-            From your diagnostic consultation to building robust technical systems with dedicated one-on-one mentorship.
+            From your diagnostic consultation to building robust technical systems with dedicated One-on-One mentorship.
           </p>
         </div>
 

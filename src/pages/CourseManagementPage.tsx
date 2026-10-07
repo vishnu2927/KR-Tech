@@ -24,7 +24,7 @@ interface CourseFormData {
 const INITIAL_FORM_STATE: CourseFormData = {
   title: "",
   category: "Java Backend",
-  duration: "80 Hours",
+  duration: "41 Hours",
   level: "Intermediate",
   price: "$499",
   originalPrice: "",
@@ -147,7 +147,8 @@ export default function CourseManagementPage() {
     }));
 
     const matchHours = formData.duration.match(/(\d+)/);
-    const durationHours = matchHours ? parseInt(matchHours[1], 10) : 80;
+    const parsedHours = matchHours ? parseInt(matchHours[1], 10) : (formData.level === "Beginner" ? 40 : formData.level === "Advanced" ? 42 : 41);
+    const durationHours = Math.min(42, Math.max(40, parsedHours));
     const cleanDuration = `${durationHours} Hours`;
     const cleanPrice = formData.price.trim().startsWith("$") ? formData.price.trim() : `$${formData.price.trim().replace(/^[^0-9]*/, "")}`;
 
@@ -205,7 +206,8 @@ export default function CourseManagementPage() {
 
     const highlightsArray = formData.highlights.split(",").map((h) => h.trim()).filter(Boolean);
     const matchHours = formData.duration.match(/(\d+)/);
-    const durationHours = matchHours ? parseInt(matchHours[1], 10) : 80;
+    const parsedHours = matchHours ? parseInt(matchHours[1], 10) : (formData.level === "Beginner" ? 40 : formData.level === "Advanced" ? 42 : 41);
+    const durationHours = Math.min(42, Math.max(40, parsedHours));
     const cleanDuration = `${durationHours} Hours`;
     const cleanPrice = formData.price.trim().startsWith("$") ? formData.price.trim() : `$${formData.price.trim().replace(/^[^0-9]*/, "")}`;
 

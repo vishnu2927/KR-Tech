@@ -42,8 +42,8 @@ export default function LearningFeatures() {
     {
       icon: "🎥",
       badge: "Recorded Sessions",
-      badgeBg: "bg-amber-50 text-amber-700 border-amber-200",
-      iconBg: "bg-amber-50 text-amber-700 border-amber-200",
+      badgeBg: "bg-blue-50 text-blue-700 border-blue-200",
+      iconBg: "bg-blue-50 text-blue-700 border-blue-200",
       title: "Archived HD Sessions",
       desc: "Every live class is recorded in high definition and archived with comprehensive notes and code repositories for continuous review.",
       bullets: ["HD class video recordings", "Downloadable starter code repos", "Interactive PDF study materials"],

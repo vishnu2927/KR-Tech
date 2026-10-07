@@ -5,30 +5,32 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
+  --navy-deep:     #0F172A;
+  --slate-dark:    #111827;
+  --blue-deep:     #1E3A8A;
   --primary:       #2563EB;
   --primary-dark:  #1D4ED8;
   --primary-light: #3B82F6;
-  --purple:        #7C3AED;
-  --purple-mid:    #6D28D9;
-  --purple-dark:   #5B21B6;
-  --purple-deep:   #3B0764;
-  --purple-light:  #A78BFA;
-  --lavender:      #EDE9FE;
-  --lavender-soft: #F5F3FF;
+  --indigo:        #4F46E5;
+  --indigo-dark:   #4338CA;
+  --indigo-light:  #6366F1;
   --cyan:          #06B6D4;
   --cyan-dark:     #0891B2;
   --cyan-light:    #67E8F9;
-  --green:         #10B981;
+  --blue-violet:   #6366F1;
+  --emerald:       #10B981;
   --text-primary:  #0F172A;
   --text-secondary:#334155;
   --text-muted:    #64748B;
   --border-light:  #F1F5F9;
   --border:        #E2E8F0;
   --border-dark:   #CBD5E1;
+  --border-focus:  #93C5FD;
   --bg-main:       #FFFFFF;
-  --bg-subtle:     #F8FAFC;
-  --bg-muted:      #F1F5F9;
-  --white:         #ffffff;
+  --bg-cool:       #F8FAFC;
+  --bg-subtle:     #F1F5F9;
+  --bg-navy:       #0F172A;
+  --bg-navy-dark:  #0A0F1D;
   --radius-sm:     8px;
   --radius-md:     14px;
   --radius-lg:     20px;
@@ -97,7 +99,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent 0%, #2563EB 30%, #7C3AED 70%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, #2563EB 35%, #4F46E5 70%, #06B6D4 100%);
   opacity: 0.6;
 }
 .nav-inner {
@@ -269,13 +271,13 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 /* ── Gradient text ── */
 .gradient-text {
-  background: linear-gradient(135deg, #2563EB 0%, #7C3AED 50%, #06B6D4 100%);
+  background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #06B6D4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .gradient-text-warm {
-  background: linear-gradient(135deg, #2563EB 0%, #6366F1 50%, #0891B2 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #4F46E5 50%, #0891B2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -598,9 +600,9 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 /* ── Backgrounds ── */
 .bg-hero {
-  background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 45%, #FAF5FF 85%, #FFFFFF 100%);
+  background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 50%, #F1F5F9 100%);
 }
-.bg-lavender { background: linear-gradient(180deg, #F8FAFC 0%, #ffffff 100%); }
+.bg-lavender { background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%); }
 .bg-dark-purple { background: #F8FAFC; color: #0F172A; }
 .bg-dark-obsidian { background: #FFFFFF; color: #0F172A; }
 

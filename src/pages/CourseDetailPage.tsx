@@ -432,7 +432,7 @@ Direct One-on-One Screen-Sharing & Hands-On Production Capstones Included.
                   <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-cyan-50 text-cyan-700 border border-cyan-200">
                     {course.category}
                   </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-indigo-50 text-indigo-700 border border-indigo-200">
                     {course.badge || "Featured"}
                   </span>
                 </div>
