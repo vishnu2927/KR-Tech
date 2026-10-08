@@ -1,6 +1,35 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+// Centralized API configuration
+const envApiUrl = import.meta.env.VITE_API_URL;
+
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "0.0.0.0");
+
+// Production backend base URL (e.g. https://kr-tech.onrender.com)
+export const BACKEND_URL =
+  envApiUrl && envApiUrl.startsWith("http")
+    ? envApiUrl.replace(/\/api\/?$/, "")
+    : !isLocalhost &&
+      (import.meta.env.PROD ||
+        (typeof window !== "undefined" && window.location.hostname.includes("krgloballearning")))
+    ? "https://kr-tech.onrender.com"
+    : "";
+
+// Axios baseURL: https://kr-tech.onrender.com/api in production, /api in local development
+export const API_BASE_URL = BACKEND_URL ? `${BACKEND_URL}/api` : (envApiUrl || "/api");
+
+/**
+ * Returns the Google OAuth 2.0 authorization start URL.
+ * In production: https://kr-tech.onrender.com/api/auth/google
+ * In local development: /api/auth/google (handled by Vite proxy)
+ */
+export const getGoogleAuthUrl = (): string => {
+  return BACKEND_URL ? `${BACKEND_URL}/api/auth/google` : "/api/auth/google";
+};
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

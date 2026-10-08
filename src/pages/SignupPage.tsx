@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getGoogleAuthUrl } from "../services/authService";
 import SEO from "../components/common/SEO";
 
 export default function SignupPage() {
@@ -370,7 +371,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => {
-                window.location.href = "/api/auth/google";
+                window.location.href = getGoogleAuthUrl();
               }}
               className="w-full py-3 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-3 transition-all cursor-pointer hover:border-slate-400"
             >

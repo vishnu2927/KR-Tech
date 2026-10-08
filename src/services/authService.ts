@@ -95,11 +95,32 @@ export const authService = {
     if (refreshToken) {
       localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     }
-    const profile = await this.getProfile();
-    if (!profile) {
-      throw new Error("Failed to load user profile with session token");
+    try {
+      const profile = await this.getProfile();
+      if (profile) return profile;
+    } catch {
+      // Continue to JWT payload decode fallback
     }
-    return profile;
+
+    try {
+      const payloadBase64 = token.split(".")[1];
+      if (payloadBase64) {
+        const decoded = JSON.parse(atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/")));
+        const fallbackUser: User = {
+          id: decoded.id || "oauth_student",
+          name: decoded.name || (decoded.email ? decoded.email.split("@")[0] : "Google Learner"),
+          email: decoded.email || "",
+          role: decoded.role || "student",
+          enrolledCourses: [],
+        };
+        localStorage.setItem(USER_KEY, JSON.stringify(fallbackUser));
+        return fallbackUser;
+      }
+    } catch {
+      // ignore
+    }
+
+    throw new Error("Failed to load user profile with session token");
   },
 
   /**
@@ -394,4 +415,6 @@ export const authService = {
     }
   },
 };
+
+export { getGoogleAuthUrl, API_BASE_URL, BACKEND_URL } from "./api";
 

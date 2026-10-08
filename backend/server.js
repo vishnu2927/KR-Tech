@@ -26,6 +26,8 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://krgloballearning.com',
   'https://www.krgloballearning.com',
+  'https://krgloballearning.org',
+  'https://www.krgloballearning.org',
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:8443',
@@ -39,6 +41,7 @@ const isOriginAllowed = (origin) => {
     allowedOrigins.includes(origin) ||
     origin.endsWith('.vercel.app') ||
     origin.endsWith('.krgloballearning.com') ||
+    origin.endsWith('.krgloballearning.org') ||
     (origin.startsWith('http://localhost:') && process.env.NODE_ENV !== 'production')
   ) {
     return true;
