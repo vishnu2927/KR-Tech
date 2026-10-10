@@ -27,26 +27,26 @@ router.get('/course/:courseId/lessons', optionalAuth, getCourseLessons);
 router.patch('/course/:courseId/progress', optionalAuth, updateCourseProgress);
 router.post('/course/:courseId/assignment', optionalAuth, submitCourseAssignment);
 
-// Primary Protected Student LMS APIs (Sprint 6.14)
-router.get('/', optionalAuth, getDashboardSummary);
-router.get('/dashboard', optionalAuth, getDashboardSummary);
-router.get('/courses', optionalAuth, getStudentCourses);
-router.get('/progress', optionalAuth, getStudentProgress);
-router.get('/notifications', optionalAuth, require('../controllers/notificationController').getNotifications);
-router.post('/upload', optionalAuth, submitCourseAssignment);
-router.post('/assignment/upload', optionalAuth, submitCourseAssignment);
-router.post('/assignments/upload', optionalAuth, submitCourseAssignment);
+// Primary Protected Student LMS APIs
+router.get('/', protect, getDashboardSummary);
+router.get('/dashboard', protect, getDashboardSummary);
+router.get('/courses', protect, getStudentCourses);
+router.get('/progress', protect, getStudentProgress);
+router.get('/notifications', protect, require('../controllers/notificationController').getNotifications);
+router.post('/upload', protect, submitCourseAssignment);
+router.post('/assignment/upload', protect, submitCourseAssignment);
+router.post('/assignments/upload', protect, submitCourseAssignment);
 
-// Public / Demo Fallback Route
-router.get('/summary', optionalAuth, getDashboardSummary);
+// Summary alias
+router.get('/summary', protect, getDashboardSummary);
 
 // Enrollments
-router.get('/enrollments', optionalAuth, getEnrollments);
-router.post('/enrollments', optionalAuth, createEnrollment);
+router.get('/enrollments', protect, getEnrollments);
+router.post('/enrollments', protect, createEnrollment);
 
 // Progress by Course
-router.get('/progress/:courseId', optionalAuth, getProgress);
-router.post('/progress/mark-lecture', optionalAuth, markLectureCompleted);
+router.get('/progress/:courseId', protect, getProgress);
+router.post('/progress/mark-lecture', protect, markLectureCompleted);
 
 // Recorded Lectures
 router.get('/lectures', getLectures);
@@ -54,6 +54,6 @@ router.get('/lectures/:id', getLectureById);
 
 // Assignments
 router.get('/assignments', getAssignments);
-router.post('/assignments/:id/submit', optionalAuth, submitAssignment);
+router.post('/assignments/:id/submit', protect, submitAssignment);
 
 module.exports = router;

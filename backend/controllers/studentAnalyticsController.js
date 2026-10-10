@@ -182,16 +182,28 @@ const DEFAULT_XP_ACTIVITIES = [
   },
 ];
 
-const getEffectiveEmail = (req) => {
-  return (req.user?.email || req.query.email || 'aditya.sharma@krtech.edu').toLowerCase().trim();
+const getEffectiveStudent = (req) => {
+  if (req.user && req.user.email) {
+    return {
+      userId: req.user._id,
+      email: req.user.email.toLowerCase().trim(),
+      name: req.user.name || 'Student',
+      role: req.user.role || 'student',
+    };
+  }
+  return null;
 };
 
 // @desc    Get complete student learning analytics & progress tracker
 // @route   GET /api/student/analytics
-// @access  Public / Authenticated
+// @access  Private
 exports.getStudentAnalytics = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
 
     // Find or provision student analytics
     let analytics = await StudentAnalytics.findOne({ userEmail });
@@ -199,60 +211,43 @@ exports.getStudentAnalytics = async (req, res) => {
     if (!analytics) {
       analytics = await StudentAnalytics.create({
         userEmail,
-        userName: req.user?.name || 'Aditya Sharma',
-        xp: 3850,
-        level: 8,
-        levelTitle: 'Senior Systems Builder',
+        userName: student.name,
+        xp: 0,
+        level: 1,
+        levelTitle: 'Novice Explorer',
         streak: {
-          current: 5,
-          longest: 18,
-          lastActiveDate: new Date(),
-          weeklyDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+          current: 0,
+          longest: 0,
+          lastActiveDate: null,
+          weeklyDays: [],
         },
         attendance: {
-          attendedSessions: 16,
-          totalSessions: 17,
-          attendanceRate: 94.1,
-          history: DEFAULT_ATTENDANCE_HISTORY,
+          attendedSessions: 0,
+          totalSessions: 0,
+          attendanceRate: 0,
+          history: [],
         },
-        badges: DEFAULT_BADGES,
-        xpActivities: DEFAULT_XP_ACTIVITIES,
+        badges: [],
+        xpActivities: [],
       });
     }
 
     // Dynamic XP next level computation
     const xpPerLevel = 500;
-    const computedLevel = Math.floor(analytics.xp / xpPerLevel) + 1;
+    const computedLevel = Math.max(1, Math.floor(analytics.xp / xpPerLevel) + 1);
     const currentLevelProgressXP = analytics.xp % xpPerLevel;
     const xpToNextLevel = xpPerLevel - currentLevelProgressXP;
     const levelTitle = LEVEL_TITLES[Math.min(computedLevel - 1, LEVEL_TITLES.length - 1)];
 
-    // Fetch Course Progress Bars and Completion Status
-    const enrollments = await Enrollment.find({ userEmail });
-    const progressDocs = await Progress.find({ userEmail });
+    // Fetch Course Progress Bars and Completion Status strictly for authenticated user
+    const enrollments = await Enrollment.find({ userEmail }).lean();
+    const progressDocs = await Progress.find({ userEmail }).lean();
 
-    const coursesWithProgress = (enrollments.length > 0 ? enrollments : [
-      {
-        courseId: 'java-backend',
-        courseTitle: 'Complete Java Backend Development with Spring Boot 3 & Microservices',
-        category: 'Software Engineering',
-        mentor: 'Rajesh Kumar',
-      },
-      {
-        courseId: 'aws-architect',
-        courseTitle: 'AWS Certified Solutions Architect Associate (SAA-C03)',
-        category: 'Cloud & DevOps',
-        mentor: 'Vikram Nair',
-      },
-      {
-        courseId: 'system-design',
-        courseTitle: 'System Design & High-Scale Architecture Masterclass',
-        category: 'System Design',
-        mentor: 'Rajesh Kumar',
-      },
-    ]).map((enr, i) => {
+    const coursesWithProgress = enrollments.map((enr) => {
       const pDoc = progressDocs.find((p) => p.courseId === enr.courseId);
-      const percent = pDoc?.progressPercent || [75, 100, 45][i % 3];
+      const percent = pDoc?.progressPercent || 0;
+      const completedCount = (pDoc?.completedLectures || []).length;
+      const totalLectures = 24;
 
       return {
         courseId: enr.courseId,
@@ -260,21 +255,19 @@ exports.getStudentAnalytics = async (req, res) => {
         category: enr.category,
         mentor: enr.mentor,
         progressPercent: percent,
-        completedLectures: pDoc?.completedLectures?.length || [18, 24, 9][i % 3],
-        totalLectures: [24, 24, 20][i % 3],
-        watchHours: Math.round(((pDoc?.completedLectures?.length || [18, 24, 9][i % 3]) * 45) / 60) || 14,
+        completedLectures: completedCount,
+        totalLectures,
+        watchHours: Math.round((completedCount * 45) / 60),
         modules: [
-          { name: 'Architecture Foundations', progress: 100 },
-          { name: 'Core Implementation', progress: percent >= 75 ? 100 : 80 },
-          { name: 'Distributed Systems & Queues', progress: percent >= 75 ? 75 : 40 },
-          { name: 'Production Capstone & CI/CD', progress: percent === 100 ? 100 : 25 },
+          { name: 'Architecture Foundations', progress: Math.min(100, percent * 2) },
+          { name: 'Core Implementation', progress: percent >= 50 ? Math.min(100, (percent - 50) * 2) : 0 },
         ],
       };
     });
 
-    const overallCurriculumCompletion = Math.round(
-      coursesWithProgress.reduce((acc, c) => acc + c.progressPercent, 0) / coursesWithProgress.length
-    );
+    const overallCurriculumCompletion = coursesWithProgress.length > 0
+      ? Math.round(coursesWithProgress.reduce((acc, c) => acc + c.progressPercent, 0) / coursesWithProgress.length)
+      : 0;
 
     res.json({
       success: true,
@@ -292,8 +285,8 @@ exports.getStudentAnalytics = async (req, res) => {
         },
         streak: analytics.streak,
         attendance: analytics.attendance,
-        badges: analytics.badges,
-        xpActivities: analytics.xpActivities,
+        badges: analytics.badges || [],
+        xpActivities: analytics.xpActivities || [],
         courses: coursesWithProgress,
         overallCurriculumCompletion,
       },
@@ -306,19 +299,23 @@ exports.getStudentAnalytics = async (req, res) => {
 
 // @desc    Award XP for completing activities (Lecture, Assignment, Streak)
 // @route   POST /api/student/analytics/xp
-// @access  Public / Authenticated
+// @access  Private
 exports.awardXP = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
     const { xp = 50, title = 'Completed Learning Activity', type = 'lecture' } = req.body;
 
     let analytics = await StudentAnalytics.findOne({ userEmail });
     if (!analytics) {
-      analytics = new StudentAnalytics({ userEmail });
+      analytics = new StudentAnalytics({ userEmail, userName: student.name });
     }
 
     analytics.xp += parseInt(xp, 10);
-    analytics.level = Math.floor(analytics.xp / 500) + 1;
+    analytics.level = Math.max(1, Math.floor(analytics.xp / 500) + 1);
     analytics.levelTitle = LEVEL_TITLES[Math.min(analytics.level - 1, LEVEL_TITLES.length - 1)];
 
     analytics.xpActivities.unshift({
@@ -351,13 +348,17 @@ exports.awardXP = async (req, res) => {
 
 // @desc    Check-in and update daily streak
 // @route   POST /api/student/analytics/check-in
-// @access  Public / Authenticated
+// @access  Private
 exports.checkInStreak = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
     let analytics = await StudentAnalytics.findOne({ userEmail });
     if (!analytics) {
-      analytics = new StudentAnalytics({ userEmail });
+      analytics = new StudentAnalytics({ userEmail, userName: student.name });
     }
 
     const todayDayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date().getDay()];
@@ -396,12 +397,16 @@ exports.checkInStreak = async (req, res) => {
 
 // @desc    Get all badges
 // @route   GET /api/student/analytics/badges
-// @access  Public
+// @access  Private
 exports.getBadges = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
-    const analytics = await StudentAnalytics.findOne({ userEmail });
-    const badges = analytics?.badges?.length ? analytics.badges : DEFAULT_BADGES;
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
+    const analytics = await StudentAnalytics.findOne({ userEmail }).lean();
+    const badges = analytics?.badges || [];
 
     res.json({
       success: true,

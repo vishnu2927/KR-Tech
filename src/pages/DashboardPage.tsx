@@ -70,12 +70,12 @@ export default function DashboardPage() {
   const [bookingMentor, setBookingMentor] = useState<boolean>(false);
 
   // Profile Settings State
-  const [profileName, setProfileName] = useState<string>(user?.name || "Aditya Sharma");
-  const [profilePhone, setProfilePhone] = useState<string>(user?.phone || "+91 98765 43210");
-  const [profileCollege, setProfileCollege] = useState<string>("IIT Bombay / BITS Pilani");
-  const [profileBranch, setProfileBranch] = useState<string>("Computer Science & Engineering");
-  const [profileLinkedIn, setProfileLinkedIn] = useState<string>("https://linkedin.com/in/student-dev");
-  const [profileGitHub, setProfileGitHub] = useState<string>("https://github.com/student-dev");
+  const [profileName, setProfileName] = useState<string>(user?.name || "");
+  const [profilePhone, setProfilePhone] = useState<string>(user?.phone || "");
+  const [profileCollege, setProfileCollege] = useState<string>("");
+  const [profileBranch, setProfileBranch] = useState<string>("");
+  const [profileLinkedIn, setProfileLinkedIn] = useState<string>("");
+  const [profileGitHub, setProfileGitHub] = useState<string>("");
   const [currPassword, setCurrPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -237,63 +237,49 @@ export default function DashboardPage() {
     setConfirmPassword("");
   };
 
-  // Fallback defaults
+  // Default metrics from authenticated user records
   const metrics = dashboardData?.metrics || {
-    coursesEnrolled: 3,
-    lessonsCompleted: 48,
-    learningHours: 38,
-    certificatesEarned: 2,
-    overallProgress: 74,
+    coursesEnrolled: 0,
+    lessonsCompleted: 0,
+    learningHours: 0,
+    certificatesEarned: 0,
+    overallProgress: 0,
+    streakDays: 0,
   };
 
-  const continueLearning = dashboardData?.continueLearning || {
-    courseId: "crs-java-fullstack-2026",
-    title: "Complete Java Backend & Spring Boot Microservices",
-    category: "Backend Engineering",
-    thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=340&fit=crop&auto=format",
-    mentor: "Rajesh Kumar (Principal Technical Architect Staff)",
-    progressPercent: 74,
-    currentLesson: "Module 4 · Lecture 12: Distributed Transactions with Saga Pattern",
-    completedLessons: 18,
-    totalLessons: 24,
-  };
+  const continueLearning = dashboardData?.continueLearning || null;
 
   // Weekly Activity Chart Data (Recharts)
-  const weeklyAnalyticsData = [
-    { day: "Mon", hours: 2.5, target: 2.0, score: 85 },
-    { day: "Tue", hours: 3.8, target: 2.5, score: 90 },
-    { day: "Wed", hours: 1.5, target: 2.0, score: 75 },
-    { day: "Thu", hours: 4.2, target: 3.0, score: 95 },
-    { day: "Fri", hours: 2.0, target: 2.0, score: 80 },
-    { day: "Sat", hours: 5.5, target: 3.5, score: 98 },
-    { day: "Sun", hours: 3.0, target: 2.5, score: 88 },
+  const weeklyAnalyticsData = dashboardData?.weeklyActivity || [
+    { day: "Mon", hours: 0, target: 2.0, score: 0 },
+    { day: "Tue", hours: 0, target: 2.0, score: 0 },
+    { day: "Wed", hours: 0, target: 2.0, score: 0 },
+    { day: "Thu", hours: 0, target: 2.0, score: 0 },
+    { day: "Fri", hours: 0, target: 2.0, score: 0 },
+    { day: "Sat", hours: 0, target: 2.0, score: 0 },
+    { day: "Sun", hours: 0, target: 2.0, score: 0 },
   ];
 
-  const courseCompletionData = [
-    { name: "Java Backend", progress: 74, total: 100 },
-    { name: "MERN Stack", progress: 45, total: 100 },
-    { name: "AWS Cloud", progress: 100, total: 100 },
-    { name: "DSA 250", progress: 58, total: 100 },
-  ];
+  const courseCompletionData = enrolledCourses.map((c: any) => ({
+    name: (c.title || c.courseTitle || "Course").split(" ")[0],
+    progress: c.progress || 0,
+    total: 100,
+  }));
 
-  const attendanceData = [
-    { week: "W1", attendance: 100 },
-    { week: "W2", attendance: 95 },
-    { week: "W3", attendance: 100 },
-    { week: "W4", attendance: 94 },
-  ];
+  const attendanceData: any[] = [];
 
-  const assignmentScoresData = [
-    { title: "Kafka Saga", score: 98, max: 100 },
-    { title: "Docker Swarm", score: 92, max: 100 },
-    { title: "VPC Transit", score: 96, max: 100 },
-    { title: "JWT Vault", score: 94, max: 100 },
-  ];
+  const assignmentScoresData = assignments
+    .filter((a: any) => a.studentSubmission?.score != null)
+    .map((a: any) => ({
+      title: a.title,
+      score: a.studentSubmission.score,
+      max: a.maxScore || 100,
+    }));
 
   // SVG Circular Progress Ring
   const circleRadius = 40;
   const circleCircumference = 2 * Math.PI * circleRadius;
-  const strokeDashoffset = circleCircumference - (circleCircumference * (metrics.overallProgress || 74)) / 100;
+  const strokeDashoffset = circleCircumference - (circleCircumference * (metrics.overallProgress || 0)) / 100;
 
   // Recordings Library Items (Sprint 6.6)
   const recordingsCatalog = [
@@ -352,43 +338,9 @@ export default function DashboardPage() {
     { id: "res-05", title: "Tier-1 Software Architect Certification Roadmap 2026", category: "Roadmaps", size: "2.4 MB", format: "Infographic PDF", downloads: 4300 },
   ];
 
-  // Filtered Courses
+  // Filtered Courses strictly from enrolledCourses
   const displayedCourses = useMemo(() => {
-    let list = enrolledCourses.length > 0 ? enrolledCourses : [
-      {
-        id: "crs-java-fullstack-2026",
-        courseId: "crs-java-fullstack-2026",
-        title: "Complete Java Backend & Spring Boot Microservices",
-        category: "Backend Engineering",
-        thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=340&fit=crop&auto=format",
-        mentor: "Rajesh Kumar (Principal Technical Architect Staff)",
-        duration: "45 Hours · 24 Lectures",
-        progress: 74,
-        status: "ongoing",
-      },
-      {
-        id: "crs-mern-bootcamp",
-        courseId: "crs-mern-bootcamp",
-        title: "MERN Stack Full Stack Web Development Mastery",
-        category: "Full Stack",
-        thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=340&fit=crop&auto=format",
-        mentor: "Amit Verma (Principal Systems Architect)",
-        duration: "52 Hours · 32 Lectures",
-        progress: 45,
-        status: "ongoing",
-      },
-      {
-        id: "crs-aws-architect",
-        courseId: "crs-aws-architect",
-        title: "AWS Certified Solutions Architect – Associate (SAA-C03)",
-        category: "Cloud Engineering",
-        thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=340&fit=crop&auto=format",
-        mentor: "Vikram Nair (Staff Software Engineer Cloud)",
-        duration: "38 Hours · 20 Lectures",
-        progress: 100,
-        status: "completed",
-      },
-    ];
+    let list = enrolledCourses;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -480,6 +432,9 @@ export default function DashboardPage() {
             {/* ═════════════════════════════════════════════════════════════════════════════
                 TAB 1: DASHBOARD HOME (Sprint 6.2 - The 8 Core Widgets)
             ═════════════════════════════════════════════════════════════════════════════ */}
+            {/* ═════════════════════════════════════════════════════════════════════════════
+                TAB 1: DASHBOARD HOME (Sprint 6.2 - The 8 Core Widgets)
+            ═════════════════════════════════════════════════════════════════════════════ */}
             {(activeTab === "dashboard" || activeTab === "home") && (
               <div className="space-y-8 animate-in fade-in duration-200">
                 {/* ── Widget 1: Welcome Banner ── */}
@@ -488,16 +443,19 @@ export default function DashboardPage() {
                     <div>
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-3">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <span>Spring 2026 Batch Active</span>
+                        <span>Student Portal Active</span>
                         <span>•</span>
-                        <span>🔥 5-Day Learning Streak</span>
+                        <span>{metrics.streakDays > 0 ? `🔥 ${metrics.streakDays}-Day Learning Streak` : "0-Day Learning Streak"}</span>
                       </div>
                       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                         Welcome back, {user?.name ? user.name.split(" ")[0] : "Student"}! 👋
                       </h1>
                       <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
-                        You have completed <strong className="text-cyan-400">18 of 24 modules</strong> in your Enterprise Java Backend track.
-                        Your next live pair-programming session begins in <strong className="text-amber-400">{formatCountdown(countdownSeconds)}</strong>.
+                        {continueLearning ? (
+                          <>You are currently progressing through <strong className="text-cyan-400">{continueLearning.title}</strong> with <strong className="text-emerald-400">{metrics.overallProgress}%</strong> completion.</>
+                        ) : (
+                          <>You have not enrolled in any course yet. Explore our curriculum to begin your learning journey.</>
+                        )}
                       </p>
                     </div>
 
@@ -509,12 +467,21 @@ export default function DashboardPage() {
                       >
                         <span>↻ Sync Atlas</span>
                       </button>
-                      <Link
-                        to={`/courses/${continueLearning.courseId}`}
-                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-xs font-bold text-white shadow-lg shadow-purple-900/40 transition-all no-underline"
-                      >
-                        Resume Learning →
-                      </Link>
+                      {continueLearning ? (
+                        <Link
+                          to={`/courses/${continueLearning.courseId}`}
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-xs font-bold text-white shadow-lg shadow-purple-900/40 transition-all no-underline"
+                        >
+                          Resume Learning →
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/courses"
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-xs font-bold text-white shadow-lg shadow-purple-900/40 transition-all no-underline"
+                        >
+                          Browse Courses →
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -526,16 +493,16 @@ export default function DashboardPage() {
                       <span className="text-xl">📚</span>
                       <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full">Enrolled</span>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.coursesEnrolled || 3}</div>
+                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.coursesEnrolled ?? 0}</div>
                     <div className="text-xs text-slate-400 mt-1">Active Courses</div>
                   </div>
 
                   <div className="p-5 rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-cyan-500/40 transition-all shadow-xl">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xl">🎯</span>
-                      <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">+4 this week</span>
+                      <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">Lectures</span>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.lessonsCompleted || 48}</div>
+                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.lessonsCompleted ?? 0}</div>
                     <div className="text-xs text-slate-400 mt-1">Lectures Watched</div>
                   </div>
 
@@ -544,7 +511,7 @@ export default function DashboardPage() {
                       <span className="text-xl">⏱️</span>
                       <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Study Time</span>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.learningHours || 38}h</div>
+                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.learningHours ?? 0}h</div>
                     <div className="text-xs text-slate-400 mt-1">Learning Hours</div>
                   </div>
 
@@ -553,7 +520,7 @@ export default function DashboardPage() {
                       <span className="text-xl">🎓</span>
                       <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">Verified Credential</span>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.certificatesEarned || 2}</div>
+                    <div className="text-2xl sm:text-3xl font-black text-white">{metrics.certificatesEarned ?? 0}</div>
                     <div className="text-xs text-slate-400 mt-1">Credentials Earned</div>
                   </div>
                 </div>
@@ -562,127 +529,123 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                   {/* Left Column (2 Cols) */}
                   <div className="lg:col-span-2 space-y-6 sm:space-y-8">
-                    {/* ── Widget 2 & 3: Current Batch & Progress Ring ── */}
+                    {/* ── Widget 2 & 3: Current Course & Progress Ring ── */}
                     <div className="p-6 sm:p-7 rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl space-y-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">⚡</span>
-                          <h2 className="text-base font-bold text-white">Current Batch & Progress Ring</h2>
+                          <h2 className="text-base font-bold text-white">Current Course & Progress Ring</h2>
                         </div>
                         <span className="text-xs text-purple-400 font-semibold font-mono">
-                          Batch: Spring 2026 (Live One-on-One)
+                          {continueLearning ? `Batch: ${continueLearning.category || "Active Track"}` : "No Active Track"}
                         </span>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-                        <div className="space-y-2">
-                          <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                            {continueLearning.category}
-                          </span>
-                          <h3 className="text-base font-bold text-white">{continueLearning.title}</h3>
-                          <p className="text-xs text-slate-400">
-                            Mentor: <strong className="text-slate-200">{continueLearning.mentor}</strong>
-                          </p>
-                          <p className="text-[11px] text-cyan-300 font-mono">
-                            Current: {continueLearning.currentLesson}
-                          </p>
-                        </div>
-
-                        {/* Progress Ring Widget */}
-                        <div className="flex items-center gap-4 self-end sm:self-center shrink-0">
-                          <div className="relative w-20 h-20 flex items-center justify-center">
-                            <svg className="w-20 h-20 transform -rotate-90">
-                              <circle cx="40" cy="40" r={circleRadius} stroke="#1e293b" strokeWidth="6" fill="transparent" />
-                              <circle
-                                cx="40"
-                                cy="40"
-                                r={circleRadius}
-                                stroke="url(#progressGradient)"
-                                strokeWidth="6"
-                                strokeDasharray={circleCircumference}
-                                strokeDashoffset={strokeDashoffset}
-                                strokeLinecap="round"
-                                fill="transparent"
-                                className="transition-all duration-1000 ease-out"
-                              />
-                              <defs>
-                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                  <stop offset="0%" stopColor="#8b5cf6" />
-                                  <stop offset="100%" stopColor="#06b6d4" />
-                                </linearGradient>
-                              </defs>
-                            </svg>
-                            <span className="absolute text-sm font-black text-white font-mono">
-                              {metrics.overallProgress || 74}%
+                      {continueLearning ? (
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+                          <div className="space-y-2">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                              {continueLearning.category}
                             </span>
+                            <h3 className="text-base font-bold text-white">{continueLearning.title}</h3>
+                            <p className="text-xs text-slate-400">
+                              Mentor: <strong className="text-slate-200">{continueLearning.mentor || "Assigned Mentor"}</strong>
+                            </p>
+                            <p className="text-[11px] text-cyan-300 font-mono">
+                              Current: {continueLearning.currentLesson || "Module 1"}
+                            </p>
                           </div>
 
-                          <Link
-                            to={`/courses/${continueLearning.courseId}`}
-                            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-xs font-bold text-white shadow-md shadow-cyan-900/30 transition-all no-underline"
-                          >
-                            Continue →
-                          </Link>
+                          {/* Progress Ring Widget */}
+                          <div className="flex items-center gap-4 self-end sm:self-center shrink-0">
+                            <div className="relative w-20 h-20 flex items-center justify-center">
+                              <svg className="w-20 h-20 transform -rotate-90">
+                                <circle cx="40" cy="40" r={circleRadius} stroke="#1e293b" strokeWidth="6" fill="transparent" />
+                                <circle
+                                  cx="40"
+                                  cy="40"
+                                  r={circleRadius}
+                                  stroke="url(#progressGradient)"
+                                  strokeWidth="6"
+                                  strokeDasharray={circleCircumference}
+                                  strokeDashoffset={strokeDashoffset}
+                                  strokeLinecap="round"
+                                  fill="transparent"
+                                  className="transition-all duration-1000 ease-out"
+                                />
+                                <defs>
+                                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#8b5cf6" />
+                                    <stop offset="100%" stopColor="#06b6d4" />
+                                  </linearGradient>
+                                </defs>
+                              </svg>
+                              <span className="absolute text-sm font-black text-white font-mono">
+                                {metrics.overallProgress ?? 0}%
+                              </span>
+                            </div>
+
+                            <Link
+                              to={`/courses/${continueLearning.courseId}`}
+                              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-xs font-bold text-white shadow-md shadow-cyan-900/30 transition-all no-underline"
+                            >
+                              Continue →
+                            </Link>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+                          <div className="space-y-2">
+                            <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                              No Enrollment
+                            </span>
+                            <h3 className="text-base font-bold text-white">No course enrolled yet</h3>
+                            <p className="text-xs text-slate-400">
+                              Explore our industry-aligned tracks to begin your learning journey.
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-4 self-end sm:self-center shrink-0">
+                            <div className="relative w-20 h-20 flex items-center justify-center">
+                              <svg className="w-20 h-20 transform -rotate-90">
+                                <circle cx="40" cy="40" r={circleRadius} stroke="#1e293b" strokeWidth="6" fill="transparent" />
+                              </svg>
+                              <span className="absolute text-sm font-black text-white font-mono">
+                                0%
+                              </span>
+                            </div>
+
+                            <Link
+                              to="/courses"
+                              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-xs font-bold text-white shadow-md shadow-purple-900/30 transition-all no-underline"
+                            >
+                              Browse Courses
+                            </Link>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* ── Widget 4: Today's Live Class ── */}
-                    <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-slate-900/90 to-purple-950/40 backdrop-blur-xl border border-purple-500/30 shadow-xl space-y-4">
+                    <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-slate-900/90 to-purple-950/40 backdrop-blur-xl border border-slate-800 shadow-xl space-y-4">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                          <h2 className="text-base font-bold text-white">Today's Live Class & Pair Coding</h2>
+                          <span className="w-2.5 h-2.5 rounded-full bg-slate-500" />
+                          <h2 className="text-base font-bold text-white">Live Classes & Mentoring</h2>
                         </div>
-                        <div className="text-xs font-mono font-bold text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
-                          ⏱️ Starts in: {formatCountdown(countdownSeconds)}
+                        <div className="text-xs font-mono font-semibold text-slate-400 bg-slate-950 px-3 py-1 rounded-full border border-slate-800">
+                          {continueLearning ? "No sessions today" : "No active cohort"}
                         </div>
                       </div>
 
-                      <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full">
-                              One-on-One Interactive Room
-                            </span>
-                            <h3 className="text-sm sm:text-base font-bold text-white mt-1.5">
-                              Kafka Event Streams & Distributed Consumer Groups (Live Pair Programming)
-                            </h3>
-                            <p className="text-xs text-slate-400 mt-1">
-                              Mentor: <span className="text-purple-300 font-semibold">Rajesh Kumar (Principal Technical Architect Staff Architect)</span>
-                            </p>
-                          </div>
-                          <span className="text-2xl">🔴</span>
-                        </div>
-
-                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
-                          <div className="flex items-center gap-3">
-                            <a
-                              href="https://meet.google.com/krtech-live-pair"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-xs font-bold text-white shadow-lg shadow-rose-900/40 transition no-underline flex items-center gap-2"
-                            >
-                              <span>📹 Join Google Meet / Zoom</span>
-                            </a>
-                            <button
-                              type="button"
-                              onClick={handleMarkAttendance}
-                              disabled={attendanceMarked}
-                              className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5 ${
-                                attendanceMarked
-                                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                                  : "bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700"
-                              }`}
-                            >
-                              <span>{attendanceMarked ? "✓ Attendance Recorded" : "Mark Attendance"}</span>
-                            </button>
-                          </div>
-
-                          <span className="text-[11px] text-slate-400 font-mono">
-                            Slot: 7:00 PM – 8:30 PM IST
-                          </span>
-                        </div>
+                      <div className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800 text-center py-8 space-y-2">
+                        <span className="text-2xl block">🗓️</span>
+                        <h3 className="text-sm font-bold text-white">No Live Classes Scheduled</h3>
+                        <p className="text-xs text-slate-400 max-w-md mx-auto">
+                          {continueLearning
+                            ? "Your upcoming 1-on-1 pair-programming sessions and cohort workshops will appear here when scheduled."
+                            : "Once you enroll in a course track and are assigned a mentor schedule, your live sessions will appear here."}
+                        </p>
                       </div>
                     </div>
 
@@ -692,40 +655,9 @@ export default function DashboardPage() {
                         <h2 className="text-base font-bold text-white flex items-center gap-2">
                           <span>🗓️ Upcoming Sessions Timeline</span>
                         </h2>
-                        <button
-                          type="button"
-                          onClick={() => showToast("✓ Calendar invite (.ics) downloaded for all upcoming classes!")}
-                          className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
-                        >
-                          Export to Calendar ↗
-                        </button>
                       </div>
-
-                      <div className="space-y-3">
-                        {[
-                          { date: "Tomorrow, 8:00 PM", topic: "React 19 Server Actions & Multi-Tenant DB", mentor: "Amit Verma (Principal Systems Architect)", type: "One-on-One Live" },
-                          { date: "Saturday, 10:00 AM", topic: "AWS Multi-Region High-Availability VPC Peering", mentor: "Vikram Nair (Staff Software Engineer Cloud)", type: "Capstone Clinic" },
-                          { date: "Sunday, 6:00 PM", topic: "High-Scale Uber Geospatial Dispatch Architecture", mentor: "Rajesh Kumar (Principal Technical Architect)", type: "System Design" },
-                        ].map((sess, sidx) => (
-                          <div key={sidx} className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs border border-purple-500/20 shrink-0">
-                                #{sidx + 1}
-                              </div>
-                              <div>
-                                <h4 className="text-xs sm:text-sm font-bold text-white">{sess.topic}</h4>
-                                <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                                  <span>{sess.date}</span>
-                                  <span>•</span>
-                                  <span className="text-purple-300">{sess.mentor}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
-                              {sess.type}
-                            </span>
-                          </div>
-                        ))}
+                      <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800/80 text-center text-xs text-slate-400">
+                        No upcoming sessions scheduled yet.
                       </div>
                     </div>
 
@@ -734,67 +666,67 @@ export default function DashboardPage() {
                       <h2 className="text-base font-bold text-white flex items-center gap-2">
                         <span>📋 Recent Activity Feed</span>
                       </h2>
-                      <div className="space-y-3">
-                        {[
-                          { title: "Completed Lecture: Saga Pattern Compensating Transactions", time: "2 hours ago", xp: "+100 XP", icon: "✓" },
-                          { title: "Submitted Assignment: Kafka Consumer Group Partitioning", time: "Yesterday", xp: "Evaluated (98/100)", icon: "📝" },
-                          { title: "Earned Badge: Distributed Systems Specialist Level 4", time: "2 days ago", xp: "Badge Unlocked", icon: "🏆" },
-                          { title: "Scored 96% in AWS Solutions Architect Practice Quiz", time: "3 days ago", xp: "Quiz Passed", icon: "⚡" },
-                        ].map((act, aidx) => (
-                          <div key={aidx} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800 text-xs">
-                            <div className="flex items-center gap-3">
-                              <span className="w-7 h-7 rounded-lg bg-slate-900 text-cyan-400 flex items-center justify-center font-bold border border-slate-800">
-                                {act.icon}
-                              </span>
-                              <div>
-                                <span className="font-semibold text-white block">{act.title}</span>
-                                <span className="text-[10px] text-slate-500">{act.time}</span>
+                      {dashboardData?.recentActivity && dashboardData.recentActivity.length > 0 ? (
+                        <div className="space-y-3">
+                          {dashboardData.recentActivity.map((act: any, aidx: number) => (
+                            <div key={aidx} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800 text-xs">
+                              <div className="flex items-center gap-3">
+                                <span className="w-7 h-7 rounded-lg bg-slate-900 text-cyan-400 flex items-center justify-center font-bold border border-slate-800">
+                                  ✓
+                                </span>
+                                <div>
+                                  <span className="font-semibold text-white block">{act.title || act.action}</span>
+                                  <span className="text-[10px] text-slate-500">{act.time || act.timestamp}</span>
+                                </div>
                               </div>
                             </div>
-                            <span className="text-[10px] font-mono font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">
-                              {act.xp}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-6 rounded-2xl bg-slate-950/50 border border-slate-800 text-center text-xs text-slate-400">
+                          No learning activity yet
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   {/* Right Column (1 Col) */}
                   <div className="space-y-6 sm:space-y-8">
-                    {/* ── Widget 7: Mentor of the Week ── */}
+                    {/* ── Widget 7: Assigned Mentor ── */}
                     <div className="p-6 rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-                          ⭐ Mentor of the Week
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
+                          Mentor Support
                         </span>
-                        <span className="text-xs text-amber-400">4.98 ★ (420+ One-on-Ones)</span>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        <img
-                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&crop=faces&auto=format"
-                          alt="Rajesh Kumar"
-                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-purple-500/40"
-                        />
-                        <div>
-                          <h3 className="text-sm font-bold text-white">Rajesh Kumar</h3>
-                          <p className="text-xs text-purple-300 font-semibold">Principal Technical Architect Staff Architect</p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">Distributed Systems & Kafka</p>
+                      {continueLearning?.mentor ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-xl text-purple-300">
+                              👨‍🏫
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-bold text-white">{continueLearning.mentor}</h3>
+                              <p className="text-xs text-slate-400">Assigned Course Mentor</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsMentorModalOpen(true)}
+                            className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-md shadow-purple-900/30 cursor-pointer"
+                          >
+                            Book One-on-One Session ↗
+                          </button>
                         </div>
-                      </div>
-
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        "Architecting scalable event pipelines with transactional outboxes is the #1 skill top tech companies look for in 2026."
-                      </p>
-
-                      <button
-                        type="button"
-                        onClick={() => setIsMentorModalOpen(true)}
-                        className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-md shadow-purple-900/30 cursor-pointer"
-                      >
-                        Book One-on-One Live Slot ↗
-                      </button>
+                      ) : (
+                        <div className="p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80 text-center space-y-2">
+                          <span className="text-2xl block">🤝</span>
+                          <p className="text-xs text-slate-400">
+                            Your mentor will appear here after a session is assigned.
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* ── Widget 8: Industry Certification Readiness ── */}
@@ -803,42 +735,28 @@ export default function DashboardPage() {
                         <h2 className="text-sm font-bold text-white flex items-center gap-2">
                           <span>🚀 Industry Certification Readiness</span>
                         </h2>
-                        <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          84% Exam Ready
+                        <span className="text-xs font-mono font-bold text-slate-400 bg-slate-950 px-2 py-0.5 rounded-full border border-slate-800">
+                          {metrics.overallProgress || 0}% Exam Ready
                         </span>
                       </div>
 
-                      <div className="space-y-3 text-xs">
-                        <div>
-                          <div className="flex justify-between text-slate-300 mb-1">
-                            <span>Technical Architecture Score</span>
-                            <span className="font-bold text-cyan-400">92 / 100</span>
-                          </div>
-                          <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
-                            <div className="bg-cyan-400 h-full w-[92%]" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between text-slate-300 mb-1">
-                            <span>Practical Capstone Labs</span>
-                            <span className="font-bold text-purple-400">9.4 / 10</span>
-                          </div>
-                          <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
-                            <div className="bg-purple-400 h-full w-[94%]" />
+                      {metrics.overallProgress > 0 ? (
+                        <div className="space-y-3 text-xs">
+                          <div>
+                            <div className="flex justify-between text-slate-300 mb-1">
+                              <span>Curriculum Progress</span>
+                              <span className="font-bold text-cyan-400">{metrics.overallProgress}%</span>
+                            </div>
+                            <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                              <div style={{ width: `${metrics.overallProgress}%` }} className="bg-cyan-400 h-full" />
+                            </div>
                           </div>
                         </div>
-
-                        <div>
-                          <div className="flex justify-between text-slate-300 mb-1">
-                            <span>Coding & Problem Solving</span>
-                            <span className="font-bold text-amber-400">142 / 250</span>
-                          </div>
-                          <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
-                            <div className="bg-amber-400 h-full w-[57%]" />
-                          </div>
-                        </div>
-                      </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          Complete course modules and assignments to unlock certification eligibility.
+                        </p>
+                      )}
 
                       <Link
                         to="/certificates"
@@ -917,59 +835,75 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Course Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {displayedCourses.map((c: any) => (
-                    <div
-                      key={c.id || c.courseId}
-                      className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all overflow-hidden flex flex-col justify-between shadow-xl group"
+                {displayedCourses.length === 0 ? (
+                  <div className="p-12 rounded-3xl bg-slate-900/80 border border-slate-800 text-center space-y-4">
+                    <span className="text-4xl block">📚</span>
+                    <h3 className="text-lg font-bold text-white">No course enrolled yet</h3>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      You are not currently enrolled in any courses. Browse our catalog to get started.
+                    </p>
+                    <Link
+                      to="/courses"
+                      className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-xs font-bold text-white shadow-lg shadow-purple-900/40 transition no-underline"
                     >
-                      <div>
-                        <div className="relative aspect-video overflow-hidden">
-                          <img
-                            src={c.thumbnail || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=340&fit=crop&auto=format"}
-                            alt={c.title || c.courseTitle}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/60 backdrop-blur-md text-white border border-white/10">
-                            {c.category || "Software Engineering"}
-                          </span>
-                        </div>
+                      Browse Courses
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {displayedCourses.map((c: any) => (
+                      <div
+                        key={c.id || c.courseId}
+                        className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all overflow-hidden flex flex-col justify-between shadow-xl group"
+                      >
+                        <div>
+                          <div className="relative aspect-video overflow-hidden">
+                            <img
+                              src={c.thumbnail || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=340&fit=crop&auto=format"}
+                              alt={c.title || c.courseTitle}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/60 backdrop-blur-md text-white border border-white/10">
+                              {c.category || "Software Engineering"}
+                            </span>
+                          </div>
 
-                        <div className="p-5 space-y-3">
-                          <h3 className="text-sm font-bold text-white line-clamp-1">{c.title || c.courseTitle}</h3>
-                          <p className="text-xs text-slate-400">
-                            Mentor: <span className="text-slate-200">{c.mentor || "Senior Tech Lead"}</span>
-                          </p>
+                          <div className="p-5 space-y-3">
+                            <h3 className="text-sm font-bold text-white line-clamp-1">{c.title || c.courseTitle}</h3>
+                            <p className="text-xs text-slate-400">
+                              Mentor: <span className="text-slate-200">{c.mentor || "Senior Tech Lead"}</span>
+                            </p>
 
-                          <div className="space-y-1.5 pt-1">
-                            <div className="flex justify-between text-xs">
-                              <span className="text-slate-400">Progress</span>
-                              <span className="font-bold text-cyan-400 font-mono">{c.progress || 0}%</span>
-                            </div>
-                            <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
-                              <div
-                                style={{ width: `${c.progress || 0}%` }}
-                                className="bg-gradient-to-r from-purple-500 to-cyan-400 h-full rounded-full"
-                              />
+                            <div className="space-y-1.5 pt-1">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-slate-400">Progress</span>
+                                <span className="font-bold text-cyan-400 font-mono">{c.progress || 0}%</span>
+                              </div>
+                              <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                                <div
+                                  style={{ width: `${c.progress || 0}%` }}
+                                  className="bg-gradient-to-r from-purple-500 to-cyan-400 h-full rounded-full"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="p-5 pt-0 border-t border-slate-800/80 mt-3 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          {c.duration || "45 Hours"}
-                        </span>
-                        <Link
-                          to={`/courses/${c.courseId || c.id}`}
-                          className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white transition no-underline"
-                        >
-                          Continue Learning →
-                        </Link>
+                        <div className="p-5 pt-0 border-t border-slate-800/80 mt-3 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            {c.duration || "45 Hours"}
+                          </span>
+                          <Link
+                            to={`/courses/${c.courseId || c.id}`}
+                            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white transition no-underline"
+                          >
+                            Continue Learning →
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1100,13 +1034,13 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="relative aspect-video rounded-2xl overflow-hidden bg-black">
-                      <ReactPlayer
-                        url={selectedRecording.videoUrl}
-                        controls
-                        width="100%"
-                        height="100%"
-                        playing
-                      />
+                      {(ReactPlayer as any)({
+                        url: selectedRecording.videoUrl,
+                        controls: true,
+                        width: "100%",
+                        height: "100%",
+                        playing: true,
+                      })}
                     </div>
 
                     <div className="flex items-center justify-between pt-2">
@@ -1193,71 +1127,60 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  {[
-                    {
-                      id: "asg-01",
-                      title: "High-Concurrency E-Commerce Order Saga Pattern with Kafka",
-                      courseTitle: "Enterprise Java Backend & Spring Boot Microservices",
-                      deadline: "Sunday, 11:59 PM IST",
-                      status: "pending",
-                      points: 100,
-                      requirements: ["Implement Order, Payment & Stock services", "Handle compensation rollbacks", "Add Docker Compose & unit tests"],
-                    },
-                    {
-                      id: "asg-02",
-                      title: "React 19 Server Actions & Multi-Tenant Database Architecture",
-                      courseTitle: "MERN Stack Full Stack Mastery",
-                      deadline: "Next Week, 11:59 PM IST",
-                      status: "evaluated",
-                      grade: "Distinction (98/100)",
-                      feedback: "Excellent modularity, database connection pooling, and error boundary implementation.",
-                      points: 100,
-                      requirements: ["Server Actions for zero-bundle mutations", "Dynamic multi-tenant schema isolation"],
-                    },
-                  ].map((asg) => (
-                    <div
-                      key={asg.id}
-                      className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all space-y-4"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            asg.status === "evaluated"
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                          }`}>
-                            {asg.status === "evaluated" ? "✓ Evaluated" : "⏰ Due Soon"}
-                          </span>
-                          <h3 className="text-base font-bold text-white mt-1.5">{asg.title}</h3>
-                          <p className="text-xs text-slate-400">Course: {asg.courseTitle}</p>
+                {assignments.length === 0 ? (
+                  <div className="p-12 rounded-3xl bg-slate-900/80 border border-slate-800 text-center space-y-3">
+                    <span className="text-3xl block">📝</span>
+                    <h3 className="text-base font-bold text-white">No assignments assigned yet</h3>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      Assignments will appear here once you enroll in an active course module.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {assignments.map((asg: any) => (
+                      <div
+                        key={asg._id || asg.id}
+                        className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all space-y-4"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div>
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              asg.status === "evaluated"
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                            }`}>
+                              {asg.status === "evaluated" ? "✓ Evaluated" : "⏰ Due Soon"}
+                            </span>
+                            <h3 className="text-base font-bold text-white mt-1.5">{asg.title}</h3>
+                            <p className="text-xs text-slate-400">Course: {asg.courseTitle}</p>
+                          </div>
+                          <div className="text-xs text-amber-400 font-mono">
+                            Deadline: {asg.deadline || "TBA"} • {asg.points || 100} Points
+                          </div>
                         </div>
-                        <div className="text-xs text-amber-400 font-mono">
-                          Deadline: {asg.deadline} • {asg.points} Points
+
+                        {asg.feedback && (
+                          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
+                            <strong>Mentor Feedback:</strong> {asg.feedback} — Grade: <strong>{asg.grade}</strong>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedAssignment(asg);
+                              setIsAssignmentModalOpen(true);
+                            }}
+                            className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-md shadow-purple-900/30 cursor-pointer"
+                          >
+                            {asg.status === "evaluated" ? "Resubmit Updated Code →" : "Submit Assignment →"}
+                          </button>
                         </div>
                       </div>
-
-                      {asg.feedback && (
-                        <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
-                          <strong>Mentor Feedback:</strong> {asg.feedback} — Grade: <strong>{asg.grade}</strong>
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-3 pt-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedAssignment(asg);
-                            setIsAssignmentModalOpen(true);
-                          }}
-                          className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-md shadow-purple-900/30 cursor-pointer"
-                        >
-                          {asg.status === "evaluated" ? "Resubmit Updated Code →" : "Submit Assignment →"}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1273,73 +1196,67 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    {
-                      id: "KR-CERT-884920",
-                      title: "Full Stack Microservices Architecture with Spring Cloud & Kafka",
-                      date: "Aug 2026",
-                      grade: "Distinction (98%)",
-                      credentialId: "KR-CERT-884920",
-                      verifyUrl: "/verify-certificate/KR-CERT-884920",
-                    },
-                    {
-                      id: "KR-CERT-991204",
-                      title: "AWS Certified Solutions Architect – Associate Mastery Track",
-                      date: "July 2026",
-                      grade: "Excellence (96%)",
-                      credentialId: "KR-CERT-991204",
-                      verifyUrl: "/verify-certificate/KR-CERT-991204",
-                    },
-                  ].map((cert) => (
-                    <div
-                      key={cert.id}
-                      className="p-6 rounded-3xl bg-slate-900/90 border border-amber-500/30 hover:border-amber-500/60 transition-all space-y-4 shadow-xl"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20 font-bold">
-                          {cert.credentialId}
-                        </span>
-                        <span className="text-xs font-bold text-emerald-400">{cert.grade}</span>
-                      </div>
-
-                      <div>
-                        <h3 className="text-base font-bold text-white">{cert.title}</h3>
-                        <p className="text-xs text-slate-400 mt-1">Issued to: {user?.name || "Aditya Sharma"} • {cert.date}</p>
-                      </div>
-
-                      {/* QR Code and Verification Badge */}
-                      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-white p-1 rounded-lg flex items-center justify-center">
-                            <span className="text-black text-2xl font-black">QR</span>
-                          </div>
-                          <div>
-                            <span className="text-xs font-bold text-white block">KR Global Learning Verified</span>
-                            <span className="text-[10px] text-slate-400">Registry Recorded</span>
-                          </div>
+                {certificates.length === 0 ? (
+                  <div className="p-12 rounded-3xl bg-slate-900/80 border border-slate-800 text-center space-y-3">
+                    <span className="text-3xl block">🎓</span>
+                    <h3 className="text-base font-bold text-white">No credentials earned yet</h3>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      Complete course modules and pass the final capstone assessment to earn your industry certificate.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {certificates.map((cert: any) => (
+                      <div
+                        key={cert.id || cert._id || cert.certificateId}
+                        className="p-6 rounded-3xl bg-slate-900/90 border border-amber-500/30 hover:border-amber-500/60 transition-all space-y-4 shadow-xl"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20 font-bold">
+                            {cert.certificateId || cert.id}
+                          </span>
+                          <span className="text-xs font-bold text-emerald-400">{cert.grade || "Completed"}</span>
                         </div>
-                        <span className="text-amber-400 text-2xl">🏆</span>
-                      </div>
 
-                      <div className="flex items-center justify-between pt-2">
-                        <button
-                          type="button"
-                          onClick={() => showToast(`✓ Official PDF certificate generated for ${cert.credentialId}`)}
-                          className="px-4 py-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
-                        >
-                          Download Official PDF ↓
-                        </button>
-                        <Link
-                          to={cert.verifyUrl}
-                          className="text-xs text-cyan-400 hover:underline font-semibold"
-                        >
-                          Verify Online ↗
-                        </Link>
+                        <div>
+                          <h3 className="text-base font-bold text-white">{cert.title || cert.courseName}</h3>
+                          <p className="text-xs text-slate-400 mt-1">Issued to: {user?.name || "Student"} • {cert.date || cert.issueDate}</p>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-white p-1 rounded-lg flex items-center justify-center">
+                              <span className="text-black text-2xl font-black">QR</span>
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-white block">KR Global Learning Verified</span>
+                              <span className="text-[10px] text-slate-400">Registry Recorded</span>
+                            </div>
+                          </div>
+                          <span className="text-amber-400 text-2xl">🏆</span>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2">
+                          <button
+                            type="button"
+                            onClick={() => showToast(`✓ Official PDF certificate generated for ${cert.certificateId || cert.id}`)}
+                            className="px-4 py-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
+                          >
+                            Download Official PDF ↓
+                          </button>
+                          {cert.verifyUrl && (
+                            <Link
+                              to={cert.verifyUrl}
+                              className="text-xs text-cyan-400 hover:underline font-semibold"
+                            >
+                              Verify Online ↗
+                            </Link>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

@@ -12,168 +12,185 @@ const Lesson = require('../models/Lesson');
 const Module = require('../models/Module');
 const CourseContent = require('../models/CourseContent');
 const Submission = require('../models/Submission');
+const StudentAnalytics = require('../models/StudentAnalytics');
 
-const getEffectiveEmail = (req) => {
-  return (req.user?.email || req.query.email || 'aditya.sharma@krtech.edu').toLowerCase().trim();
+const getEffectiveStudent = (req) => {
+  if (req.user && req.user.email) {
+    return {
+      userId: req.user._id,
+      email: req.user.email.toLowerCase().trim(),
+      name: req.user.name || 'Student',
+      role: req.user.role || 'student',
+      avatar: req.user.avatar || '',
+    };
+  }
+  return null;
 };
 
 // @desc    Get aggregated Student Dashboard Summary
 // @route   GET /api/student/dashboard
-// @access  Public / OptionalAuth
+// @access  Private
 const getDashboardSummary = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
+    const userId = student.userId;
 
-    // 1. Fetch Enrollments
-    let enrollments = await Enrollment.find({ userEmail }).sort({ enrolledAt: -1 });
+    // 1. Fetch Enrollments strictly for authenticated student
+    let enrollments = await Enrollment.find({
+      $or: [{ userEmail }, ...(userId ? [{ userId }] : [])],
+    }).sort({ enrolledAt: -1 }).lean();
 
-    // Fallback: If no enrollments exist for this email, fetch first 3 or provision sample enrollments
-    if (enrollments.length === 0) {
-      enrollments = await Enrollment.find().sort({ enrolledAt: -1 }).limit(3);
+    if (enrollments.length === 0 && userId) {
+      const courseEnrollments = await CourseEnrollment.find({ user: userId }).sort({ enrolledAt: -1 }).lean();
+      if (courseEnrollments.length > 0) {
+        enrollments = courseEnrollments.map((ce) => ({
+          _id: ce._id,
+          courseId: ce.courseId,
+          courseTitle: ce.title,
+          category: ce.category,
+          thumbnail: ce.thumbnail,
+          mentor: ce.mentor,
+          mentorCompany: ce.mentorCompany,
+          batch: ce.batch || '',
+          status: ce.status,
+          enrolledAt: ce.enrolledAt,
+        }));
+      }
     }
 
-    // 2. Fetch Progress for enrolled courses
-    const progressList = await Progress.find({ userEmail });
+    const enrolledCourseIds = enrollments.map((e) => e.courseId);
 
-    // 3. Fetch Recent Recorded Lectures
-    const recentLectures = await Lecture.find().sort({ lectureNumber: 1 }).limit(8);
+    // 2. Fetch Progress strictly for enrolled courses of authenticated student
+    let progressList = [];
+    if (enrolledCourseIds.length > 0) {
+      progressList = await Progress.find({
+        userEmail,
+        courseId: { $in: enrolledCourseIds },
+      }).lean();
 
-    // 4. Fetch Assignments
-    const assignments = await Assignment.find().sort({ createdAt: -1 }).limit(6);
+      if (progressList.length === 0 && userId) {
+        progressList = await CourseProgress.find({
+          user: userId,
+          courseId: { $in: enrolledCourseIds },
+        }).lean();
+      }
+    }
 
-    // 5. Fetch Certificates
-    const certificates = await Certificate.find().sort({ createdAt: -1 }).limit(4);
+    // 3. Fetch Recent Recorded Lectures for enrolled courses (empty if not enrolled)
+    let recentLectures = [];
+    if (enrolledCourseIds.length > 0) {
+      recentLectures = await Lecture.find({
+        courseId: { $in: enrolledCourseIds },
+      }).sort({ lectureNumber: 1 }).limit(8).lean();
+    }
 
-    // 6. Compute Aggregated Metrics
-    const totalEnrolled = enrollments.length || (req.user?.enrolledCourses?.length || 1);
-    const overallProgress = progressList.length > 0
+    // 4. Fetch Assignments strictly for enrolled courses
+    let assignments = [];
+    if (enrolledCourseIds.length > 0) {
+      assignments = await Assignment.find({
+        courseId: { $in: enrolledCourseIds },
+      }).sort({ createdAt: -1 }).limit(6).lean();
+    }
+
+    // 5. Fetch Certificates strictly for authenticated student
+    const certificates = await Certificate.find({
+      $or: [
+        { studentEmail: userEmail },
+        ...(userId ? [{ user: userId }] : []),
+      ],
+    }).sort({ createdAt: -1 }).lean();
+
+    // 6. Student Analytics (Streak, Activity)
+    const analytics = await StudentAnalytics.findOne({ userEmail }).lean();
+    const streakDays = analytics?.streak?.current || 0;
+    const recentActivity = analytics?.xpActivities || [];
+
+    // 7. Compute Aggregated Metrics
+    const totalEnrolled = enrollments.length;
+    const overallProgress = (progressList.length > 0 && totalEnrolled > 0)
       ? Math.round(progressList.reduce((acc, curr) => acc + (curr.progressPercent || 0), 0) / progressList.length)
-      : 74;
+      : 0;
 
     const totalCompletedLectures = progressList.reduce(
-      (acc, curr) => acc + (curr.completedLectures?.length || 0),
+      (acc, curr) => acc + (curr.completedLectures?.length || curr.completedLessons?.length || 0),
       0
-    ) || 48;
+    );
 
-    const totalWatchHours = Math.round((totalCompletedLectures * 45) / 60) || 38;
-    const certificatesEarned = certificates.length || 2;
+    const totalWatchMinutes = progressList.reduce(
+      (acc, curr) => acc + (curr.totalTimeSpentMinutes || ((curr.learningHours || 0) * 60) || 0),
+      0
+    );
+    const totalWatchHours = Math.round(totalWatchMinutes / 60);
+    const certificatesEarned = certificates.length;
 
-    // 7. Upcoming 1:1 Live Sessions
-    const upcomingClasses = [
-      {
-        id: 'cls-live-101',
-        title: 'Kafka Event Streams & Distributed Consumer Groups (1:1 Live)',
-        courseTitle: 'Complete Java Backend Development with Spring Boot & Microservices',
-        mentor: 'Rajesh Kumar',
-        mentorCompany: 'Principal Technical Architect · Staff Architect',
-        date: 'Today',
-        time: '7:00 PM IST',
-        duration: '60 mins',
-        roomUrl: 'https://krtech.edu/live-room/kafka-live-pair',
-        status: 'Scheduled',
-      },
-      {
-        id: 'cls-live-102',
-        title: 'React 19 Server Actions & Next.js 15 Full Stack Capstone Review',
-        courseTitle: 'MERN Stack Full Stack Web Development Mastery Bootcamp',
-        mentor: 'Amit Verma',
-        mentorCompany: 'Principal Systems Architect',
-        date: 'Tomorrow',
-        time: '8:30 PM IST',
-        duration: '60 mins',
-        roomUrl: 'https://krtech.edu/live-room/react19-live-pair',
-        status: 'Upcoming',
-      },
-      {
-        id: 'cls-live-103',
-        title: 'Multi-Region VPC Peering & Transit Gateway Architecture',
-        courseTitle: 'AWS Certified Solutions Architect – Associate (SAA-C03)',
-        mentor: 'Vikram Nair',
-        mentorCompany: 'Staff Software Engineer Cloud · Cloud Specialist',
-        date: 'Saturday',
-        time: '10:00 AM IST',
-        duration: '90 mins',
-        roomUrl: 'https://krtech.edu/live-room/aws-transit-live',
-        status: 'Upcoming',
-      },
-    ];
+    // 8. Primary Continue Learning Course (Only if enrolled)
+    let continueLearning = null;
+    let upcomingAssignment = null;
+    let upcomingMentorSession = null;
+    let assignedMentor = null;
 
-    // 8. Weekly Learning Activity (Last 7 Days)
-    const weeklyActivity = [
-      { day: 'Mon', hours: 2.5, lessons: 2 },
-      { day: 'Tue', hours: 3.8, lessons: 3 },
-      { day: 'Wed', hours: 1.5, lessons: 1 },
-      { day: 'Thu', hours: 4.2, lessons: 4 },
-      { day: 'Fri', hours: 2.0, lessons: 2 },
-      { day: 'Sat', hours: 5.5, lessons: 5 },
-      { day: 'Sun', hours: 3.0, lessons: 3 },
-    ];
+    if (enrollments.length > 0) {
+      const primaryEnrollment = enrollments[0];
+      const primaryProgress = progressList.find((p) => p.courseId === primaryEnrollment.courseId);
+      const totalLessonsCount = await Lecture.countDocuments({ courseId: primaryEnrollment.courseId }) || 24;
+      const completedCount = (primaryProgress?.completedLectures || primaryProgress?.completedLessons || []).length;
 
-    // Primary Continue Learning Course
-    const primaryEnrollment = enrollments[0] || {};
-    const continueLearning = {
-      courseId: primaryEnrollment.courseId || 'crs-java-fullstack-2026',
-      title: primaryEnrollment.courseTitle || 'Complete Java Backend & Spring Boot Microservices',
-      category: primaryEnrollment.category || 'Backend Engineering',
-      thumbnail: primaryEnrollment.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=340&fit=crop&auto=format',
-      mentor: primaryEnrollment.mentor || 'Rajesh Kumar (Principal Technical Architect Staff)',
-      progressPercent: overallProgress,
-      currentLesson: 'Module 4 · Lecture 12: Distributed Transactions with Saga Pattern',
-      completedLessons: totalCompletedLectures,
-      totalLessons: 64,
-    };
+      continueLearning = {
+        courseId: primaryEnrollment.courseId,
+        title: primaryEnrollment.courseTitle || primaryEnrollment.title,
+        category: primaryEnrollment.category || 'General',
+        thumbnail: primaryEnrollment.thumbnail || '',
+        mentor: primaryEnrollment.mentor || '',
+        batch: primaryEnrollment.batch || '',
+        progressPercent: primaryProgress?.progressPercent || 0,
+        currentLesson: primaryProgress?.currentLesson || primaryProgress?.currentLectureTitle || 'Module 1: Introduction',
+        completedLessons: completedCount,
+        totalLessons: totalLessonsCount,
+      };
 
-    // Primary Upcoming Assignment
-    const rawAssignment = assignments[0];
-    const upcomingAssignment = rawAssignment
-      ? {
+      if (primaryEnrollment.mentor) {
+        assignedMentor = {
+          name: primaryEnrollment.mentor,
+          title: primaryEnrollment.mentorCompany || '',
+        };
+      }
+
+      const rawAssignment = assignments[0];
+      if (rawAssignment) {
+        upcomingAssignment = {
           id: rawAssignment._id,
           title: rawAssignment.title,
           courseTitle: rawAssignment.moduleTitle || continueLearning.title,
-          dueDate: rawAssignment.deadline || 'In 3 days (Sunday, 11:59 PM)',
+          dueDate: rawAssignment.deadline || 'Pending assignment',
           status: 'pending',
           points: rawAssignment.maxScore || 100,
-        }
-      : {
-          id: 'asg-capstone-01',
-          title: 'High-Concurrency E-Commerce Order Saga Pattern with Kafka',
-          courseTitle: continueLearning.title,
-          dueDate: 'In 3 days (Sunday, 11:59 PM)',
-          status: 'pending',
-          points: 100,
         };
+      }
+    }
 
-    // Primary Upcoming Mentor Session
-    const upcomingMentorSession = upcomingClasses[0];
-
-    // Recent Certificates List
-    const recentCertificates = certificates.length > 0 ? certificates : [
-      {
-        id: 'cert-mock-01',
-        credentialId: 'KR-CERT-884920',
-        title: 'Full Stack Microservices Architecture with Spring Cloud & Kafka',
-        issueDate: 'Aug 2026',
-        grade: 'Distinction (98%)',
-        verifyUrl: '/verify-certificate/KR-CERT-884920',
-      },
-      {
-        id: 'cert-mock-02',
-        credentialId: 'KR-CERT-991204',
-        title: 'AWS Certified Solutions Architect – Associate Mastery Track',
-        issueDate: 'July 2026',
-        grade: 'Excellence (96%)',
-        verifyUrl: '/verify-certificate/KR-CERT-991204',
-      },
+    // Weekly Activity: 7-day learning activity (0s for fresh user)
+    const weeklyActivity = [
+      { day: 'Mon', hours: 0, lessons: 0 },
+      { day: 'Tue', hours: 0, lessons: 0 },
+      { day: 'Wed', hours: 0, lessons: 0 },
+      { day: 'Thu', hours: 0, lessons: 0 },
+      { day: 'Fri', hours: 0, lessons: 0 },
+      { day: 'Sat', hours: 0, lessons: 0 },
+      { day: 'Sun', hours: 0, lessons: 0 },
     ];
 
     res.json({
       success: true,
       user: {
-        id: req.user?._id,
+        id: userId,
         email: userEmail,
-        name: req.user?.name || 'Aditya Sharma',
-        role: req.user?.role || 'student',
-        avatar: req.user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=160&h=160&fit=crop&crop=faces&auto=format',
+        name: student.name,
+        role: student.role,
+        avatar: student.avatar,
       },
       metrics: {
         coursesEnrolled: totalEnrolled,
@@ -185,19 +202,22 @@ const getDashboardSummary = async (req, res) => {
         totalCompletedLectures,
         totalWatchHours,
         activeCertificates: certificatesEarned,
-        pendingAssignments: 2,
+        pendingAssignments: assignments.length,
+        streakDays,
       },
       continueLearning,
       upcomingAssignment,
       upcomingMentorSession,
-      recentCertificates,
+      assignedMentor,
+      recentCertificates: certificates,
       weeklyActivity,
       enrollments,
       progress: progressList,
       recentLectures,
       assignments,
       certificates,
-      upcomingClasses,
+      upcomingClasses: [],
+      recentActivity,
     });
   } catch (error) {
     console.error('Student Dashboard Summary Error:', error);
@@ -207,14 +227,22 @@ const getDashboardSummary = async (req, res) => {
 
 // @desc    Get All Student Enrollments
 // @route   GET /api/enrollments
-// @access  Public / OptionalAuth
+// @access  Private
 const getEnrollments = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
-    let enrollments = await Enrollment.find({ userEmail }).sort({ enrolledAt: -1 });
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
+    const userId = student.userId;
 
-    if (enrollments.length === 0) {
-      enrollments = await Enrollment.find().limit(4);
+    let enrollments = await Enrollment.find({
+      $or: [{ userEmail }, ...(userId ? [{ userId }] : [])],
+    }).sort({ enrolledAt: -1 }).lean();
+
+    if (enrollments.length === 0 && userId) {
+      enrollments = await CourseEnrollment.find({ user: userId }).sort({ enrolledAt: -1 }).lean();
     }
 
     res.json({ success: true, count: enrollments.length, enrollments });
@@ -226,10 +254,15 @@ const getEnrollments = async (req, res) => {
 
 // @desc    Enroll in a Course
 // @route   POST /api/enrollments
-// @access  Public / OptionalAuth
+// @access  Private
 const createEnrollment = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
+    const userId = student.userId;
     const { courseId, courseTitle, category, mentor } = req.body;
 
     if (!courseId || !courseTitle) {
@@ -249,9 +282,9 @@ const createEnrollment = async (req, res) => {
     }
 
     enrollment = await Enrollment.create({
-      userId: req.user ? req.user._id : null,
+      userId: userId || null,
       userEmail,
-      userName: req.user ? req.user.name : 'Student',
+      userName: student.name,
       courseId,
       courseTitle,
       category: category || 'Software Engineering',
@@ -260,17 +293,18 @@ const createEnrollment = async (req, res) => {
       enrolledAt: new Date(),
     });
 
-    // Initialize Progress record
+    // Initialize Progress record with 0% progress and 0 minutes
     await Progress.findOneAndUpdate(
       { userEmail, courseId },
       {
         $setOnInsert: {
+          userId: userId || null,
           userEmail,
           courseId,
           completedLectures: [],
           completedAssignments: [],
-          progressPercent: 5,
-          totalTimeSpentMinutes: 45,
+          progressPercent: 0,
+          totalTimeSpentMinutes: 0,
           lastActiveAt: new Date(),
         },
       },
@@ -290,10 +324,14 @@ const createEnrollment = async (req, res) => {
 
 // @desc    Get Course Progress
 // @route   GET /api/progress/:courseId
-// @access  Public / OptionalAuth
+// @access  Private
 const getProgress = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
     const { courseId } = req.params;
 
     let progress = await Progress.findOne({ userEmail, courseId });
@@ -488,15 +526,19 @@ const submitAssignment = async (req, res) => {
 // @access  Private
 const getStudentCourses = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
-    const userId = req.user?._id;
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
+    const userId = student.userId;
 
     let enrollments = [];
     if (userId) {
-      enrollments = await CourseEnrollment.find({ user: userId }).sort({ enrolledAt: -1 });
+      enrollments = await CourseEnrollment.find({ user: userId }).sort({ enrolledAt: -1 }).lean();
     }
     if (enrollments.length === 0) {
-      enrollments = await Enrollment.find({ userEmail }).sort({ enrolledAt: -1 });
+      enrollments = await Enrollment.find({ userEmail }).sort({ enrolledAt: -1 }).lean();
     }
 
     if (enrollments.length === 0 && req.user?.enrolledCourses?.length > 0) {
@@ -511,22 +553,6 @@ const getStudentCourses = async (req, res) => {
         status: 'active',
         enrolledAt: c.enrolledAt || new Date(),
       }));
-    }
-
-    if (enrollments.length === 0) {
-      enrollments = [
-        {
-          courseId: 'crs-java-fullstack-2026',
-          title: 'Complete Java Backend & Spring Boot Microservices',
-          courseTitle: 'Complete Java Backend & Spring Boot Microservices',
-          category: 'Backend Engineering',
-          thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=340&fit=crop&auto=format',
-          mentor: 'Rajesh Kumar (Principal Technical Architect Staff)',
-          progress: 74,
-          status: 'active',
-          enrolledAt: new Date(),
-        },
-      ];
     }
 
     res.json({
@@ -545,48 +571,56 @@ const getStudentCourses = async (req, res) => {
 // @access  Private
 const getStudentProgress = async (req, res) => {
   try {
-    const userEmail = getEffectiveEmail(req);
-    const userId = req.user?._id;
+    const student = getEffectiveStudent(req);
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const userEmail = student.email;
+    const userId = student.userId;
 
     let progressRecords = [];
     if (userId) {
-      progressRecords = await CourseProgress.find({ user: userId });
+      progressRecords = await CourseProgress.find({ user: userId }).lean();
     }
     if (progressRecords.length === 0) {
-      progressRecords = await Progress.find({ userEmail });
+      progressRecords = await Progress.find({ userEmail }).lean();
     }
 
     const overallProgress = progressRecords.length > 0
       ? Math.round(progressRecords.reduce((acc, curr) => acc + (curr.progressPercent || 0), 0) / progressRecords.length)
-      : 74;
+      : 0;
 
     const totalCompletedLectures = progressRecords.reduce(
-      (acc, curr) => acc + (curr.completedLectures?.length || 0),
+      (acc, curr) => acc + (curr.completedLectures?.length || curr.completedLessons?.length || 0),
       0
-    ) || 48;
+    );
+
+    const totalWatchMinutes = progressRecords.reduce(
+      (acc, curr) => acc + (curr.totalTimeSpentMinutes || ((curr.learningHours || 0) * 60) || 0),
+      0
+    );
+    const totalHours = Math.round(totalWatchMinutes / 60);
+
+    const analytics = await StudentAnalytics.findOne({ userEmail }).lean();
 
     const weeklyActivity = [
-      { day: 'Mon', hours: 2.5, lessons: 2 },
-      { day: 'Tue', hours: 3.8, lessons: 3 },
-      { day: 'Wed', hours: 1.5, lessons: 1 },
-      { day: 'Thu', hours: 4.2, lessons: 4 },
-      { day: 'Fri', hours: 2.0, lessons: 2 },
-      { day: 'Sat', hours: 5.5, lessons: 5 },
-      { day: 'Sun', hours: 3.0, lessons: 3 },
+      { day: 'Mon', hours: 0, lessons: 0 },
+      { day: 'Tue', hours: 0, lessons: 0 },
+      { day: 'Wed', hours: 0, lessons: 0 },
+      { day: 'Thu', hours: 0, lessons: 0 },
+      { day: 'Fri', hours: 0, lessons: 0 },
+      { day: 'Sat', hours: 0, lessons: 0 },
+      { day: 'Sun', hours: 0, lessons: 0 },
     ];
 
     res.json({
       success: true,
       overallProgress,
       lessonsCompleted: totalCompletedLectures,
-      totalHours: 38,
-      weeklyStreak: 5,
-      xp: 1480,
-      badges: [
-        { id: 'b1', name: 'Microservices Architect', icon: '🚀', earnedAt: '2 days ago' },
-        { id: 'b2', name: '7-Day Code Streak', icon: '🔥', earnedAt: 'Yesterday' },
-        { id: 'b3', name: 'Kafka Guru', icon: '⚡', earnedAt: 'Last week' },
-      ],
+      totalHours,
+      weeklyStreak: analytics?.streak?.current || 0,
+      xp: analytics?.xp || 0,
+      badges: analytics?.badges?.filter((b) => b.unlocked) || [],
       progressList: progressRecords,
       weeklyActivity,
     });

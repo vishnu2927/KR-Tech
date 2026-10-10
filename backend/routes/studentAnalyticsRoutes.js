@@ -6,10 +6,11 @@ const {
   checkInStreak,
   getBadges,
 } = require('../controllers/studentAnalyticsController');
+const { protect } = require('../middleware/authMiddleware');
 
-router.get('/', getStudentAnalytics);
-router.post('/xp', awardXP);
-router.post('/check-in', checkInStreak);
-router.get('/badges', getBadges);
+router.get('/', protect, getStudentAnalytics);
+router.post('/xp', protect, awardXP);
+router.post('/check-in', protect, checkInStreak);
+router.get('/badges', protect, getBadges);
 
 module.exports = router;

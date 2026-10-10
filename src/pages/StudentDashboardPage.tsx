@@ -19,136 +19,22 @@ import StudentProgressTrackerView from "../components/student/StudentProgressTra
 import RecordedLecturePortal from "../components/lectures/RecordedLecturePortal";
 import { I } from "../components/Icons";
 
-const DEFAULT_ENROLLMENTS: EnrollmentItem[] = [
-  {
-    _id: "enr-01",
-    courseId: "java-backend",
-    courseTitle: "Complete Java Backend Development with Spring Boot 3 & Microservices",
-    category: "Java Backend",
-    thumbnail: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=340&fit=crop&auto=format",
-    mentor: "Rajesh Kumar",
-    mentorCompany: "Principal Technical Architect · Staff Architect",
-    batch: "Batch-2026 (Live One-on-One Weekend)",
-    status: "active",
-    enrolledAt: "2026-08-01T00:00:00.000Z",
-  },
-  {
-    _id: "enr-02",
-    courseId: "mern-stack",
-    courseTitle: "MERN Stack Full Stack Web Development Mastery Bootcamp",
-    category: "MERN Stack",
-    thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=340&fit=crop&auto=format",
-    mentor: "Amit Verma",
-    mentorCompany: "Principal Systems Architect",
-    batch: "Batch-2026 (Live One-on-One Evening)",
-    status: "active",
-    enrolledAt: "2026-08-15T00:00:00.000Z",
-  },
-  {
-    _id: "enr-03",
-    courseId: "aws-architect",
-    courseTitle: "AWS Certified Solutions Architect – Associate (SAA-C03)",
-    category: "AWS Cloud",
-    thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=340&fit=crop&auto=format",
-    mentor: "Vikram Nair",
-    mentorCompany: "Staff Software Engineer Cloud · Cloud Specialist",
-    batch: "Batch-2026 (Fast-Track)",
-    status: "completed",
-    enrolledAt: "2026-07-10T00:00:00.000Z",
-  },
-];
-
-const DEFAULT_PROGRESS: CourseProgress[] = [
-  {
-    courseId: "java-backend",
-    completedLectures: ["lec-java-01", "lec-java-02", "lec-java-03"],
-    completedAssignments: ["asg-java-01"],
-    progressPercent: 75,
-    currentLectureId: "lec-java-04",
-    totalTimeSpentMinutes: 360,
-  },
-  {
-    courseId: "mern-stack",
-    completedLectures: ["lec-mern-01", "lec-mern-02"],
-    completedAssignments: [],
-    progressPercent: 45,
-    currentLectureId: "lec-mern-02",
-    totalTimeSpentMinutes: 180,
-  },
-  {
-    courseId: "aws-architect",
-    completedLectures: ["lec-aws-01", "lec-aws-02", "lec-aws-03", "lec-aws-04"],
-    completedAssignments: ["asg-aws-01"],
-    progressPercent: 100,
-    currentLectureId: "lec-aws-04",
-    totalTimeSpentMinutes: 480,
-  },
-];
-
-const DEFAULT_CERTIFICATES: CertificateItem[] = [
-  {
-    id: "CERT-KR-2026-8841",
-    certificateId: "KR-AWS-88419",
-    courseName: "AWS Certified Solutions Architect Associate (SAA-C03)",
-    issueDate: "Sep 01, 2026",
-    grade: "Distinction (96%)",
-    credentialUrl: "https://krtech.edu/verify/KR-AWS-88419",
-    downloadUrl: "https://krtech.edu/certificates/KR-AWS-88419.pdf",
-    skills: ["AWS", "VPC", "ECS", "Terraform", "Serverless"],
-  },
-  {
-    id: "CERT-KR-2026-9204",
-    certificateId: "KR-JAV-92041",
-    courseName: "Enterprise Spring Boot 3 & Distributed Microservices",
-    issueDate: "Aug 15, 2026",
-    grade: "Distinction (94%)",
-    credentialUrl: "https://krtech.edu/verify/KR-JAV-92041",
-    downloadUrl: "https://krtech.edu/certificates/KR-JAV-92041.pdf",
-    skills: ["Spring Boot 3", "Kafka", "Docker", "PostgreSQL", "Redis"],
-  },
-];
-
-const DEFAULT_UPCOMING_CLASSES: UpcomingClassItem[] = [
-  {
-    id: "cls-01",
-    title: "One-on-One Live Mentoring: Event-Driven Kafka Consumer Partitioning & Offsets",
-    date: "Today",
-    time: "7:00 PM - 8:30 PM IST",
-    course: "Java Backend Microservices Mastery",
-    instructor: "Rajesh Kumar (Principal Technical Architect)",
-    meetLink: "https://meet.google.com/krtech-live-mentorship",
-  },
-  {
-    id: "cls-02",
-    title: "One-on-One Architecture Review: Next.js 15 Server Actions & Multi-Tenant Database",
-    date: "Tomorrow",
-    time: "8:00 PM - 9:30 PM IST",
-    course: "MERN Stack Full Stack Mastery",
-    instructor: "Amit Verma (Principal Systems Architect)",
-    meetLink: "https://meet.google.com/krtech-live-mentorship",
-  },
-  {
-    id: "cls-03",
-    title: "Weekend Capstone Clinic: Multi-Region High-Availability VPC Peering",
-    date: "Saturday",
-    time: "10:00 AM - 12:00 PM IST",
-    course: "AWS Cloud Solutions Architect",
-    instructor: "Vikram Nair (Staff Software Engineer Cloud)",
-    meetLink: "https://meet.google.com/krtech-live-mentorship",
-  },
-];
+const DEFAULT_ENROLLMENTS: EnrollmentItem[] = [];
+const DEFAULT_PROGRESS: CourseProgress[] = [];
+const DEFAULT_CERTIFICATES: CertificateItem[] = [];
+const DEFAULT_UPCOMING_CLASSES: UpcomingClassItem[] = [];
 
 export default function StudentDashboardPage() {
   const { user, updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("dashboard");
 
   // Live Data States
-  const [enrollments, setEnrollments] = useState<EnrollmentItem[]>(DEFAULT_ENROLLMENTS);
-  const [progressList, setProgressList] = useState<CourseProgress[]>(DEFAULT_PROGRESS);
+  const [enrollments, setEnrollments] = useState<EnrollmentItem[]>([]);
+  const [progressList, setProgressList] = useState<CourseProgress[]>([]);
   const [lectures, setLectures] = useState<RecordedLecture[]>([]);
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
-  const [certificates, setCertificates] = useState<CertificateItem[]>(DEFAULT_CERTIFICATES);
-  const [upcomingClasses, setUpcomingClasses] = useState<UpcomingClassItem[]>(DEFAULT_UPCOMING_CLASSES);
+  const [certificates, setCertificates] = useState<CertificateItem[]>([]);
+  const [upcomingClasses, setUpcomingClasses] = useState<UpcomingClassItem[]>([]);
   const [myBookings, setMyBookings] = useState<DemoBooking[]>([]);
   const [myPayments, setMyPayments] = useState<PaymentRecord[]>([]);
 
@@ -164,9 +50,9 @@ export default function StudentDashboardPage() {
   const [savingProfile, setSavingProfile] = useState<boolean>(false);
 
   // Profile Form State
-  const [profileName, setProfileName] = useState(user?.name || "Aditya Sharma");
-  const [profileEmail, setProfileEmail] = useState(user?.email || "aditya.sharma@krtech.edu");
-  const [profilePhone, setProfilePhone] = useState(user?.phone || "+91 98765 43210");
+  const [profileName, setProfileName] = useState(user?.name || "Student");
+  const [profileEmail, setProfileEmail] = useState(user?.email || "");
+  const [profilePhone, setProfilePhone] = useState(user?.phone || "");
   const [profileTimezone, setProfileTimezone] = useState("IST (UTC+5:30)");
 
   const showToast = (msg: string) => {
@@ -188,12 +74,12 @@ export default function StudentDashboardPage() {
       try {
         const summary: DashboardSummary = await studentDashboardService.getDashboardSummary(user?.email);
         if (summary) {
-          if (summary.enrollments?.length) setEnrollments(summary.enrollments);
-          if (summary.progress?.length) setProgressList(summary.progress);
-          if (summary.recentLectures?.length) setLectures(summary.recentLectures);
-          if (summary.assignments?.length) setAssignments(summary.assignments);
-          if (summary.certificates?.length) setCertificates(summary.certificates);
-          if (summary.upcomingClasses?.length) setUpcomingClasses(summary.upcomingClasses);
+          setEnrollments(summary.enrollments || []);
+          setProgressList(summary.progress || []);
+          setLectures(summary.recentLectures || []);
+          setAssignments(summary.assignments || []);
+          setCertificates(summary.certificates || []);
+          setUpcomingClasses(summary.upcomingClasses || []);
         }
       } catch (err) {
         console.warn("Using default student data fallback:", err);
@@ -236,7 +122,7 @@ export default function StudentDashboardPage() {
 
   // Calculate Overall Progress
   const overallProgress = useMemo(() => {
-    if (progressList.length === 0) return 75;
+    if (progressList.length === 0) return 0;
     const total = progressList.reduce((acc, p) => acc + (p.progressPercent || 0), 0);
     return Math.round(total / progressList.length);
   }, [progressList]);
@@ -317,7 +203,7 @@ export default function StudentDashboardPage() {
             KR GLOBAL LEARNING CERTIFICATE OF ACCOMPLISHMENT
 ================================================================================
 This is to certify that:
-Recipient:        ${user?.name || "Aditya Sharma"}
+Recipient:        ${user?.name || "Student"}
 Course Completed: ${cert.courseName}
 Grade Achieved:   ${cert.grade}
 Issue Date:       ${cert.issueDate}
@@ -354,7 +240,7 @@ Verification:    KR Global Learning Registry Verified Training Credential
 
   const sidebarItems: SidebarItem[] = [
     { key: "dashboard", label: "Dashboard", icon: "📊" },
-    { key: "progress", label: "Progress & XP", icon: "🔥", count: "Level 8" },
+    { key: "progress", label: "Progress & XP", icon: "🔥", count: `${overallProgress}%` },
     { key: "courses", label: "My Courses", icon: "📚", count: `${enrollments.length}` },
     { key: "ai_assistant", label: "AI Study Assistant", icon: "🤖", count: "24×7", path: "/ai-assistant" },
     { key: "portfolio_builder", label: "Portfolio Builder", icon: "✨", path: "/portfolio/builder" },
@@ -402,7 +288,7 @@ Verification:    KR Global Learning Registry Verified Training Credential
             <h1 className="font-sans font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
               Welcome back,{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-300 to-amber-300">
-                {user?.name || "Aditya Sharma"}
+                {user?.name || "Student"}
               </span>{" "}
               🚀
             </h1>
@@ -442,7 +328,7 @@ Verification:    KR Global Learning Registry Verified Training Credential
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
                   <span>Across {enrollments.length} Enrolled Tracks</span>
-                  <span className="text-purple-400 font-semibold">Tier-1 Pace</span>
+                  <span className="text-purple-400 font-semibold">{enrollments.length > 0 ? "In Progress" : "No Enrollments"}</span>
                 </div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
                   <div
@@ -465,7 +351,10 @@ Verification:    KR Global Learning Registry Verified Training Credential
                 </div>
                 <div className="text-[11px] text-slate-400">Live One-on-One Pair Programming with Senior Industry Mentors</div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800 mt-3">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full w-[80%]" />
+                  <div
+                    style={{ width: enrollments.length > 0 ? "100%" : "0%" }}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full"
+                  />
                 </div>
               </div>
 
@@ -482,7 +371,10 @@ Verification:    KR Global Learning Registry Verified Training Credential
                 </div>
                 <div className="text-[11px] text-slate-400">Includes Architecture Notes & Cheatsheets</div>
                 <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800 mt-3">
-                  <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full w-[65%]" />
+                  <div
+                    style={{ width: lectures.length > 0 ? "100%" : "0%" }}
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full"
+                  />
                 </div>
               </div>
 
@@ -490,43 +382,62 @@ Verification:    KR Global Learning Registry Verified Training Credential
               <div className="p-5 rounded-3xl bg-gradient-to-br from-purple-950/80 to-indigo-950/80 border border-purple-500/30 hover:border-purple-500 transition-all group shadow-lg">
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-bold text-white flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-                    Next Live One-on-One Class
+                    <span className="w-2 h-2 rounded-full bg-slate-400" />
+                    Next Live Class
                   </span>
-                  <span className="text-purple-300 font-bold text-[10px]">Today 7 PM</span>
+                  <span className="text-purple-300 font-bold text-[10px]">{upcomingClasses[0] ? "Scheduled" : "None"}</span>
                 </div>
-                <div className="text-xs font-bold text-white line-clamp-1 mb-1">
-                  {upcomingClasses[0]?.title || "Event-Driven Kafka Architecture"}
-                </div>
-                <div className="text-[11px] text-slate-300 mb-3">
-                  Mentor: <strong className="text-purple-300">{upcomingClasses[0]?.instructor || "Rajesh Kumar (Principal Technical Architect)"}</strong>
-                </div>
-                <a
-                  href={upcomingClasses[0]?.meetLink || "https://meet.google.com/krtech-live-mentorship"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md text-center block no-underline"
-                >
-                  Join Live Room 🔴
-                </a>
+                {upcomingClasses[0] ? (
+                  <>
+                    <div className="text-xs font-bold text-white line-clamp-1 mb-1">
+                      {upcomingClasses[0].title}
+                    </div>
+                    <div className="text-[11px] text-slate-300 mb-3">
+                      Mentor: <strong className="text-purple-300">{upcomingClasses[0].instructor}</strong>
+                    </div>
+                    <a
+                      href={upcomingClasses[0].meetLink || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md text-center block no-underline"
+                    >
+                      Join Live Room 🔴
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-xs font-bold text-white line-clamp-1 mb-1">
+                      No Live Classes Scheduled
+                    </div>
+                    <div className="text-[11px] text-slate-400 mb-3">
+                      Sessions appear after enrollment
+                    </div>
+                    <Link
+                      to="/courses"
+                      className="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-all shadow-md text-center block no-underline"
+                    >
+                      Browse Courses
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
             {/* Gamified Progress & Streak Quick Widget */}
             <div className="p-5 rounded-3xl bg-gradient-to-r from-purple-950/70 via-slate-900 to-indigo-950/70 border border-purple-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-2xl shadow-lg shadow-orange-500/20 flex-shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-2xl shadow-lg shadow-purple-500/20 flex-shrink-0">
                   🔥
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-bold text-white">Gamified Level 8 · Senior Systems Builder</span>
-                    <span className="text-[10px] font-extrabold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
-                      5-Day Streak Active
+                    <span className="text-xs font-bold text-white">Curriculum Progress · {overallProgress}% Completed</span>
+                    <span className="text-[10px] font-extrabold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                      Live Tracking
                     </span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    Earn XP, track live attendance (94.1%), unlock engineering badges, and climb cohort rankings.
+                    Track your real-time curriculum progress, attend live pair-programming sessions, and build engineering capstones.
                   </p>
                 </div>
               </div>
@@ -556,94 +467,110 @@ Verification:    KR Global Learning Registry Verified Training Credential
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {enrollments.map((course) => {
-                  const prog = progressList.find((p) => p.courseId === course.courseId);
-                  const percent = prog ? prog.progressPercent : 50;
+              {enrollments.length === 0 ? (
+                <div className="p-12 rounded-3xl bg-slate-900/80 border border-slate-800 text-center space-y-4">
+                  <span className="text-4xl block">📚</span>
+                  <h4 className="text-lg font-bold text-white">No course enrolled yet</h4>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    You have not enrolled in any courses yet. Explore our curriculum to begin your learning journey.
+                  </p>
+                  <Link
+                    to="/courses"
+                    className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-xs font-bold text-white shadow-lg transition no-underline"
+                  >
+                    Browse Courses
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {enrollments.map((course) => {
+                    const prog = progressList.find((p) => p.courseId === course.courseId);
+                    const percent = prog ? prog.progressPercent : 0;
 
-                  return (
-                    <div
-                      key={course._id}
-                      className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all overflow-hidden shadow-xl flex flex-col justify-between group"
-                    >
-                      <div>
-                        {/* Thumbnail with overlay */}
-                        <div className="relative h-44 overflow-hidden">
-                          <img
-                            src={course.thumbnail}
-                            alt={course.courseTitle}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                          <span className="absolute top-3 left-3 px-3 py-1 bg-slate-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
-                            {course.category}
-                          </span>
-                          <span className="absolute top-3 right-3 px-2.5 py-1 bg-slate-950/80 backdrop-blur-md text-slate-300 text-[10px] font-semibold rounded-full border border-slate-700">
-                            {course.status === "completed" ? "✓ Completed" : "⚡ Active Track"}
-                          </span>
-                          <div className="absolute bottom-3 left-3 right-3">
-                            <span className="text-[10px] font-bold text-purple-300 block mb-0.5">BATCH</span>
-                            <h4 className="text-xs font-bold text-white truncate">{course.batch}</h4>
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-5 space-y-3">
-                          <h3 className="font-sans font-bold text-sm text-white line-clamp-2 leading-snug">
-                            {course.courseTitle}
-                          </h3>
-
-                          <div className="flex items-center justify-between text-xs text-slate-400">
-                            <span>Mentor: <strong className="text-slate-200">{course.mentor}</strong></span>
-                            <span className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-purple-300 font-semibold">
-                              {course.mentorCompany || "Senior Architect"}
+                    return (
+                      <div
+                        key={course._id}
+                        className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition-all overflow-hidden shadow-xl flex flex-col justify-between group"
+                      >
+                        <div>
+                          {/* Thumbnail with overlay */}
+                          <div className="relative h-44 overflow-hidden">
+                            <img
+                              src={course.thumbnail}
+                              alt={course.courseTitle}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                            <span className="absolute top-3 left-3 px-3 py-1 bg-slate-950/80 backdrop-blur-md text-purple-300 text-[10px] font-bold rounded-full border border-purple-500/30">
+                              {course.category}
                             </span>
+                            <span className="absolute top-3 right-3 px-2.5 py-1 bg-slate-950/80 backdrop-blur-md text-slate-300 text-[10px] font-semibold rounded-full border border-slate-700">
+                              {course.status === "completed" ? "✓ Completed" : "⚡ Active Track"}
+                            </span>
+                            <div className="absolute bottom-3 left-3 right-3">
+                              <span className="text-[10px] font-bold text-purple-300 block mb-0.5">BATCH</span>
+                              <h4 className="text-xs font-bold text-white truncate">{course.batch}</h4>
+                            </div>
                           </div>
 
-                          {/* Progress Bar */}
-                          <div className="space-y-1.5 pt-1">
-                            <div className="flex items-center justify-between text-[11px]">
-                              <span className="text-slate-400">Course Progress</span>
-                              <span className="font-bold text-emerald-400">{percent}%</span>
+                          {/* Content */}
+                          <div className="p-5 space-y-3">
+                            <h3 className="font-sans font-bold text-sm text-white line-clamp-2 leading-snug">
+                              {course.courseTitle}
+                            </h3>
+
+                            <div className="flex items-center justify-between text-xs text-slate-400">
+                              <span>Mentor: <strong className="text-slate-200">{course.mentor}</strong></span>
+                              <span className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-purple-300 font-semibold">
+                                {course.mentorCompany || "Senior Architect"}
+                              </span>
                             </div>
-                            <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                              <div
-                                style={{ width: `${percent}%` }}
-                                className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
-                              />
+
+                            {/* Progress Bar */}
+                            <div className="space-y-1.5 pt-1">
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="text-slate-400">Course Progress</span>
+                                <span className="font-bold text-emerald-400">{percent}%</span>
+                              </div>
+                              <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                                <div
+                                  style={{ width: `${percent}%` }}
+                                  className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Bottom Actions */}
-                      <div className="p-5 pt-0 flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedCourseFilter(course.courseId);
-                            setActiveTab("lectures");
-                          }}
-                          className="flex-1 py-2.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white font-bold rounded-2xl text-xs transition-all border border-purple-500/30 hover:border-purple-600 shadow-md cursor-pointer flex items-center justify-center gap-1.5"
-                        >
-                          <span>🎥</span> Watch Lectures
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedCourseFilter(course.courseId);
-                            setActiveTab("notes");
-                          }}
-                          className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition cursor-pointer"
-                          title="Download Notes"
-                        >
-                          📥 Notes
-                        </button>
+                        {/* Bottom Actions */}
+                        <div className="p-5 pt-0 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedCourseFilter(course.courseId);
+                              setActiveTab("lectures");
+                            }}
+                            className="flex-1 py-2.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white font-bold rounded-2xl text-xs transition-all border border-purple-500/30 hover:border-purple-600 shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                          >
+                            <span>🎥</span> Watch Lectures
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedCourseFilter(course.courseId);
+                              setActiveTab("notes");
+                            }}
+                            className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition cursor-pointer"
+                            title="Download Notes"
+                          >
+                            📥 Notes
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -665,74 +592,90 @@ Verification:    KR Global Learning Registry Verified Training Credential
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {enrollments.map((course) => {
-                const prog = progressList.find((p) => p.courseId === course.courseId);
-                const percent = prog ? prog.progressPercent : 50;
-                const completedCount = prog?.completedLectures?.length || 0;
+            {enrollments.length === 0 ? (
+              <div className="p-12 rounded-3xl bg-slate-900/80 border border-slate-800 text-center space-y-4">
+                <span className="text-4xl block">📚</span>
+                <h4 className="text-lg font-bold text-white">No course enrolled yet</h4>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  You are not currently enrolled in any courses. Explore our catalog to get started.
+                </p>
+                <Link
+                  to="/courses"
+                  className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-xs font-bold text-white shadow-lg transition no-underline"
+                >
+                  Browse Courses
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {enrollments.map((course) => {
+                  const prog = progressList.find((p) => p.courseId === course.courseId);
+                  const percent = prog ? prog.progressPercent : 0;
+                  const completedCount = prog?.completedLectures?.length || 0;
 
-                return (
-                  <div
-                    key={course._id}
-                    className="rounded-3xl bg-slate-900/80 border border-slate-800 p-5 space-y-4 shadow-xl flex flex-col justify-between"
-                  >
-                    <div className="space-y-3">
-                      <img
-                        src={course.thumbnail}
-                        alt={course.courseTitle}
-                        className="w-full h-40 object-cover rounded-2xl border border-slate-800"
-                      />
-                      <div>
-                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
-                          {course.category} · {course.batch}
-                        </span>
-                        <h3 className="font-bold text-sm text-white line-clamp-2 mt-1">{course.courseTitle}</h3>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Mentor: <strong className="text-slate-200">{course.mentor}</strong> ({course.mentorCompany})
-                        </p>
+                  return (
+                    <div
+                      key={course._id}
+                      className="rounded-3xl bg-slate-900/80 border border-slate-800 p-5 space-y-4 shadow-xl flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        <img
+                          src={course.thumbnail}
+                          alt={course.courseTitle}
+                          className="w-full h-40 object-cover rounded-2xl border border-slate-800"
+                        />
+                        <div>
+                          <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                            {course.category} · {course.batch}
+                          </span>
+                          <h3 className="font-bold text-sm text-white line-clamp-2 mt-1">{course.courseTitle}</h3>
+                          <p className="text-xs text-slate-400 mt-1">
+                            Mentor: <strong className="text-slate-200">{course.mentor}</strong> ({course.mentorCompany})
+                          </p>
+                        </div>
+
+                        {/* Live Progress Bar */}
+                        <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
+                          <div className="flex justify-between text-xs text-slate-400">
+                            <span>{completedCount} Lectures Finished</span>
+                            <span className="font-bold text-emerald-400">{percent}% Complete</span>
+                          </div>
+                          <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                            <div
+                              style={{ width: `${percent}%` }}
+                              className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                            />
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Live Progress Bar */}
-                      <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
-                        <div className="flex justify-between text-xs text-slate-400">
-                          <span>{completedCount} Lectures Finished</span>
-                          <span className="font-bold text-emerald-400">{percent}% Complete</span>
-                        </div>
-                        <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                          <div
-                            style={{ width: `${percent}%` }}
-                            className="bg-gradient-to-r from-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
-                          />
-                        </div>
+                      <div className="pt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCourseFilter(course.courseId);
+                            setActiveTab("lectures");
+                          }}
+                          className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md cursor-pointer text-center"
+                        >
+                          Go to Lectures →
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCourseFilter(course.courseId);
+                            setActiveTab("assignments");
+                          }}
+                          className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                        >
+                          Assignments
+                        </button>
                       </div>
                     </div>
-
-                    <div className="pt-2 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCourseFilter(course.courseId);
-                          setActiveTab("lectures");
-                        }}
-                        className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition-all shadow-md cursor-pointer text-center"
-                      >
-                        Go to Lectures →
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCourseFilter(course.courseId);
-                          setActiveTab("assignments");
-                        }}
-                        className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                      >
-                        Assignments
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

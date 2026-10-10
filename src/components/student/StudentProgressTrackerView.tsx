@@ -13,248 +13,40 @@ interface Props {
   onToast?: (msg: string) => void;
 }
 
-const FALLBACK_ANALYTICS: StudentAnalyticsData = {
-  userEmail: "student@krtech.in",
-  userName: "Aditya Sharma",
-  xp: 3850,
-  level: 8,
-  levelTitle: "Senior Systems Builder",
+const EMPTY_ANALYTICS: StudentAnalyticsData = {
+  userEmail: "",
+  userName: "Student",
+  xp: 0,
+  level: 1,
+  levelTitle: "Beginner",
   xpProgress: {
-    currentLevelXP: 350,
+    currentLevelXP: 0,
     xpPerLevel: 500,
-    xpToNextLevel: 150,
-    progressPercent: 70,
+    xpToNextLevel: 500,
+    progressPercent: 0,
   },
   streak: {
-    current: 5,
-    longest: 14,
-    lastActiveDate: new Date().toISOString().split("T")[0],
-    weeklyDays: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+    current: 0,
+    longest: 0,
+    lastActiveDate: null,
+    weeklyDays: [],
   },
   attendance: {
-    attendedSessions: 32,
-    totalSessions: 34,
-    attendanceRate: 94.1,
-    history: [
-      {
-        sessionId: "sess-01",
-        topic: "Event-Driven Architecture with Apache Kafka & Debezium",
-        mentorName: "Rajesh Kumar (Principal Technical Architect)",
-        date: "Sep 16, 2026",
-        status: "Present",
-        sessionType: "Live One-on-One Expert Mentorship",
-      },
-      {
-        sessionId: "sess-02",
-        topic: "Microservices Resiliency with Resilience4j & Envoy Mesh",
-        mentorName: "Rajesh Kumar (Principal Technical Architect)",
-        date: "Sep 14, 2026",
-        status: "Present",
-        sessionType: "Hands-on Lab",
-      },
-      {
-        sessionId: "sess-03",
-        topic: "AWS VPC Peering & High Availability Multi-Region Setup",
-        mentorName: "Vikram Nair (Staff Software Engineer)",
-        date: "Sep 11, 2026",
-        status: "Present",
-        sessionType: "Live One-on-One Expert Mentorship",
-      },
-      {
-        sessionId: "sess-04",
-        topic: "Distributed Tracing with OpenTelemetry & Jaeger",
-        mentorName: "Rajesh Kumar (Principal Technical Architect)",
-        date: "Sep 08, 2026",
-        status: "Excused",
-        sessionType: "Architecture Review",
-      },
-      {
-        sessionId: "sess-05",
-        topic: "MERN Authentication with JWT, Refresh Tokens & OAuth2",
-        mentorName: "Amit Verma (Principal Systems Architect)",
-        date: "Sep 05, 2026",
-        status: "Present",
-        sessionType: "Live One-on-One Expert Mentorship",
-      },
-    ],
+    attendedSessions: 0,
+    totalSessions: 0,
+    attendanceRate: 0,
+    history: [],
   },
-  badges: [
-    {
-      id: "badge-fast-learner",
-      name: "Fast Track Learner",
-      icon: "⚡",
-      description: "Finished 5 architectural modules in a single study week.",
-      category: "Speed",
-      unlocked: true,
-      unlockedAt: "2026-08-15T00:00:00.000Z",
-      progressPercent: 100,
-      criteria: "5 modules completed in 7 days",
-    },
-    {
-      id: "badge-streak-5",
-      name: "Consistency Flame",
-      icon: "🔥",
-      description: "Maintained a 5-day uninterrupted learning streak.",
-      category: "Dedication",
-      unlocked: true,
-      unlockedAt: "2026-09-17T00:00:00.000Z",
-      progressPercent: 100,
-      criteria: "5-day check-in streak",
-    },
-    {
-      id: "badge-kafka-pro",
-      name: "Kafka Stream Master",
-      icon: "🚀",
-      description: "Configured multi-partition Kafka consumer groups with zero lag.",
-      category: "Engineering",
-      unlocked: true,
-      unlockedAt: "2026-09-02T00:00:00.000Z",
-      progressPercent: 100,
-      criteria: "Complete Event-Driven Kafka module",
-    },
-    {
-      id: "badge-resilience",
-      name: "Resilience Architect",
-      icon: "🛡️",
-      description: "Implemented Circuit Breaker and Rate Limiter with 99.99% fault tolerance.",
-      category: "Architecture",
-      unlocked: true,
-      unlockedAt: "2026-09-14T00:00:00.000Z",
-      progressPercent: 100,
-      criteria: "Complete Distributed Resiliency capstone",
-    },
-    {
-      id: "badge-cloud-pro",
-      name: "Cloud Terraform Pioneer",
-      icon: "☁️",
-      description: "Provisioned multi-tier AWS infrastructure using pure Infrastructure-as-Code.",
-      category: "DevOps",
-      unlocked: true,
-      unlockedAt: "2026-09-01T00:00:00.000Z",
-      progressPercent: 100,
-      criteria: "Pass AWS Associate capstone test",
-    },
-    {
-      id: "badge-attendance-90",
-      name: "Unbroken Presence",
-      icon: "🎯",
-      description: "Achieved over 90% attendance across all live One-on-One mentor syncs.",
-      category: "Attendance",
-      unlocked: true,
-      unlockedAt: "2026-09-10T00:00:00.000Z",
-      progressPercent: 100,
-      criteria: "Maintain >90% live attendance",
-    },
-    {
-      id: "badge-streak-14",
-      name: "Streak Warrior",
-      icon: "⚔️",
-      description: "Hit 14 days of consecutive coding & lecture study.",
-      category: "Dedication",
-      unlocked: false,
-      progressPercent: 35,
-      criteria: "14-day check-in streak (5/14)",
-    },
-    {
-      id: "badge-staff-engineer",
-      name: "Staff Engineer Candidate",
-      icon: "👑",
-      description: "Attain Level 10 and complete all core curriculum capstones.",
-      category: "Mastery",
-      unlocked: false,
-      progressPercent: 80,
-      criteria: "Reach Level 10 (Current: Level 8)",
-    },
-  ],
-  xpActivities: [
-    {
-      title: "Completed Hands-on Lab: Resilience4j Circuit Breaker",
-      xp: 150,
-      type: "lecture",
-      timestamp: "2026-09-17T14:30:00.000Z",
-    },
-    {
-      title: "Daily Learning Streak Bonus",
-      xp: 75,
-      type: "streak",
-      timestamp: "2026-09-17T09:00:00.000Z",
-    },
-    {
-      title: "Attended Live One-on-One Expert Mentorship Session with Rajesh Kumar",
-      xp: 100,
-      type: "attendance",
-      timestamp: "2026-09-16T19:45:00.000Z",
-    },
-    {
-      title: "Unlocked Badge: Resilience Architect",
-      xp: 200,
-      type: "badge",
-      timestamp: "2026-09-14T20:00:00.000Z",
-    },
-    {
-      title: "Submitted Assignment: Kafka Distributed Producer & Consumer",
-      xp: 250,
-      type: "assignment",
-      timestamp: "2026-09-12T18:00:00.000Z",
-    },
-  ],
-  courses: [
-    {
-      courseId: "java-backend",
-      courseTitle: "Complete Java Backend Development with Spring Boot 3 & Microservices",
-      category: "Java Backend",
-      mentor: "Rajesh Kumar (Principal Technical Architect)",
-      progressPercent: 78,
-      completedLectures: 19,
-      totalLectures: 24,
-      watchHours: 38.5,
-      modules: [
-        { name: "Microservices Architecture & Spring Cloud", progress: 100 },
-        { name: "Event-Driven Messaging with Apache Kafka", progress: 90 },
-        { name: "Distributed Caching & Redis Cluster", progress: 75 },
-        { name: "Resilience, Rate Limiting & Docker Swarm", progress: 50 },
-      ],
-    },
-    {
-      courseId: "aws-architect",
-      courseTitle: "AWS Certified Solutions Architect – Associate (SAA-C03)",
-      category: "AWS Cloud",
-      mentor: "Vikram Nair (Staff Software Engineer)",
-      progressPercent: 100,
-      completedLectures: 28,
-      totalLectures: 28,
-      watchHours: 46.0,
-      modules: [
-        { name: "IAM, Security, VPC Peering & Transit Gateway", progress: 100 },
-        { name: "Compute, ECS, Fargate & Serverless Lambda", progress: 100 },
-        { name: "Storage & High Availability Databases (RDS/Aurora)", progress: 100 },
-        { name: "Terraform Infrastructure as Code Capstone", progress: 100 },
-      ],
-    },
-    {
-      courseId: "mern-stack",
-      courseTitle: "MERN Stack Full Stack Web Development Mastery Bootcamp",
-      category: "MERN Stack",
-      mentor: "Amit Verma (Principal Systems Architect)",
-      progressPercent: 48,
-      completedLectures: 12,
-      totalLectures: 25,
-      watchHours: 21.0,
-      modules: [
-        { name: "Modern React 19 & TypeScript State Systems", progress: 95 },
-        { name: "Node.js Event Loop & Express REST Design", progress: 60 },
-        { name: "MongoDB Aggregation Pipelines & Sharding", progress: 40 },
-        { name: "Production CI/CD Pipelines & Cloud Run", progress: 0 },
-      ],
-    },
-  ],
-  overallCurriculumCompletion: 75.3,
+  badges: [],
+  xpActivities: [],
+  courses: [],
+  overallCurriculumCompletion: 0,
 };
 
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default function StudentProgressTrackerView({ userEmail, userName, onToast }: Props) {
-  const [data, setData] = useState<StudentAnalyticsData>(FALLBACK_ANALYTICS);
+  const [data, setData] = useState<StudentAnalyticsData>(EMPTY_ANALYTICS);
   const [loading, setLoading] = useState<boolean>(true);
   const [checkingIn, setCheckingIn] = useState<boolean>(false);
   const [badgeFilter, setBadgeFilter] = useState<"all" | "unlocked" | "locked">("all");
@@ -350,17 +142,17 @@ export default function StudentProgressTrackerView({ userEmail, userName, onToas
                   </div>
                 </div>
                 <div className="absolute -bottom-2 -right-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow border border-amber-300">
-                  PRO
+                  LVL {data.level}
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-semibold uppercase tracking-wider text-purple-300">
-                    KR Global Learning Gamified Tier
+                    KR Global Learning Progress Tier
                   </span>
                   <span className="px-2 py-0.5 text-[10px] font-extrabold bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full">
-                    Top 5% Cohort
+                    Active Student
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
@@ -526,44 +318,50 @@ export default function StudentProgressTrackerView({ userEmail, userName, onToas
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-800 text-slate-400">
-                  <th className="pb-3 font-semibold">Topic / Milestone</th>
-                  <th className="pb-3 font-semibold">Mentor</th>
-                  <th className="pb-3 font-semibold">Type</th>
-                  <th className="pb-3 font-semibold">Date</th>
-                  <th className="pb-3 font-semibold text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {data.attendance.history.map((sess, idx) => (
-                  <tr key={sess.sessionId || idx} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 font-medium text-white max-w-[220px] truncate">
-                      {sess.topic}
-                    </td>
-                    <td className="py-3 text-slate-300">{sess.mentorName}</td>
-                    <td className="py-3 text-slate-400 text-[11px]">{sess.sessionType}</td>
-                    <td className="py-3 text-slate-400 font-mono text-[11px]">{sess.date}</td>
-                    <td className="py-3 text-right">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                          sess.status === "Present"
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                            : sess.status === "Excused"
-                            ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                            : "bg-red-500/10 text-red-400 border-red-500/30"
-                        }`}
-                      >
-                        {sess.status}
-                      </span>
-                    </td>
+          {data.attendance.history.length === 0 ? (
+            <div className="text-center py-8 text-xs text-slate-400">
+              No attendance records yet. Live session attendance will appear here once attended.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-800 text-slate-400">
+                    <th className="pb-3 font-semibold">Topic / Milestone</th>
+                    <th className="pb-3 font-semibold">Mentor</th>
+                    <th className="pb-3 font-semibold">Type</th>
+                    <th className="pb-3 font-semibold">Date</th>
+                    <th className="pb-3 font-semibold text-right">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {data.attendance.history.map((sess, idx) => (
+                    <tr key={sess.sessionId || idx} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="py-3 font-medium text-white max-w-[220px] truncate">
+                        {sess.topic}
+                      </td>
+                      <td className="py-3 text-slate-300">{sess.mentorName}</td>
+                      <td className="py-3 text-slate-400 text-[11px]">{sess.sessionType}</td>
+                      <td className="py-3 text-slate-400 font-mono text-[11px]">{sess.date}</td>
+                      <td className="py-3 text-right">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            sess.status === "Present"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                              : sess.status === "Excused"
+                              ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                              : "bg-red-500/10 text-red-400 border-red-500/30"
+                          }`}
+                        >
+                          {sess.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
@@ -596,80 +394,91 @@ export default function StudentProgressTrackerView({ userEmail, userName, onToas
         </div>
 
         {/* Course Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {data.courses.map((c) => (
-            <div
-              key={c.courseId}
-              className="rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-purple-500/40 p-5 flex flex-col justify-between transition-all group shadow-md"
-            >
-              <div>
-                {/* Course Category Badge */}
-                <div className="flex items-center justify-between text-[10px] text-slate-400 mb-2">
-                  <span className="px-2 py-0.5 rounded-full font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                    {c.category}
-                  </span>
-                  <span className="font-mono text-slate-300">
-                    {c.completedLectures} / {c.totalLectures} Lectures
-                  </span>
+        {data.courses.length === 0 ? (
+          <div className="text-center py-10 px-4 rounded-2xl bg-slate-950/40 border border-slate-800">
+            <span className="text-3xl block mb-2">📚</span>
+            <h4 className="text-sm font-bold text-white mb-1">No course enrolled yet</h4>
+            <p className="text-xs text-slate-400 mb-4">Explore our curriculum to start tracking module progress and video watch time.</p>
+            <a href="/courses" className="inline-flex items-center px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition">
+              Browse Courses
+            </a>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {data.courses.map((c) => (
+              <div
+                key={c.courseId}
+                className="rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-purple-500/40 p-5 flex flex-col justify-between transition-all group shadow-md"
+              >
+                <div>
+                  {/* Course Category Badge */}
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 mb-2">
+                    <span className="px-2 py-0.5 rounded-full font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                      {c.category}
+                    </span>
+                    <span className="font-mono text-slate-300">
+                      {c.completedLectures} / {c.totalLectures} Lectures
+                    </span>
+                  </div>
+
+                  <h4 className="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-purple-300 transition-colors">
+                    {c.courseTitle}
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mb-4">
+                    Mentor: <strong className="text-slate-200">{c.mentor || "Staff Architect"}</strong>
+                  </p>
+
+                  {/* Main Course Progress Bar */}
+                  <div className="space-y-1.5 mb-5">
+                    <div className="flex justify-between text-xs font-semibold">
+                      <span className="text-slate-300">Course Completion</span>
+                      <span className="text-purple-400 font-extrabold">{c.progressPercent}%</span>
+                    </div>
+                    <div className="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                      <div
+                        style={{ width: `${c.progressPercent}%` }}
+                        className={`h-full rounded-full transition-all duration-700 ${
+                          c.progressPercent === 100
+                            ? "bg-gradient-to-r from-emerald-500 to-teal-400"
+                            : "bg-gradient-to-r from-purple-500 to-indigo-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Sub-module breakdown progress bars */}
+                  <div className="space-y-3 pt-3 border-t border-slate-800/80">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Key Module Breakdown
+                    </span>
+                    {c.modules &&
+                      c.modules.map((m, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex justify-between text-[11px] text-slate-300">
+                            <span className="truncate pr-2">{m.name}</span>
+                            <span className="font-mono text-[10px] text-purple-300 font-bold">{m.progress}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                            <div
+                              style={{ width: `${m.progress}%` }}
+                              className="h-full bg-purple-400/80 rounded-full"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
 
-                <h4 className="font-bold text-white text-sm line-clamp-2 mb-2 group-hover:text-purple-300 transition-colors">
-                  {c.courseTitle}
-                </h4>
-                <p className="text-[11px] text-slate-400 mb-4">
-                  Mentor: <strong className="text-slate-200">{c.mentor || "Staff Architect"}</strong>
-                </p>
-
-                {/* Main Course Progress Bar */}
-                <div className="space-y-1.5 mb-5">
-                  <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-slate-300">Course Completion</span>
-                    <span className="text-purple-400 font-extrabold">{c.progressPercent}%</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-                    <div
-                      style={{ width: `${c.progressPercent}%` }}
-                      className={`h-full rounded-full transition-all duration-700 ${
-                        c.progressPercent === 100
-                          ? "bg-gradient-to-r from-emerald-500 to-teal-400"
-                          : "bg-gradient-to-r from-purple-500 to-indigo-500"
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                {/* Sub-module breakdown progress bars */}
-                <div className="space-y-3 pt-3 border-t border-slate-800/80">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Key Module Breakdown
+                <div className="mt-5 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Watch Hours: <strong className="text-slate-200">{c.watchHours} hrs</strong></span>
+                  <span className={c.progressPercent === 100 ? "text-emerald-400 font-bold" : "text-purple-400 font-semibold"}>
+                    {c.progressPercent === 100 ? "✓ Completed" : "In Progress"}
                   </span>
-                  {c.modules &&
-                    c.modules.map((m, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between text-[11px] text-slate-300">
-                          <span className="truncate pr-2">{m.name}</span>
-                          <span className="font-mono text-[10px] text-purple-300 font-bold">{m.progress}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                          <div
-                            style={{ width: `${m.progress}%` }}
-                            className="h-full bg-purple-400/80 rounded-full"
-                          />
-                        </div>
-                      </div>
-                    ))}
                 </div>
               </div>
-
-              <div className="mt-5 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Watch Hours: <strong className="text-slate-200">{c.watchHours} hrs</strong></span>
-                <span className={c.progressPercent === 100 ? "text-emerald-400 font-bold" : "text-purple-400 font-semibold"}>
-                  {c.progressPercent === 100 ? "✓ Completed" : "In Progress"}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
@@ -722,77 +531,83 @@ export default function StudentProgressTrackerView({ userEmail, userName, onToas
         </div>
 
         {/* Badges Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {filteredBadges.map((badge) => (
-            <div
-              key={badge.id}
-              onClick={() => setSelectedBadge(badge)}
-              className={`relative p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between group ${
-                badge.unlocked
-                  ? "bg-slate-950/80 border-purple-500/40 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-900/20"
-                  : "bg-slate-950/40 border-slate-800/80 opacity-70 hover:opacity-100 hover:border-slate-700"
-              }`}
-            >
-              {/* Badge Top Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${
-                    badge.unlocked
-                      ? "bg-gradient-to-tr from-purple-600/30 to-amber-500/30 border border-purple-400/40"
-                      : "bg-slate-900 border border-slate-800 text-slate-600 grayscale"
-                  }`}
-                >
-                  {badge.icon}
+        {filteredBadges.length === 0 ? (
+          <div className="text-center py-8 text-xs text-slate-400">
+            No badges earned yet. Complete lessons and maintain daily streaks to unlock badges.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {filteredBadges.map((badge) => (
+              <div
+                key={badge.id}
+                onClick={() => setSelectedBadge(badge)}
+                className={`relative p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between group ${
+                  badge.unlocked
+                    ? "bg-slate-950/80 border-purple-500/40 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-900/20"
+                    : "bg-slate-950/40 border-slate-800/80 opacity-70 hover:opacity-100 hover:border-slate-700"
+                }`}
+              >
+                {/* Badge Top Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${
+                      badge.unlocked
+                        ? "bg-gradient-to-tr from-purple-600/30 to-amber-500/30 border border-purple-400/40"
+                        : "bg-slate-900 border border-slate-800 text-slate-600 grayscale"
+                    }`}
+                  >
+                    {badge.icon}
+                  </div>
+                  <span
+                    className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${
+                      badge.unlocked
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        : "bg-slate-800 text-slate-400 border-slate-700"
+                    }`}
+                  >
+                    {badge.unlocked ? "UNLOCKED" : "LOCKED"}
+                  </span>
                 </div>
-                <span
-                  className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${
-                    badge.unlocked
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                      : "bg-slate-800 text-slate-400 border-slate-700"
-                  }`}
-                >
-                  {badge.unlocked ? "UNLOCKED" : "LOCKED"}
-                </span>
-              </div>
 
-              <div>
-                <h4 className="font-bold text-sm text-white group-hover:text-purple-300 transition-colors mb-1">
-                  {badge.name}
-                </h4>
-                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3">
-                  {badge.description}
-                </p>
-              </div>
+                <div>
+                  <h4 className="font-bold text-sm text-white group-hover:text-purple-300 transition-colors mb-1">
+                    {badge.name}
+                  </h4>
+                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3">
+                    {badge.description}
+                  </p>
+                </div>
 
-              {/* Progress bar or unlock timestamp */}
-              <div className="pt-3 border-t border-slate-900">
-                {badge.unlocked ? (
-                  <div className="text-[10px] text-purple-300 font-medium flex items-center gap-1">
-                    <span>✓ Achieved</span>
-                    {badge.unlockedAt && (
-                      <span className="text-slate-500">
-                        · {new Date(badge.unlockedAt).toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-[10px] text-slate-400">
-                      <span>Progress</span>
-                      <span className="text-slate-300 font-mono">{badge.progressPercent}%</span>
+                {/* Progress bar or unlock timestamp */}
+                <div className="pt-3 border-t border-slate-900">
+                  {badge.unlocked ? (
+                    <div className="text-[10px] text-purple-300 font-medium flex items-center gap-1">
+                      <span>✓ Achieved</span>
+                      {badge.unlockedAt && (
+                        <span className="text-slate-500">
+                          · {new Date(badge.unlockedAt).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
-                    <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                      <div
-                        style={{ width: `${badge.progressPercent}%` }}
-                        className="h-full bg-amber-400/80 rounded-full"
-                      />
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] text-slate-400">
+                        <span>Progress</span>
+                        <span className="text-slate-300 font-mono">{badge.progressPercent}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                        <div
+                          style={{ width: `${badge.progressPercent}%` }}
+                          className="h-full bg-amber-400/80 rounded-full"
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
@@ -811,47 +626,53 @@ export default function StudentProgressTrackerView({ userEmail, userName, onToas
           </span>
         </div>
 
-        <div className="space-y-3">
-          {data.xpActivities.map((act, index) => {
-            const isStreak = act.type === "streak";
-            const isBadge = act.type === "badge";
-            const isAssg = act.type === "assignment";
-            return (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 hover:border-purple-500/30 transition-all"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm ${
-                      isStreak
-                        ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
-                        : isBadge
-                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                        : isAssg
-                        ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
-                        : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    }`}
-                  >
-                    {isStreak ? "🔥" : isBadge ? "🏆" : isAssg ? "📝" : "⚡"}
+        {data.xpActivities.length === 0 ? (
+          <div className="text-center py-8 text-xs text-slate-400">
+            No learning activity yet.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {data.xpActivities.map((act, index) => {
+              const isStreak = act.type === "streak";
+              const isBadge = act.type === "badge";
+              const isAssg = act.type === "assignment";
+              return (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 hover:border-purple-500/30 transition-all"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm ${
+                        isStreak
+                          ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
+                          : isBadge
+                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                          : isAssg
+                          ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                          : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      }`}
+                    >
+                      {isStreak ? "🔥" : isBadge ? "🏆" : isAssg ? "📝" : "⚡"}
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-xs text-white">{act.title}</h5>
+                      <span className="text-[10px] text-slate-500 font-mono">
+                        {new Date(act.timestamp).toLocaleString()}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h5 className="font-bold text-xs text-white">{act.title}</h5>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      {new Date(act.timestamp).toLocaleString()}
+
+                  <div className="text-right">
+                    <span className="text-xs font-black text-emerald-400 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
+                      +{act.xp} XP
                     </span>
                   </div>
                 </div>
-
-                <div className="text-right">
-                  <span className="text-xs font-black text-emerald-400 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
-                    +{act.xp} XP
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────────────

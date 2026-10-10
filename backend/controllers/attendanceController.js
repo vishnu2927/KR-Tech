@@ -108,8 +108,11 @@ const getAttendance = async (req, res) => {
 // @access  Public / Authenticated
 const markAttendance = async (req, res) => {
   try {
-    const studentEmail = req.user?.email || req.body.email || 'aditya.sharma@krtech.edu';
-    const { sessionTitle = 'Live 1:1 Interactive Class', mentor = 'Rajesh Kumar (Principal Technical Architect)' } = req.body;
+    const studentEmail = req.user?.email || req.body.email;
+    if (!studentEmail) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+    const { sessionTitle = 'Live 1:1 Interactive Class', mentor = 'Senior Technical Mentor' } = req.body;
 
     res.status(200).json({
       success: true,
@@ -121,7 +124,6 @@ const markAttendance = async (req, res) => {
         status: 'present',
         timestamp: new Date().toISOString(),
         streakUpdated: true,
-        streakDays: 15,
       },
     });
   } catch (error) {

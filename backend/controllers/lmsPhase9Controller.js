@@ -27,11 +27,11 @@ const User = require('../models/User');
 
 // Helper to resolve user
 const getUserId = (req) => {
-  return req.user?._id || req.user?.id || new mongoose.Types.ObjectId('65f1a2b3c4d5e6f7a8b9c0d1');
+  return req.user?._id || req.user?.id || null;
 };
 
 const getUserEmail = (req) => {
-  return req.user?.email || 'aditya.sharma@krtech.edu';
+  return req.user?.email || '';
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -43,28 +43,32 @@ exports.getDashboardData = async (req, res) => {
     const email = getUserEmail(req);
 
     // 1. XP & Streak
-    let xpRecord = await XP.findOne({ userId });
+    let xpRecord = userId ? await XP.findOne({ userId }) : null;
     if (!xpRecord) {
       xpRecord = {
-        totalXp: 3450,
-        currentLevel: 7,
-        levelTitle: 'Senior Cloud Craftsman',
-        dailyStreak: 18,
-        longestStreak: 24,
+        totalXp: 0,
+        currentLevel: 1,
+        levelTitle: 'Novice Explorer',
+        dailyStreak: 0,
+        longestStreak: 0,
       };
     }
 
-    // 2. Active Course & Continue Learning
-    const continueLearning = {
-      courseId: 'crs-java-fullstack-2026',
-      title: 'Full Stack Java & Cloud Microservices Architecture',
-      category: 'Backend Engineering',
-      progressPercent: 78,
-      currentLesson: 'Module 5 · Lecture 3: CQRS & Event Sourcing with Apache Kafka',
-      mentor: 'Rajesh Kumar (Principal Technical Architect Staff Architect)',
-      nextAction: 'Resume Lecture',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    };
+    // 2. Active Course & Continue Learning (only if enrollment exists)
+    let continueLearning = null;
+    const enrollment = email ? await Enrollment.findOne({ userEmail: email }).lean() : null;
+    if (enrollment) {
+      const progress = await Progress.findOne({ userEmail: email, courseId: enrollment.courseId }).lean();
+      continueLearning = {
+        courseId: enrollment.courseId,
+        title: enrollment.courseTitle,
+        category: enrollment.category || 'Software Engineering',
+        progressPercent: progress?.progressPercent || 0,
+        currentLesson: progress?.currentLectureTitle || 'Introduction',
+        mentor: enrollment.mentor || 'Senior Technical Mentor',
+        nextAction: 'Resume Lecture',
+      };
+    }
 
     // 3. Today's Classes
     const today = new Date();
